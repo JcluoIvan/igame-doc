@@ -1,0 +1,1484 @@
+openapi: 3.0.2
+info:
+  title: Swagger Petstore
+  description: |
+    ### 認證碼 (Provider Password)
+    用來識別與確認請求方資料正確性，使用 sha256 加密資料
+    
+    sha256(provider + privateKey + JSON.stringify(data))
+    #### example:
+    ```
+      var provider = 'Demo';
+      var privateKey = '8a2cc0673b1c428315fe84c0138d95c3ddda30baf81e7d9aa821f1ca47098193';
+      var data = {
+        accessToken: '94a2776e7bd6f611462bc4344e17773c65fc4c486401643b724d102a8936dff4',
+        time: 1576838249373,
+        ip: '127.0.0.1',
+      };
+      var strSecret = provider + privateKey + JSON.stringify(data);
+      // strSecret = Demo8a2cc0673b1c428315fe84c0138d95c3ddda30baf81e7d9aa821f1ca47098193{"accessToken":"94a2776e7bd6f611462bc4344e17773c65fc4c486401643b724d102a8936dff4","time":1576838249373,"ip":"127.0.0.1"}
+
+      var ProviderPassword = sha256(strSecret);
+    // ProviderPassword = c4f80e7afa5594f4ce1f9a38ca85028ffcd7b0aaa7837972ea9710e799cde5a2
+    ```
+  termsOfService: "http://swagger.io/terms/"
+  contact:
+    email: apiteam@swagger.io
+  license:
+    name: Apache 2.0
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+  version: 0.0.1
+externalDocs:
+  description: Find out more about Swagger
+  url: "http://swagger.io"
+
+servers:
+  - url: "https://api.project-host.net/v1"
+    description: 正式伺服器網址
+  - url: "http://demo.project-host.net/v1"
+    description: 測試伺服器網址
+tags:
+  - name: Update-0.0.3
+    description: 部分 API 更新&修正
+  - name: Update-0.0.2
+    description: 部分 API 更新&修正
+  - name: Common
+    description: 共用 API
+  - name: Multiplayer
+    description: 多人連線 API
+  - name: Slot
+    description: 老虎機遊戲類型
+  - name: Table
+    description: Table Game 類型
+paths:
+  /auth:
+    parameters:
+      - $ref: '#/components/parameters/ProviderName'
+      - $ref: '#/components/parameters/ProviderPassword'
+    post:
+      tags:
+        - Common
+        - Update-0.0.3
+        - Update-0.0.2
+      summary: 驗證玩家 & 取得玩家資料
+      description: |
+        #### Update-0.0.3
+        - 增加 `game` 參數 (防止玩家用 accessToken 偷渡開啟不同的遊戲)
+        - 增加 403 兩個錯誤
+          - 遊戲不存在
+          - 遊戲已停用
+        #### Update-0.0.2
+        - response 新增 `rank` 參數
+      operationId: Auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - accessToken
+                - time
+                - game
+              allOf:
+                - type: object
+                  properties:
+                    accessToken:
+                      type: string
+                      minLength: 64
+                      maxLength: 64
+                      description: 驗證玩家是否可以登入, 並回傳玩家資訊
+                    time: 
+                      $ref: '#/components/schemas/UnixTime'
+                - $ref: '#/components/schemas/KeyGame'
+                - type: object
+                  properties:
+                    ip:
+                      type: string
+                      description: 玩家登入遊戲的 IP
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/MemberInfo"
+                  - type: object
+                    properties:
+                      memberToken:
+                        type: string
+                        maxLength: 64
+                        description: 玩家唯一編號
+                      sessionToken:
+                        type: string
+                        maxLength: 64
+                        description: 驗證登入狀態
+        '401':
+          description: 401 Error
+          content:
+            application/json:
+              schema:
+                type: object
+                example: 請參考 schema
+                oneOf:
+                  - $ref: '#/components/schemas/ResponseErrorDirectIPAccessNotAllowed'
+                  - $ref: '#/components/schemas/ResponseErrorProviderNotFound'
+                  - $ref: '#/components/schemas/ResponseErrorIncorrectProviderPassword'
+                  - $ref: '#/components/schemas/ResponseErrorProviderIsDisabled'
+                  - $ref: '#/components/schemas/ResponseErrorIncorrectAccessToken'
+        '403':
+          description: 403 Error
+          content:
+            application/json:
+              schema: 
+                type: object
+                example: "請參考 schema"
+                oneOf:
+                  - $ref: '#/components/schemas/ResponseErrorMemberNotFound'
+                  - $ref: '#/components/schemas/ResponseErrorMemberIsDisabled'
+                  - $ref: '#/components/schemas/ResponseErrorGameNotFound'
+                  - $ref: '#/components/schemas/ResponseErrorGameIsDisabled'
+  /balance:
+    parameters:
+      - $ref: '#/components/parameters/ProviderName'
+      - $ref: '#/components/parameters/ProviderPassword'
+    post:
+      tags:
+        - Common
+        - Update-0.0.2
+      summary: 取得餘額
+      operationId: GetBalance
+      description: |
+        #### Update-0.0.2
+        - 移除 SessionToken 傳入參數
+      requestBody:
+        description: 取得餘額
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/RequestData"
+                - type: object 
+                  properties:
+                    sessionToken:
+                      type: string
+                      minLength: 64
+                      maxLength: 64
+                      description: |
+                        <s>驗證登入狀態 (sha256 string)</s>
+                        #### <i style="color:red">棄用</i>
+                  
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      balance:
+                        type: number
+        '401':
+          description: 401 Error
+          content:
+            application/json:
+              schema: 
+                type: object
+                example: "請參考 schema"
+                oneOf:
+                  - $ref: '#/components/schemas/ResponseErrorDirectIPAccessNotAllowed'
+                  - $ref: '#/components/schemas/ResponseErrorProviderNotFound'
+                  - $ref: '#/components/schemas/ResponseErrorIncorrectProviderPassword'
+                  - $ref: '#/components/schemas/ResponseErrorProviderIsDisabled'
+                  - $ref: '#/components/schemas/ResponseErrorIncorrectSessionToken'
+        '403':
+          description: 403 Error
+          content:
+            application/json:
+              schema: 
+                type: object
+                example: "請參考 schema"
+                oneOf:
+                  - $ref: '#/components/schemas/ResponseErrorMemberNotFound'
+  /game/record:
+    parameters:
+      - $ref: '#/components/parameters/ProviderName'
+      - $ref: '#/components/parameters/ProviderPassword'
+    post:
+      tags:
+        - Common
+        - Update-0.0.2
+      summary: 取得遊戲存檔
+      description: |
+        #### Update-0.0.2
+        - 新增此 API 
+      operationId: GameRecord
+      requestBody:
+        description: |
+          提供遊戲記錄存檔的 api
+        content:
+          application/json:
+            schema:
+              required:
+                - game
+                - value
+              allOf:
+                - $ref: '#/components/schemas/RequestData'
+                - $ref: '#/components/schemas/KeyGame'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  value: 
+                    type: string
+                    description: 資料格式皆為字串 (json 類型請自行處理), 若資料不存在時, 回傳空字串
+                    example: "..."
+        '401':
+          description: 401 Error
+          content:
+            application/json:
+              schema:
+                type: object
+                example: 請參考 Schema
+                oneOf:
+                  - $ref: '#/components/schemas/ResponseErrorDirectIPAccessNotAllowed'
+                  - $ref: '#/components/schemas/ResponseErrorProviderNotFound'
+                  - $ref: '#/components/schemas/ResponseErrorIncorrectProviderPassword'
+                  - $ref: '#/components/schemas/ResponseErrorProviderIsDisabled'
+        '403':
+          description: 403 Error
+          content:
+            application/json:
+              schema: 
+                type: object
+                example: 請參考 Schema
+                oneOf:
+                  - $ref: '#/components/schemas/ResponseErrorMemberNotFound'
+                  - $ref: '#/components/schemas/ResponseErrorGameNotFound'
+  /game/record/save:
+    parameters:
+      - $ref: '#/components/parameters/ProviderName'
+      - $ref: '#/components/parameters/ProviderPassword'
+    post:
+      tags:
+        - Common
+        - Update-0.0.2
+      summary: 遊戲存檔
+      description: |
+        #### Update-0.0.2
+        - 新增此 API 
+      operationId: GameRecordSave
+      requestBody:
+        description: |
+          提供遊戲記錄存檔的 api
+        content:
+          application/json:
+            schema:
+              required:
+                - game
+              allOf:
+                - $ref: '#/components/schemas/RequestData'
+                - $ref: '#/components/schemas/KeyGame'
+                - type: object
+                  properties:
+                    value:
+                      type: string
+                      description: 需要儲存的記錄檔(若為 json, 請轉為字串)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: 
+                    type: string
+                    example: "OK"
+        '400':
+          description: 400 Error 
+          content:
+            application/json:
+              schema:
+                type: object
+                example: 請參考 Schema
+                oneOf:
+                  - $ref: '#/components/schemas/ResponseErrorInvalidRecordValue'
+        '401':
+          description: 401 Error
+          content:
+            application/json:
+              schema:
+                type: object
+                example: 請參考 Schema
+                oneOf:
+                  - $ref: '#/components/schemas/ResponseErrorDirectIPAccessNotAllowed'
+                  - $ref: '#/components/schemas/ResponseErrorProviderNotFound'
+                  - $ref: '#/components/schemas/ResponseErrorIncorrectProviderPassword'
+                  - $ref: '#/components/schemas/ResponseErrorProviderIsDisabled'
+        '403':
+          description: 403 Error
+          content:
+            application/json:
+              schema: 
+                type: object
+                example: 請參考 Schema
+                oneOf:
+                  - $ref: '#/components/schemas/ResponseErrorMemberNotFound'
+                  - $ref: '#/components/schemas/ResponseErrorGameNotFound'
+
+  /multiplayer/create:
+    parameters:
+      - $ref: '#/components/parameters/ProviderName'
+      - $ref: '#/components/parameters/ProviderPassword'
+    post:
+      tags: 
+        - Multiplayer
+        - Update-0.0.3
+      summary: 多人連線建立房間
+      description: |
+        #### Update-0.0.3
+        - 移除 200.response 的回傳參數 `expire`
+        #### Update-0.0.2
+        - 移除「房間」狀態保留 30s 的規則
+      operationId: MultiplayerCreate
+      requestBody:
+        description: |
+          - 開啟多人連線模式，可邀請其他人加入
+            (完成請求後，玩家狀態會變更為房主，可邀請好友加入遊戲)
+          - <s>(討論) 啟用此功能後，多人模式狀態將會保留 30s 後過期</s> <i style="color:red">棄用</i>
+          - <s>(討論) 若要保持狀態，請於過期時間內重複傳送此請求</s> <i style="color:red">棄用</i>
+        content:
+          application/json:
+            schema:
+              required:
+                - game
+                - room
+              allOf:
+                - $ref: '#/components/schemas/RequestData'
+                - $ref: '#/components/schemas/KeyGame'
+                - type: object
+                  properties:
+                    room: 
+                      type: string
+                      description: 多人遊戲的房間 ID, 參與者會在開啟遊戲時帶入此參數 `room={room}`
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'ok'
+                  expire: 
+                    type: number
+                    description: |
+                      <s>多人遊戲狀態過期時間 (秒)</s> <i style="color:red">棄用</i>
+                    example: '30(棄用)'
+        '401':
+          description: 401 Error
+          content:
+            application/json:
+              schema: 
+                type: object
+                example: 請參考 Schema
+                oneOf:
+                  - $ref: '#/components/schemas/ResponseErrorDirectIPAccessNotAllowed'
+                  - $ref: '#/components/schemas/ResponseErrorProviderNotFound'
+                  - $ref: '#/components/schemas/ResponseErrorIncorrectProviderPassword'
+                  - $ref: '#/components/schemas/ResponseErrorProviderIsDisabled'
+                  - $ref: '#/components/schemas/ResponseErrorIncorrectSessionToken'
+        '403':
+          description: 403 Error
+          content:
+            application/json:
+              schema: 
+                type: object
+                example: 請參考 Schema
+                oneOf:
+                  - $ref: '#/components/schemas/ResponseErrorMemberNotFound'
+                  - $ref: '#/components/schemas/ResponseErrorGameNotFound'
+
+  /multiplayer/close:
+    parameters:
+      - $ref: '#/components/parameters/ProviderName'
+      - $ref: '#/components/parameters/ProviderPassword'
+    post:
+      tags: 
+        - Multiplayer
+      summary: 關閉多人連線模式
+      description: |
+        - 完成請求後，玩家(原房主)狀態會變為一般，不能邀請好友
+      operationId: MultiplayerClose
+      requestBody:
+        description: |
+          - 開啟多人連線模式，可邀請其他人加入
+          - (討論) 啟用此功能後，多人模式狀態將會保留 30s 後過期
+          - (討論) 若要保持狀態，於過期時間內重複傳送請求
+        content:
+          application/json:
+            schema:
+              required:
+                - game
+                - room
+              allOf:
+                - $ref: '#/components/schemas/RequestData'
+                - $ref: '#/components/schemas/KeyGame'
+                - type: object
+                  properties:
+                    room: 
+                      type: string
+                      description: 多人遊戲的房間 ID, 參與者會在開啟遊戲時帶入此參數 `room={room}`
+      responses:
+        '200':
+          description: Ok (no content response)
+        '401':
+          description: 401 Error
+          content:
+            application/json:
+              schema: 
+                type: object
+                example: 請參考 Schema
+                oneOf:
+                  - $ref: '#/components/schemas/ResponseErrorDirectIPAccessNotAllowed'
+                  - $ref: '#/components/schemas/ResponseErrorProviderNotFound'
+                  - $ref: '#/components/schemas/ResponseErrorIncorrectProviderPassword'
+                  - $ref: '#/components/schemas/ResponseErrorProviderIsDisabled'
+        '403':
+          description: 403 Error
+          content:
+            application/json:
+              schema: 
+                type: object
+                example: 請參考 Schema
+                oneOf:
+                  - $ref: '#/components/schemas/ResponseErrorMemberNotFound'
+                  - $ref: '#/components/schemas/ResponseErrorMemberIsDisabled'
+                  - $ref: '#/components/schemas/ResponseErrorGameNotFound'
+
+  
+
+
+
+            
+  /slot/bet:
+    parameters:
+      - $ref: '#/components/parameters/ProviderName'
+      - $ref: '#/components/parameters/ProviderPassword'
+    post:
+      tags: 
+        - Slot
+        - Update-0.0.3
+      description: |
+        #### Update-0.0.3
+        - 新增 403 回傳錯誤
+          - 遊戲已用
+      summary: 下注
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - id 
+                - round
+                - game
+                - betAmount
+                - betAt
+              allOf:
+                - $ref: '#/components/schemas/KeySessionToken'
+                - $ref: '#/components/schemas/RequestData'
+                - $ref: '#/components/schemas/KeyTransactionID'
+                - $ref: '#/components/schemas/KeyRound'
+                - $ref: '#/components/schemas/KeyGame'
+                - type: object
+                  properties:
+                    betAmount:
+                      type: number
+                      description: 注額
+                    betAt:
+                      $ref: '#/components/schemas/UnixTime'
+                    ip:
+                      type: string
+                      description: 玩家下注時的 IP
+                      example: '127.0.0.1'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/TransactionResponse'
+        '401':
+          description: 401 Error
+          content:
+            application/json:
+              schema: 
+                type: object
+                example: 請參考 Schema
+                oneOf:
+                  - $ref: '#/components/schemas/ResponseErrorDirectIPAccessNotAllowed'
+                  - $ref: '#/components/schemas/ResponseErrorProviderNotFound'
+                  - $ref: '#/components/schemas/ResponseErrorIncorrectProviderPassword'
+                  - $ref: '#/components/schemas/ResponseErrorProviderIsDisabled'
+                  - $ref: '#/components/schemas/ResponseErrorIncorrectSessionToken'
+        '403':
+          description: 403 Error
+          content:
+            application/json:
+              schema: 
+                type: object
+                example: 請參考 Schema
+                oneOf:
+                  - $ref: '#/components/schemas/ResponseErrorMemberNotFound'
+                  - $ref: '#/components/schemas/ResponseErrorMemberIsDisabled'
+                  - $ref: '#/components/schemas/ResponseErrorMemberInsufficientBalance'
+                  - $ref: '#/components/schemas/ResponseErrorGameNotFound'
+                  - $ref: '#/components/schemas/ResponseErrorGameIsDisabled'
+  /slot/feature:
+    parameters:
+      - $ref: '#/components/parameters/ProviderName'
+      - $ref: '#/components/parameters/ProviderPassword'
+    post:
+      tags: 
+        - Slot
+      summary: 副遊戲獎勵
+      description: |
+        - `必需` 在遊戲局 `開獎` 之前完成，否則將被拒絕
+        - 流程上可以考慮處理完後再發過來，避免遊戲顯示沒結束，報表就結果資料
+        - 基本只要未結算的單就會無條件接受此請求(即使玩家被停用也會接受)
+        - 若發生錯誤可直接鎖定遊戲，正常流程上應該是不會錯誤
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - id
+                - round
+                - game
+                - type
+                - bonus
+                - bonusAt
+              allOf:
+                - $ref: '#/components/schemas/RequestData'
+                - $ref: '#/components/schemas/KeyTransactionID'
+                - $ref: '#/components/schemas/KeyRound'
+                - $ref: '#/components/schemas/KeyGame'
+                - type: object
+                  properties:
+                    type:
+                      $ref: '#/components/schemas/SlotFeatureType'
+                    bonus:
+                      type: number
+                      description: 派發額度
+                    bonusAt:
+                      $ref: '#/components/schemas/UnixTime'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: 
+                allOf:
+                  - $ref: '#/components/schemas/TransactionResponse'
+        '401':
+          description: 401 Error
+          content:
+            application/json:
+              schema: 
+                type: object
+                example: 請參考 Schema
+                oneOf:
+                  - $ref: '#/components/schemas/ResponseErrorDirectIPAccessNotAllowed'
+                  - $ref: '#/components/schemas/ResponseErrorProviderNotFound'
+                  - $ref: '#/components/schemas/ResponseErrorIncorrectProviderPassword'
+                  - $ref: '#/components/schemas/ResponseErrorProviderIsDisabled'
+        '403':
+          description: 403 Error
+          content:
+            application/json:
+              schema: 
+                type: object
+                example: 請參考 Schema
+                oneOf:
+                  - $ref: '#/components/schemas/ResponseErrorMemberNotFound'
+                  - $ref: '#/components/schemas/ResponseErrorGameNotFound'
+                  - $ref: '#/components/schemas/ResponseErrorRoundNotFound'
+  /slot/cancel:
+    parameters:
+      - $ref: '#/components/parameters/ProviderName'
+      - $ref: '#/components/parameters/ProviderPassword'
+    post:
+      tags: 
+        - Slot
+      summary: 取消
+      description: 取消此局遊戲，若是已結算(完成)的遊戲局無法 `取消`
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - game
+                - round
+                - cancelAt
+              allOf:
+                - $ref: "#/components/schemas/RequestData"
+                - $ref: '#/components/schemas/KeyGame'
+                - $ref: '#/components/schemas/KeyRound'
+                - type: object
+                  properties:
+                    cancelAt:
+                      $ref: '#/components/schemas/UnixTime'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: 
+                allOf:
+                  - $ref: '#/components/schemas/TransactionResponse'
+        '401':
+          description: 401 Error
+          content:
+            application/json:
+              schema: 
+                type: object
+                example: 請參考 Schema
+                oneOf:
+                  - $ref: '#/components/schemas/ResponseErrorDirectIPAccessNotAllowed'
+                  - $ref: '#/components/schemas/ResponseErrorProviderNotFound'
+                  - $ref: '#/components/schemas/ResponseErrorIncorrectProviderPassword'
+                  - $ref: '#/components/schemas/ResponseErrorProviderIsDisabled'
+        '403':
+          description: 403 Error
+          content:
+            application/json:
+              schema: 
+                type: object
+                example: 請參考 Schema
+                oneOf:
+                  - $ref: '#/components/schemas/ResponseErrorMemberNotFound'
+                  - $ref: '#/components/schemas/ResponseErrorGameNotFound'
+                  - $ref: '#/components/schemas/ResponseErrorRoundNotFound'
+
+  /slot/result:
+    parameters:
+      - $ref: '#/components/parameters/ProviderName'
+      - $ref: '#/components/parameters/ProviderPassword'
+    post:
+      tags: 
+        - Slot
+      summary: 開獎
+      description: '`開獎後`此局獎鎖定，無法再寫入其他交易'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - id
+                - game
+                - round
+                - resultAmount
+                - resultAt
+              allOf:
+                - $ref: '#/components/schemas/RequestData'
+                - $ref: '#/components/schemas/KeyTransactionID'
+                - $ref: '#/components/schemas/KeyRound'
+                - $ref: '#/components/schemas/KeyGame'
+                - type: object
+                  properties:
+                    resultAmount: 
+                      type: number
+                      description: 玩家獲得總額
+                    detail:
+                      type: string
+                      description: 下注內容、牌型
+                    resultAt:
+                      $ref: '#/components/schemas/UnixTime'
+                
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: 
+                allOf:
+                  - $ref: '#/components/schemas/TransactionResponse'
+        '401':
+          description: 401 Error
+          content:
+            application/json:
+              schema: 
+                type: object
+                example: 請參考 Schema
+                oneOf:
+                  - $ref: '#/components/schemas/ResponseErrorDirectIPAccessNotAllowed'
+                  - $ref: '#/components/schemas/ResponseErrorProviderNotFound'
+                  - $ref: '#/components/schemas/ResponseErrorIncorrectProviderPassword'
+                  - $ref: '#/components/schemas/ResponseErrorProviderIsDisabled'
+        '403':
+          description: 403 Error
+          content:
+            application/json:
+              schema: 
+                type: object
+                example: 請參考 Schema
+                oneOf:
+                  - $ref: '#/components/schemas/ResponseErrorMemberNotFound'
+                  - $ref: '#/components/schemas/ResponseErrorGameNotFound'
+                  - $ref: '#/components/schemas/ResponseErrorRoundNotFound'
+  /table/bet:
+    parameters:
+      - $ref: '#/components/parameters/ProviderName'
+      - $ref: '#/components/parameters/ProviderPassword'
+    post:
+      tags: 
+        - Table
+        - Update-0.0.2
+        - Update-0.0.3
+      summary: 下注
+      description: |
+        #### Update-0.0.3
+        - 新增 403 回傳錯誤
+          - 遊戲已用
+        #### Update-0.0.2
+        - 移除 400 response 錯誤類型: 參數中的額度計算不正確
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - id
+                - game
+                - round
+                - betAmount
+                - betAt
+              allOf:
+                - $ref: '#/components/schemas/KeySessionToken'
+                - $ref: '#/components/schemas/RequestData'
+                - $ref: '#/components/schemas/KeyTransactionID'
+                - $ref: '#/components/schemas/KeyGame'
+                - $ref: '#/components/schemas/KeyRound'
+                - type: object
+                  properties:
+                    betAmount:
+                      type: number
+                      description: 下注額度
+                    betAt:
+                      $ref: '#/components/schemas/UnixTime'
+                    ip:
+                      type: string
+                      description: 玩家下注時的 IP
+                      example: '127.0.0.1'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/TransactionResponse'
+        '400': 
+          description: |
+            <s> 400 Error </s> <i style="color: red">棄用 (於下個本版移除)</i>
+          content:
+            application/json:
+              schema: 
+                type: object
+                example: 請參考 Schema (棄用)
+                oneOf:
+                  - $ref: '#/components/schemas/ResponseErrorInvalidResultAmount'
+          
+        '401':
+          description: 401 Error
+          content:
+            application/json:
+              schema: 
+                type: object
+                example: 請參考 Schema
+                oneOf:
+                  - $ref: '#/components/schemas/ResponseErrorDirectIPAccessNotAllowed'
+                  - $ref: '#/components/schemas/ResponseErrorProviderNotFound'
+                  - $ref: '#/components/schemas/ResponseErrorIncorrectProviderPassword'
+                  - $ref: '#/components/schemas/ResponseErrorProviderIsDisabled'
+                  - $ref: '#/components/schemas/ResponseErrorIncorrectSessionToken'
+        '403':
+          description: 403 Error
+          content:
+            application/json:
+              schema: 
+                type: object
+                example: 請參考 Schema
+                oneOf:
+                  - $ref: '#/components/schemas/ResponseErrorMemberNotFound'
+                  - $ref: '#/components/schemas/ResponseErrorMemberIsDisabled'
+                  - $ref: '#/components/schemas/ResponseErrorGameNotFound'
+                  - $ref: '#/components/schemas/ResponseErrorRoundNotFound'
+                  - $ref: '#/components/schemas/ResponseErrorGameIsDisabled'
+  /table/reserve:
+    parameters:
+      - $ref: '#/components/parameters/ProviderName'
+      - $ref: '#/components/parameters/ProviderPassword'
+    post:
+      tags: 
+        - Table
+        - Update-0.0.3
+        - Update-0.0.2
+      summary: 遊戲開始時的保留額度
+      description: |
+        #### Update-0.0.3
+        - 新增 403 回傳錯誤
+          - 遊戲已用
+        #### Update-0.0.2
+        - 新增 ip 傳入值
+      requestBody:
+        description: |
+          - 部分遊戲需要此功能來保留額度(如：麻將)
+          - `使用此功能開局的遊戲，無法使用 bet 加注`
+          - 使用此功能時，下注額度由 `遊戲方` 計算扣款於保留額度
+          - 遊戲結束，傳送結果時 `必需` 包含該局的 `下注注額` 與 `中獎額度`
+          - 若中斷遊戲局時(不列下注記錄)，需發出 `cancel` 取消該局遊戲，才會將玩家保留額退還
+        content:
+          application/json:
+            schema:
+              required:
+                - id
+                - game
+                - round
+                - reserveAmount
+                - reserveAt
+              allOf:
+                - $ref: '#/components/schemas/KeySessionToken'
+                - $ref: '#/components/schemas/RequestData'
+                - $ref: '#/components/schemas/KeyTransactionID'
+                - $ref: '#/components/schemas/KeyGame'
+                - $ref: '#/components/schemas/KeyRound'
+                - type: object
+                  properties:
+                    reserveAmount:
+                      type: number
+                      description: 入桌扣住的點數
+                    reserveAt:
+                      $ref: '#/components/schemas/UnixTime'
+                    ip:
+                      type: string
+                      description: 玩家保留額度時的 IP
+                      example: '127.0.0.1'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/TransactionResponse'
+        '401':
+          description: 401 Error
+          content:
+            application/json:
+              schema: 
+                type: object
+                example: 請參考 Schema
+                oneOf:
+                  - $ref: '#/components/schemas/ResponseErrorDirectIPAccessNotAllowed'
+                  - $ref: '#/components/schemas/ResponseErrorProviderNotFound'
+                  - $ref: '#/components/schemas/ResponseErrorIncorrectProviderPassword'
+                  - $ref: '#/components/schemas/ResponseErrorProviderIsDisabled'
+                  - $ref: '#/components/schemas/ResponseErrorIncorrectSessionToken'
+        '403':
+          description: 403 Error
+          content:
+            application/json:
+              schema: 
+                type: object
+                example: 請參考 Schema
+                oneOf:
+                  - $ref: '#/components/schemas/ResponseErrorMemberNotFound'
+                  - $ref: '#/components/schemas/ResponseErrorMemberInsufficientBalance'
+                  - $ref: '#/components/schemas/ResponseErrorMemberIsDisabled'
+                  - $ref: '#/components/schemas/ResponseErrorGameNotFound'
+                  - $ref: '#/components/schemas/ResponseErrorGameIsDisabled'
+  /table/result:
+    parameters:
+      - $ref: '#/components/parameters/ProviderName'
+      - $ref: '#/components/parameters/ProviderPassword'
+    
+    post:
+      tags: 
+        - Table
+        - Update-0.0.2
+      summary: 開獎
+      description: |
+        #### Update-0.0.2
+        - 新增 400 response 錯誤回應: 參數中的額度計算不正確
+      requestBody:
+        description: '`開獎後`此局獎鎖定，無法再寫入其他交易'
+        content:
+          application/json:
+            schema:
+              required:
+                - id
+                - game
+                - round
+                - resultAmount
+                - resultAt
+              allOf:
+                - $ref: "#/components/schemas/RequestData"
+                - $ref: '#/components/schemas/KeyTransactionID'
+                - $ref: '#/components/schemas/KeyGame'
+                - $ref: '#/components/schemas/KeyRound'
+                - type: object
+                  properties:
+                    resultAmount: 
+                      type: number
+                      description: |
+                        - 玩家獲得總額
+                        - 若有使用 保留額度(reserve) 時，必需符合下列條件
+                        > resultAmount = reserveAmount - betAmount + winAmount
+                    resultAt:
+                      $ref: '#/components/schemas/UnixTime'
+                    betAmount:
+                      type: number
+                      description: |
+                        - 下注總額 (不會用來計算錢包，相當於有效額度)
+                        - `當此局有使用 保留額度(reserve) 時，為必填`
+                    winAmount:
+                      type: number
+                      description: |
+                        - 玩家此局中獎額度
+                        - `當此局有使用 保留額度(reserve) 時，為必填`
+                    detail:
+                      type: string
+                      description: 下注內容、牌型
+                
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: 
+                allOf:
+                  - $ref: '#/components/schemas/TransactionResponse'
+        '400': 
+          description: 400 Error
+          content:
+            application/json:
+              schema: 
+                type: object
+                example: 請參考 Schema
+                oneOf:
+                  - $ref: '#/components/schemas/ResponseErrorInvalidResultAmount'
+          
+        '401':
+          description: 401 Error
+          content:
+            application/json:
+              schema: 
+                type: object
+                example: 請參考 Schema
+                oneOf:
+                  - $ref: '#/components/schemas/ResponseErrorDirectIPAccessNotAllowed'
+                  - $ref: '#/components/schemas/ResponseErrorProviderNotFound'
+                  - $ref: '#/components/schemas/ResponseErrorIncorrectProviderPassword'
+                  - $ref: '#/components/schemas/ResponseErrorProviderIsDisabled'
+        '403':
+          description: 403 Error
+          content:
+            application/json:
+              schema: 
+                type: object
+                example: 請參考 Schema
+                oneOf:
+                  - $ref: '#/components/schemas/ResponseErrorMemberNotFound'
+                  - $ref: '#/components/schemas/ResponseErrorGameNotFound'
+                  - $ref: '#/components/schemas/ResponseErrorRoundNotFound'
+  /table/cancel:
+    parameters:
+      - $ref: '#/components/parameters/ProviderName'
+      - $ref: '#/components/parameters/ProviderPassword'
+    post:
+      tags: 
+        - Table
+      summary: 取消
+      description: 取消此局遊戲，若是已結算(完成)的遊戲局無法 `取消`
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - game
+                - round
+                - cancelAt
+              allOf:
+                - $ref: "#/components/schemas/RequestData"
+                - $ref: '#/components/schemas/KeyGame'
+                - $ref: '#/components/schemas/KeyRound'
+                - type: object
+                  properties:
+                    cancelAt:
+                      $ref: '#/components/schemas/UnixTime'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: 
+                allOf:
+                  - $ref: '#/components/schemas/TransactionResponse'
+        '401':
+          description: 401 Error
+          content:
+            application/json:
+              schema: 
+                type: object
+                example: 請參考 Schema
+                oneOf:
+                  - $ref: '#/components/schemas/ResponseErrorDirectIPAccessNotAllowed'
+                  - $ref: '#/components/schemas/ResponseErrorProviderNotFound'
+                  - $ref: '#/components/schemas/ResponseErrorIncorrectProviderPassword'
+                  - $ref: '#/components/schemas/ResponseErrorProviderIsDisabled'
+        '403':
+          description: 403 Error
+          content:
+            application/json:
+              schema: 
+                type: object
+                example: 請參考 Schema
+                oneOf:
+                  - $ref: '#/components/schemas/ResponseErrorMemberNotFound'
+                  - $ref: '#/components/schemas/ResponseErrorGameNotFound'
+                  - $ref: '#/components/schemas/ResponseErrorRoundNotFound'
+
+  /table/tie:
+    parameters:
+      - $ref: '#/components/parameters/ProviderName'
+      - $ref: '#/components/parameters/ProviderPassword'
+    post:
+      tags: 
+        - Table
+      summary: 合局(不算點數，直接退點)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - game
+                - round
+                - resultAt
+              allOf:
+                - $ref: '#/components/schemas/RequestData'
+                - $ref: '#/components/schemas/KeyGame'
+                - $ref: '#/components/schemas/KeyRound'
+                - type: object
+                  properties:
+                    resultAt:
+                      $ref: '#/components/schemas/UnixTime'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/TransactionResponse'
+        '401':
+          description: 401 Error
+          content:
+            application/json:
+              schema: 
+                type: object
+                example: 請參考 Schema
+                oneOf:
+                  - $ref: '#/components/schemas/ResponseErrorDirectIPAccessNotAllowed'
+                  - $ref: '#/components/schemas/ResponseErrorProviderNotFound'
+                  - $ref: '#/components/schemas/ResponseErrorIncorrectProviderPassword'
+                  - $ref: '#/components/schemas/ResponseErrorProviderIsDisabled'
+        '403':
+          description: 403 Error
+          content:
+            application/json:
+              schema: 
+                type: object
+                example: 請參考 Schema
+                oneOf:
+                  - $ref: '#/components/schemas/ResponseErrorMemberNotFound'
+                  - $ref: '#/components/schemas/ResponseErrorGameNotFound'
+                  - $ref: '#/components/schemas/ResponseErrorRoundNotFound'
+components:
+  schemas:
+    MemberInfo:
+      type: object
+      properties:
+        nickname:
+          type: string
+          maxLength: 40
+          description: 玩家暱稱
+        avatar:
+          type: string
+          maxLength: 100
+          description: 玩家頭像
+        balance:
+          type: number
+          description: 餘額/點數
+        level:
+          type: number
+          description: 玩家等級
+        rank:
+          type: string
+          description: |
+            遊戲級別, 用來區分進行遊戲時的消費級別
+            
+
+    RequestData:
+      required:
+        - memberToken
+        - time
+      type: object
+      properties:
+        memberToken:
+          type: string
+          minLength: 64
+          maxLength: 64
+          description: 玩家唯一編號 (sha256 string)
+        time:      
+          type: number
+          example: 1577811723405
+          description: |
+            - 時戳 unix (ms) 例 - 1577811723405 (2020-01-01 01:02:03.4050)
+        
+    TransactionRequestData:
+      type: object
+      properties:
+        id: 
+          type: string
+          description: 交易 or 請求 ID, 必需唯一
+          example: '200101-00001'
+        round: 
+          type: string
+          description: 局號
+          example: 'R00001'
+        game:
+          type: string
+          description: 遊戲代號
+          example: S0225
+    FailResponse:
+      type: object
+      properties:
+        code:
+          $ref: "#/components/schemas/ErrorCode"
+        message: 
+          type: string
+    TransactionResponse:
+      type: object
+      properties:
+        transactionId:
+          type: number
+          description: 交易編號
+        balance:
+          type: number
+          description: 餘額
+        level:
+          type: number
+          description: 玩家等級
+    UnixTime:
+      type: number
+      example: 1577811723405
+      description: 時戳 unix (ms) 例 - 1577811723405 (2020-01-01 01:02:03.4050)
+    KeySessionToken:
+      required:
+        - sessionToken
+      type: object
+      properties:
+        sessionToken:
+          type: string
+          minLength: 64
+          maxLength: 64
+          description: 驗證登入狀態 (sha256 string)
+    KeyTransactionID:
+      type: object
+      properties:
+        id: 
+          type: string
+          description: 交易 or 請求 ID, 必需唯一
+          example: '200101-00001'
+    KeyRound:
+      type: object
+      properties:
+        round: 
+          type: string
+          description: 局號
+          example: 'R00001'
+    KeyGame:
+      type: object
+      properties:
+        game:
+          type: string
+          description: 遊戲代號
+          example: S0225
+    ErrorCode:
+      type: string
+      description: |
+        ### 400 
+        - E400001 # 不正確的額度結果
+        - E400002 # 不正確的資料型態 (/provider/game/record/save @value)
+        ### 401
+        - E401001 # 非法 IP 請求
+        - E401002 # Provider 不存在
+        - E401003 # Provider 已停用
+        - E401004 # 不正確的 secret 加密檢查碼
+        - E401005 # accessToken 失效
+        - E401006 # sessionToken 失效
+        ### 403
+        - E403001 # 玩家不存在
+        - E403002 # 玩家已停用
+        - E403003 # 額度不足
+        - E403004 # 遊戲編號不存在 (Game not found)
+        - E403005 # 遊戲局不存在 (Round not found)
+        - E403006 # 遊戲已停用 (Game Disabled)
+        ### 404
+        - E404001 # 路徑不存在
+        ### 405
+        - E405001 # Method 不正確
+      enum:
+        ### 400 
+        - E400001 # 不正確的額度結果
+        - E400002 # 不正確的資料型態 (/provider/game/record/save @value)
+        ### 401
+        - E401001 # 非法 IP 請求
+        - E401002 # Provider 不存在
+        - E401003 # Provider 已停用
+        - E401004 # 不正確的 secret 加密檢查碼
+        - E401005 # accessToken 失效
+        - E401006 # sessionToken 失效
+        ### 403
+        - E403001 # 玩家不存在
+        - E403002 # 玩家已停用
+        - E403003 # 額度不足
+        - E403004 # 遊戲編號不存在 (Game not found)
+        - E403005 # 遊戲局不存在 (Round not found)
+        - E403006 # 遊戲已停用 (Game Disabled)
+        ### 404
+        - E404001 # 路徑不存在
+        ### 405
+        - E405001 # Method 不正確
+    TransactionType:
+      type: string
+      description: |
+        ### 交易請求類型
+        - bet # 下注
+        - result # 開獎
+        - slot-feature # Slot 副遊戲獎勵
+        - cancel # 玩家取消
+        - rollback # 系統回滾
+      enum:
+        ### 交易請求類型
+        - bet # 下注
+        - result # 開獎
+        - slot-feature # Slot 副遊戲獎勵
+        - cancel # 玩家取消
+        - rollback # 系統回滾
+    SlotFeatureType:
+      type: string
+      description: |
+        ### Slot 額外的副遊戲類型
+        - free # 免費轉 (Free Game)
+        - bonus # 獎勵遊戲 (Bonus Game)
+        - wheel # 輪盤 (Wheel Game)
+        - choose # 選擇獎勵 (Choose Game)
+      enum:
+        ### Slot 額外的副遊戲類型
+        - free # 免費轉 (Free Game)
+        - bonus # 獎勵遊戲 (Bonus Game)
+        - wheel # 輪盤 (Wheel Game)
+        - choose # 選擇獎勵 (Choose Game)
+
+    ResponseErrorInvalidResultAmount:
+      description: 參數中的額度計算不正確
+      type: object
+      properties:
+        code: 
+          type: string
+          description: 錯誤碼  E400001, 參考 [ErrorCode](#model-ErrorCode)
+          example: E400001
+        message:  
+          type: string
+          description: 錯誤原因、錯誤訊息
+          example: "resultAmount 計算不正確"
+    ResponseErrorInvalidRecordValue:
+      description: 參數 value 資料型態不正確
+      type: object
+      properties:
+        code: 
+          type: string
+          description: 錯誤碼  E400002, 參考 [ErrorCode](#model-ErrorCode)
+          example: E400002
+        message:  
+          type: string
+          description: 錯誤原因、錯誤訊息
+          example: "value 型態不正確, 必需為字串"
+    ResponseErrorDirectIPAccessNotAllowed:
+      description: 連線 IP 不被允許
+      type: object
+      properties:
+        code: 
+          type: string
+          description: 錯誤碼  E401001, 參考 [ErrorCode](#model-ErrorCode)
+          example: E401001
+        message:  
+          type: string
+          description: 錯誤原因、錯誤訊息
+          example: "IP: 10.20.30.40 不被允許訪問"
+    ResponseErrorProviderNotFound:
+      description: Provider 不存在
+      type: object
+      properties:
+        code: 
+          type: string
+          description: 錯誤編號 E401002, 參考 [ErrorCode](#model-ErrorCode)
+          example: E401002
+        message:
+          type: string
+          description: 錯誤原因、錯誤訊息
+          example: Provider 不存在
+    ResponseErrorProviderIsDisabled:
+      description: Provider 已停用
+      type: object
+      properties:
+        code: 
+          type: string
+          description: 錯誤編號 E401003, 參考 [ErrorCode](#model-ErrorCode)
+          example: E401003
+        message:
+          type: string
+          description: 錯誤原因、錯誤訊息
+          example: Provider 已停用
+    ResponseErrorIncorrectProviderPassword:
+      description: 不正確的 provider password
+      type: object
+      properties:
+        code: 
+          type: string
+          description: 錯誤碼 E401004, 參考 [ErrorCode](#model-ErrorCode)
+          example: E401004
+        message:  
+          type: string
+          description: 錯誤原因、錯誤訊息
+          example: "驗證碼不正確 (Provider Password)"
+    ResponseErrorIncorrectAccessToken:
+      description: AccessToken 不正確 or 已失效
+      properties:
+        code: 
+          type: string
+          description: 錯誤編號 E401005, 參考 [ErrorCode](#model-ErrorCode)
+          example: E401005
+        message:
+          type: string
+          description: 錯誤原因、錯誤訊息
+          example: 不正確或失效的訪問碼(AccessToken)
+    ResponseErrorIncorrectSessionToken:
+      description: SessionToken 不正確 or 已失效
+      type: object
+      properties:
+        code: 
+          type: string
+          description: 錯誤編號 E401006, 參考 [ErrorCode](#model-ErrorCode)
+          example: E401006
+        message:
+          type: string
+          description: 錯誤原因、錯誤訊息
+          example: 不正確或失效的資訊(AccessToken)
+    ResponseErrorMemberNotFound:
+      description: 玩家不存在
+      type: object
+      properties:
+        code: 
+          type: string
+          description: 錯誤編號 E403001, 參考 [ErrorCode](#model-ErrorCode) 
+          example: E403001
+        message:
+          type: string
+          description: 錯誤原因、錯誤訊息
+          example: 玩家不存在
+    ResponseErrorMemberIsDisabled:
+      description: 玩家帳號被停用
+      type: object
+      properties:
+        code: 
+          type: string
+          description: 錯誤編號 E403002, 參考 [ErrorCode](#model-ErrorCode) 
+          example: E403002
+        message:
+          type: string
+          description: 錯誤原因、錯誤訊息
+          example: 玩家帳號被停用
+    ResponseErrorMemberInsufficientBalance:
+      description: 玩家餘額不足
+      type: object
+      properties:
+        code: 
+          type: string
+          description: 錯誤編號 E403003, 參考 [ErrorCode](#model-ErrorCode) 
+          example: E403003
+        message:
+          type: string
+          description: 錯誤原因、錯誤訊息
+          example: 玩家餘額不足
+    ResponseErrorGameNotFound:
+      description: 遊戲不存在 (Game not found)
+      type: object
+      properties:
+        code: 
+          type: string
+          description: 錯誤編號 E403004, 參考 [ErrorCode](#model-ErrorCode) 
+          example: E403004
+        message:
+          type: string
+          description: 錯誤原因、錯誤訊息
+          example: 遊戲不存在
+    ResponseErrorRoundNotFound:
+      description: 遊戲局不存在 (Round not found)
+      type: object
+      properties:
+        code: 
+          type: string
+          description: 錯誤編號 E403005, 參考 [ErrorCode](#model-ErrorCode) 
+          example: E403005
+        message:
+          type: string
+          description: 錯誤原因、錯誤訊息
+          example: 遊戲局不存在
+    ResponseErrorGameIsDisabled:
+      description: 遊戲已停用 (Game is disabled)
+      type: object
+      properties:
+        code: 
+          type: string
+          description: 錯誤編號 E403006, 參考 [ErrorCode](#model-ErrorCode) 
+          example: E403004
+        message:
+          type: string
+          description: 錯誤原因、錯誤訊息
+          example: 遊戲已停用
+  parameters:
+      ProviderName:
+        name: provider-name
+        in: header
+        explode: true
+        required: true
+        description: 遊戲廠商名稱 or 代號
+        schema:
+          type: string
+      ProviderPassword:
+        name: provider-password
+        in: header
+        required: true
+        description: 認證碼, 用來識別與確認請求方資料正確性，請參考文件說明
+        schema:
+          type: string
