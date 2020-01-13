@@ -38,9 +38,9 @@ servers:
   - url: "http://demo.project-host.net/v1"
     description: 測試伺服器網址
 tags:
-  - name: Update-0.0.3
+  - name: Update-0.0.4
     description: 部分 API 更新&修正
-  - name: Update-0.0.2
+  - name: Update-0.0.3
     description: 部分 API 更新&修正
   - name: Common
     description: 共用 API
@@ -58,10 +58,12 @@ paths:
     post:
       tags:
         - Common
+        - Update-0.0.4
         - Update-0.0.3
-        - Update-0.0.2
       summary: 驗證玩家 & 取得玩家資料
       description: |
+        #### Update-0.0.4
+        - 增加 `demo` 是否為試玩的參數 (試玩的遊戲不參與 JP 等相關活動, 或是 JP 分成試玩 & 正式兩個)
         #### Update-0.0.3
         - 增加 `game` 參數 (防止玩家用 accessToken 偷渡開啟不同的遊戲)
         - 增加 403 兩個錯誤
@@ -112,6 +114,10 @@ paths:
                         type: string
                         maxLength: 64
                         description: 驗證登入狀態
+                      demo:
+                        type: boolean
+                        description: 是否為試玩 (試玩下不進 JP)
+
         '401':
           description: 401 Error
           content:
@@ -144,7 +150,6 @@ paths:
     post:
       tags:
         - Common
-        - Update-0.0.2
       summary: 取得餘額
       operationId: GetBalance
       description: |
@@ -207,7 +212,6 @@ paths:
     post:
       tags:
         - Common
-        - Update-0.0.2
       summary: 取得遊戲存檔
       description: |
         #### Update-0.0.2
@@ -266,7 +270,6 @@ paths:
     post:
       tags:
         - Common
-        - Update-0.0.2
       summary: 遊戲存檔
       description: |
         #### Update-0.0.2
@@ -741,7 +744,6 @@ paths:
     post:
       tags: 
         - Table
-        - Update-0.0.2
         - Update-0.0.3
       summary: 下注
       description: |
@@ -830,7 +832,6 @@ paths:
       tags: 
         - Table
         - Update-0.0.3
-        - Update-0.0.2
       summary: 遊戲開始時的保留額度
       description: |
         #### Update-0.0.3
@@ -913,7 +914,6 @@ paths:
     post:
       tags: 
         - Table
-        - Update-0.0.2
       summary: 開獎
       description: |
         #### Update-0.0.2

@@ -1,0 +1,252 @@
+openapi: 3.0.0
+info:
+  title: Swagger Petstore
+  description: |
+    #### websocket 通訊 (非 request / response )
+    - 所有 send/get 資料都是 bytes 資料, 由 string 代表, 使用 maxLength 代表佔位, 每 1 長度代表 1 byte
+    - 資料開頭由 channel(uint8) + event id (uint16_ 組成，共 3 bytes
+      - uint8 (1 ~ 255) 為請求的 channel , 相同的 channel 同一時間只能發出一個 (0 為保留值，代表後端主動發出的)
+      - uint16 (1 ~ 65535) 為請求類型, 請參考下方 api 說明
+    - 參數名稱為(大寫)代表為 byte 資料，於「備註」說明佔位大小，以 byte:{strart}:{end}表示
+      - 例如開頭的 channel 為 1byte, 以 byte:0:1 表示， event id 為 byte:1:3
+  termsOfService: "http://swagger.io/terms/"
+  contact:
+    email: apiteam@swagger.io
+  license:
+    name: Apache 2.0
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+  version: 0.0.1
+externalDocs:
+  description: Find out more about Swagger
+  url: "http://swagger.io"
+
+servers:
+  - url: "https://api.project-host.net/v1"
+    description: 正式伺服器網址
+  - url: "http://demo.project-host.net/v1"
+    description: 測試伺服器網址
+tags:
+  - name: Send
+    description: 可發出請求更新
+  - name: Get
+    description: 所有會收到的類型
+  - name: Home
+    description: 首頁
+  - name: Information
+    description: 個人
+paths:
+  /1:
+    post:
+      summary: 跑馬燈資訊
+      tags:
+        - Get
+        - Home
+      requestBody:
+        description: "`無請求處理`"
+        content:
+          application/json:
+            schema:
+              example: empty
+      responses:
+        "200":
+          description: ok
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/EventData"
+                  - type: object
+                    example: (byte:3:*)
+                    properties:
+                      MARQUEE:
+                        type: string
+                        description: 跑馬燈內容 (string)
+                        example: (byte:3:*) string
+  /2:
+    post:
+      summary: 遊戲列表
+      tags:
+        - Send
+        - Get
+        - Home
+      requestBody:
+        description: 更新遊戲列表
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/EventData'
+      responses:
+        "200":
+          description: ok
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/EventData"
+                  - type: object
+                    example: (byte:3:*)
+                    properties:
+                      GAME_LIST:
+                        type: array
+                        description: 遊戲列表 json data (遊戲列表陣列)
+                        example: (byte:3:*) 
+                        items:
+                          $ref: '#/components/schemas/Game'
+
+                          
+
+  /3:
+    post:
+      summary: 取得個人詳細資訊(自己)
+      tags:
+        - Send
+        - Get
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/EventData"
+                - type: object
+                  properties:
+                    memberId:
+                      type: array
+                      description: member id
+                      example: (byte:3:11)
+      responses:
+        "200":
+          description: ok
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/EventData"
+                  - type: object
+                    example: (byte:3:*)
+                    properties:
+                      rank:
+                        type: number
+                        description: 玩家階級
+                      nickname:
+                        type: string
+                        description: 玩家暱稱
+
+  /222:
+    post:
+      tags:
+        - Send
+      summary: 取得個人詳細資訊(自己)
+      # description:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/EventData"
+      responses:
+        "200":
+          description: ok
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/EventData"
+                  - type: object
+                    description: json data
+                    example: (byte:3:*)
+                    properties:
+                      nickname:
+                        type: string
+                        description: 玩家暱稱
+                      introduction:
+                        type: string
+                        description: 個人介紹
+                      avatar:
+                        type: string
+                        description: 頭像
+                      rank:
+                        type: number
+                        description: 玩家階級
+                      playerCode:
+                        type: string
+                        description: 玩家唯一 code (hash code)
+                      email:
+                        type: string
+                        description: 玩家綁定的 email
+
+components:
+  schemas:
+    EventData:
+      type: object
+      properties:
+        EVENT_CHANNEL:
+          type: string
+          maxLength: 1
+          description: |
+            #### 請求的頻道, 用來確認資料的回傳(0. 則代表 server 端的主動訊息)
+            - range: 1 ~ 255
+            - 每個 channel 編號同時只能發送一次
+            - 每個 channel 發送後，必需設定 timeout, 時間內未接到回傳時，認定失敗
+          example: (byte:0:1)
+        EVENT_ID:
+          type: string
+          maxLength: 2
+          description: |
+            #### 事件編號
+            - range: 1 ~ 65535
+            - 用來定義各請求 or 資料的編號
+          example: (byte:1:3)
+    Image:
+      type: object
+      properties:
+        id: 
+          type: number
+          description: 圖片編號
+        filename: 
+          type: string
+          description: 圖片名稱(檔名)
+        url: 
+          type: string
+          description: 圖片資源網址
+        numWidths:
+          type: number
+          description: 圖片切塊(寬)
+        numHeights:
+          type: number
+          description: 圖片切塊(高)
+    ImageIndex:
+      type: object
+      properties:
+        imageId:
+          type: number
+          description: 圖片編號
+        index:
+          type: number
+          description: 圖片位置  
+    GameType:
+      type: string
+      description: |
+        #### 遊戲類型
+        - slot # Slot
+        - table # table game 
+      enum:
+        #### 遊戲類型
+        - slot # Slot
+        - table # table game 
+    Game:
+      type: object
+      properties:
+        id:
+          type: number
+          description: 遊戲 ID
+        type:
+          $ref: '#/components/schemas/GameType'
+        image: 
+          $ref: '#/components/schemas/ImageIndex'
+        name:
+          type: string
+          description: 遊戲名稱
+        minimumLevel:
+          type: number
+          description: 最低等級限制
