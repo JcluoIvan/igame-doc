@@ -409,22 +409,22 @@ paths:
                   - $ref: '#/components/schemas/ResponseErrorMemberNotFound'
                   - $ref: '#/components/schemas/ResponseErrorGameNotFound'
 
-  /multiplayer/close:
+  /multiplayer/start:
     parameters:
       - $ref: '#/components/parameters/ProviderName'
       - $ref: '#/components/parameters/ProviderPassword'
     post:
       tags: 
         - Multiplayer
-      summary: 關閉多人連線模式
+        - Update-0.0.4
+      summary: 多人連線建立房間
       description: |
-        - 完成請求後，玩家(原房主)狀態會變為一般，不能邀請好友
-      operationId: MultiplayerClose
+        #### Update-0.0.4
+        - 房間遊戲開始
+      operationId: MultiplayerCreate
       requestBody:
         description: |
-          - 開啟多人連線模式，可邀請其他人加入
-          - (討論) 啟用此功能後，多人模式狀態將會保留 30s 後過期
-          - (討論) 若要保持狀態，於過期時間內重複傳送請求
+          房間遊戲開始
         content:
           application/json:
             schema:
@@ -438,7 +438,121 @@ paths:
                   properties:
                     room: 
                       type: string
-                      description: 多人遊戲的房間 ID, 參與者會在開啟遊戲時帶入此參數 `room={room}`
+                      description: 房間 id
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'ok'
+                  expire: 
+                    type: number
+                    description: |
+                      <s>多人遊戲狀態過期時間 (秒)</s> <i style="color:red">棄用</i>
+                    example: '30(棄用)'
+        '401':
+          description: 401 Error
+          content:
+            application/json:
+              schema: 
+                type: object
+                example: 請參考 Schema
+                oneOf:
+                  - $ref: '#/components/schemas/ResponseErrorDirectIPAccessNotAllowed'
+                  - $ref: '#/components/schemas/ResponseErrorProviderNotFound'
+                  - $ref: '#/components/schemas/ResponseErrorIncorrectProviderPassword'
+                  - $ref: '#/components/schemas/ResponseErrorProviderIsDisabled'
+                  - $ref: '#/components/schemas/ResponseErrorIncorrectSessionToken'
+        '403':
+          description: 403 Error
+          content:
+            application/json:
+              schema: 
+                type: object
+                example: 請參考 Schema
+                oneOf:
+                  - $ref: '#/components/schemas/ResponseErrorMemberNotFound'
+                  - $ref: '#/components/schemas/ResponseErrorGameNotFound'
+  /multiplayer/close:
+    parameters:
+      - $ref: '#/components/parameters/ProviderName'
+      - $ref: '#/components/parameters/ProviderPassword'
+    post:
+      tags: 
+        - Update-0.0.4
+        - Multiplayer
+      summary: 關閉多人連線模式
+      description: |
+        #### Update-0.0.4
+        - 移除參數 `game`, `room`, 將玩家相關的房間全部關閉(通常只會有一個)
+      operationId: MultiplayerClose
+      requestBody:
+        description: |
+          - 完成請求後，玩家(原房主)狀態會變為一般，不能邀請好友
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/RequestData'
+      responses:
+        '200':
+          description: Ok (no content response)
+        '401':
+          description: 401 Error
+          content:
+            application/json:
+              schema: 
+                type: object
+                example: 請參考 Schema
+                oneOf:
+                  - $ref: '#/components/schemas/ResponseErrorDirectIPAccessNotAllowed'
+                  - $ref: '#/components/schemas/ResponseErrorProviderNotFound'
+                  - $ref: '#/components/schemas/ResponseErrorIncorrectProviderPassword'
+                  - $ref: '#/components/schemas/ResponseErrorProviderIsDisabled'
+        '403':
+          description: 403 Error
+          content:
+            application/json:
+              schema: 
+                type: object
+                example: 請參考 Schema
+                oneOf:
+                  - $ref: '#/components/schemas/ResponseErrorMemberNotFound'
+  /multiplayer/join:
+    parameters:
+      - $ref: '#/components/parameters/ProviderName'
+      - $ref: '#/components/parameters/ProviderPassword'
+    post:
+      tags: 
+        - Update-0.0.4
+        - Multiplayer
+      summary: 玩家加入房間
+      description: |
+        #### Update-0.0.4
+        - 新增 api
+      operationId: MultiplayerClose
+      requestBody:
+        description: |
+          - 玩家加入房間
+        content:
+          application/json:
+            schema:
+              required:
+                - game
+                - room
+              allOf:
+                - $ref: '#/components/schemas/RequestData'
+                - $ref: '#/components/schemas/KeyGame'
+                - type: object
+                  properties:
+                    room: 
+                      type: string
+                      description: 多人遊戲的房間 ID
       responses:
         '200':
           description: Ok (no content response)
@@ -465,10 +579,52 @@ paths:
                   - $ref: '#/components/schemas/ResponseErrorMemberNotFound'
                   - $ref: '#/components/schemas/ResponseErrorMemberIsDisabled'
                   - $ref: '#/components/schemas/ResponseErrorGameNotFound'
-
-  
-
-
+                  - $ref: '#/components/schemas/ResponseErrorGameIsDisabled'
+  /multiplayer/leave:
+    parameters:
+      - $ref: '#/components/parameters/ProviderName'
+      - $ref: '#/components/parameters/ProviderPassword'
+    post:
+      tags: 
+        - Update-0.0.4
+        - Multiplayer
+      summary: 玩家離開房間
+      description: |
+        #### Update-0.0.4
+        - 新增 api
+      operationId: MultiplayerClose
+      requestBody:
+        description: |
+          - 玩家離開房間
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/RequestData'
+      responses:
+        '200':
+          description: Ok (no content response)
+        '401':
+          description: 401 Error
+          content:
+            application/json:
+              schema: 
+                type: object
+                example: 請參考 Schema
+                oneOf:
+                  - $ref: '#/components/schemas/ResponseErrorDirectIPAccessNotAllowed'
+                  - $ref: '#/components/schemas/ResponseErrorProviderNotFound'
+                  - $ref: '#/components/schemas/ResponseErrorIncorrectProviderPassword'
+                  - $ref: '#/components/schemas/ResponseErrorProviderIsDisabled'
+        '403':
+          description: 403 Error
+          content:
+            application/json:
+              schema: 
+                type: object
+                example: 請參考 Schema
+                oneOf:
+                  - $ref: '#/components/schemas/ResponseErrorMemberNotFound'
 
             
   /slot/bet:

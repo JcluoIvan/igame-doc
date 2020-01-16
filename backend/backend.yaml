@@ -1,14 +1,8 @@
 openapi: 3.0.0
 info:
-  title: Swagger Petstore
+  title: 後端管理頁面
   description: |
-    #### websocket 通訊 (非 request / response )
-    - 所有 send/get 資料都是 bytes 資料, 由 string 代表, 使用 maxLength 代表佔位, 每 1 長度代表 1 byte
-    - 資料開頭由 channel(uint8) + event id (uint16_ 組成，共 3 bytes
-      - uint8 (1 ~ 255) 為請求的 channel , 相同的 channel 同一時間只能發出一個 (0 為保留值，代表後端主動發出的)
-      - uint16 (1 ~ 65535) 為請求類型, 請參考下方 api 說明
-    - 參數名稱為(大寫)代表為 byte 資料，於「備註」說明佔位大小，以 byte:{strart}:{end}表示
-      - 例如開頭的 channel 為 1byte, 以 byte:0:1 表示， event id 為 byte:1:3
+    #### 後端管理頁面
   termsOfService: "http://swagger.io/terms/"
   contact:
     email: apiteam@swagger.io
