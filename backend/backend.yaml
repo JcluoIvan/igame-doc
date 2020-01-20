@@ -20,673 +20,1239 @@ servers:
   - url: "http://demo.project-host.net/v1"
     description: 測試伺服器網址
 tags:
-  - name: Get
-    description: 所有會收到的類型
-  - name: Send
-    description: 可發出請求更新
-  - name: Home
-    description: 首頁
-  - name: Information
-    description: 個人
-paths:
-  /1:
-    post:
-      summary: 更新圖片資源
-      tags:
-        - Send
-        - Get
-        - Home
-      requestBody:
-        description: 更新圖片資源
-        content:
-          application/json:
-            schema:
-              allOf:
-                - $ref: '#/components/schemas/EventData'
-                - type: object
-                  properties:
-                    HASH_CODE:
-                      type: string
-                      example: (byte:3:*)
-                      description: 圖片資源的 hash code, 用來檢查是否更新
-      responses:
-        "200":
-          description: ok
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: "#/components/schemas/EventData"
-                  - type: object
-                    properties:
-                      DATA:
-                        type: object
-                        description: 圖片資源的資料 json data
-                        example: (byte:3:*)
-                        properties:
-                          hashCode: 
-                            type: string
-                            description: 圖片資源的 hash code, 用來檢查是否更新
-                          images:
-                            type: array
-                            description: 圖片資源列表
-                            items:
-                              $ref: '#/components/schemas/Image'
-  /2:
-    post:
-      summary: 遊戲列表
-      tags:
-        - Send
-        - Get
-        - Home
-      requestBody:
-        description: 更新遊戲列表
-        content:
-          application/json:
-            schema:
-              allOf:
-                - $ref: '#/components/schemas/EventData'
-      responses:
-        "200":
-          description: ok
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: "#/components/schemas/EventData"
-                  - type: object
-                    properties:
-                      GAME_LIST:
-                        type: array
-                        description: 遊戲列表 json data 
-                        example: (byte:3:*) 
-                        items:
-                          $ref: '#/components/schemas/Game'
-                          
-  /3:
-    post:
-      summary: 取得貼圖列表
-      tags:
-        - Send
-        - Get
-        - Home
-      requestBody:
-        content:
-          application/json:
-            schema:
-              allOf:
-                - $ref: "#/components/schemas/EventData"
-      responses:
-        "200":
-          description: ok
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: "#/components/schemas/EventData"
-                  - type: object
-                    properties:
-                      SKICKER: 
-                        description: 貼圖列表 json data
-                        example: (byte:3:*)
-                        type: array
-                        items: 
-                          $ref: '#/components/schemas/Sticker'
-  /4:
-    post:
-      summary: 取得頭像 skin 列表 (avatar skin)
-      tags:
-        - Send
-        - Get
-        - Home
-      requestBody:
-        content:
-          application/json:
-            schema:
-              allOf:
-                - $ref: "#/components/schemas/EventData"
-      responses:
-        "200":
-          description: ok
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: "#/components/schemas/EventData"
-                  - type: object
-                    properties:
-                      AVATAR_SKINS: 
-                        description: 頭像 skin 列表 json data
-                        example: (byte:3:*)
-                        type: array
-                        items: 
-                          $ref: '#/components/schemas/AvatarSkin'
-  /5:
-    post:
-      summary: 跑馬燈資訊
-      tags:
-        - Get
-        - Home
-      requestBody:
-        description: "`無請求處理`"
-        content:
-          application/json:
-            schema:
-              example: empty
-      responses:
-        "200":
-          description: ok
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: "#/components/schemas/EventData"
-                  - type: object
-                    example: (byte:3:*)
-                    properties:
-                      MARQUEE:
-                        type: string
-                        description: 跑馬燈內容 (string)
-                        example: (byte:3:*) string
-  
-  /6:
-    post:
-      summary: 取得玩家基本資料
-      tags:
-        - Send
-        - Get
-        - Home
-      requestBody:
-        content:
-          application/json:
-            schema:
-              allOf:
-                - $ref: "#/components/schemas/EventData"
-                - type: object
-                  properties:
-                    MEMBER_ID:
-                      type: number
-                      description: 玩家 id (uint64)
-                      example: (byte:3:11)
-                  
-      responses:
-        "200":
-          description: ok
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: "#/components/schemas/EventData"
-                  - type: object
-                    properties:
-                      MEMBER_BASE_DATA: 
-                        example: (byte:3:*)
-                        type: object
-                        allOf:
-                          - $ref: '#/components/schemas/MemberBaseData'
+  - name: Public
+    description: 不需登入驗證
+  - name: Common
+    description: 共用的查詢 (避開共用各功能的查詢功能)
+  - name: Member
+    description: 玩家管理
+  - name: Provider
+    description: 提供商
+  - name: ProviderGame
+    description: 提供商遊戲
+  - name: Announcement
+    description: 公告管理
+  - name: ImageManager
+    description: 圖片管理 `/system/image`
+  - name: ItemManager
+    description: 道具管理 `/system/item`
+  - name: LevelConfigManager
+    description: 玩家等級管理
+  - name: RankConfigManager
+    description: 玩家階級(Rank)管理
 
-  /7:
+paths:
+  /login:
     post:
-      summary: 取得隨機玩家 (必需過濾黑名單)
+      summary: 使用者登入
       tags:
-        - Send
-        - Get
-        - Home
+        - Public
       requestBody:
         content:
           application/json:
+            schema:
+              type: object
+              properties:
+                account:
+                  type: string
+                  description: 使用者帳號
+                password:
+                  type: string
+                  description: 使用者密碼
+      responses:
+        '200':
+          description: OK (登入成功)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: number
+                  account:
+                    type: string
+                  name:
+                    type: string
+  /logout:
+    get:
+      summary: 使用者登出
+      tags:
+        - Public
+      responses:
+        204:
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: 
+                    type: string
+                    example: ok
+  /members:
+    get:
+      summary: 查詢玩家列表
+      tags:
+        - Member
+      requestBody:
+        description: 查詢玩家(分頁)
+        content:
+          application/x-www-form-urlencoded:
             schema:
               allOf:
-                - $ref: "#/components/schemas/EventData"
+                - $ref: '#/components/schemas/QueryList'
+                - type: object
+                  required:
+                    - enabled
+                  properties:
+                    enabled:
+                      $ref: '#/components/schemas/QueryParameterEnabled'
+                    nickname:
+                      type: string
+                      description: 暱稱查詢(模糊查詢)
       responses:
-        "200":
+        200:
           description: ok
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/EventData"
+                  - $ref: '#/components/schemas/ResponseList'
                   - type: object
                     properties:
-                      MEMBER_BASE_DATA: 
-                        example: (byte:3:*)
-                        type: object
-                        allOf:
-                          - $ref: '#/components/schemas/MemberBaseData'
-    
-  /8:
-    post:
-      summary: 請求失敗，錯誤回應
+                      rows: 
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: number
+                            nickname:
+                              type: string
+                            level:
+                              type: number
+                            rank:
+                              type: number
+                            diamondPoint:
+                              type: number
+                            gamePoint:
+                              type: number
+  /members/{uid}:
+    parameters:
+      - in: path
+        required: true
+        name: uid
+        schema:
+          type: number
+    get:
+      summary: 取得玩家資料
       tags:
-        - Send
-        - Get
-      requestBody:
-        description: "`無請求處理`"
-        content:
-          application/json:
-            schema:
-              example: empty
+        - Member
       responses:
-        "200":
-          description: 當任何請求發生失敗的時後，都以此事件回傳錯誤內容
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: "#/components/schemas/EventData"
-                  - type: object
-                    properties:
-                      ERROR_CODE: 
-                        example: (byte:3:5)
-                        type: number
-                      ERROR_MESSAGE:
-                        example: (byte:5:*)
-                        type: string
-    
-  /9:
-    post:
-      summary: 更新玩家點數 (Diamond Point & Game Point)
-      tags:
-        - Send
-        - Get
-        - Information
-      requestBody:
-        description: 請求更新點數錢包 `(僅更新自己的資料時，後端 server 才受理)`
-        content:
-          application/json:
-            schema:
-                allOf:
-                  - $ref: "#/components/schemas/EventData"
-                  - type: object
-                    properties:
-                      MEMBER_ID: 
-                        type: number
-                        example: (byte:3:*)
-                        description: 玩家 id 
-      responses:
-        "200":
+        200:
           description: ok
           content:
             application/json:
               schema:
-                allOf:
-                  - $ref: "#/components/schemas/EventData"
-                  - type: object
+                type: object
+                properties:
+                  member:
+                    type: object
                     properties:
-                      MEMBER_ID: 
+                      id:
                         type: number
-                        example: (byte:3:11)
-                        description: 玩家 id (int64)
-                      DIAMOND_POINT:
-                        type: number                
-                        example: (byte:11:19)
-                        description: Diamond point (int64)
-                      GAME_POINT:
-                        type: number                
-                        example: (byte:19:*)
-                        description: Diamond point (int64)
-  /10:
-    post:
-      summary: 更新玩家等級、經驗值、階級(Level, Experience, Rank)
-      tags:
-        - Send
-        - Get
-        - Information
-      requestBody:
-        description: 請求更新 等級、經驗值、階級 `(僅更新自己的資料時，後端 server 才受理)`
-        content:
-          application/json:
-            schema:
-                allOf:
-                  - $ref: "#/components/schemas/EventData"
-                  - type: object
-                    properties:
-                      MEMBER_ID: 
-                        type: number
-                        example: (byte:3:*)
-                        description: 玩家 id 
-                        
-      responses:
-        "200":
-          description: ok
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: "#/components/schemas/EventData"
-                  - type: object
-                    properties:
-                      MEMBER_ID: 
-                        type: number
-                        example: (byte:3:11)
-                        description: 玩家 id (int64)
-                      RANK:
-                        type: number
-                        example: (byte:11:15)
-                        description: 階級 (uint32)
-                      LEVEL:
-                        type: number
-                        example: (byte:15:19)
-                        description: 等級 (uint32)
-                      EXPERIENCE:
-                        type: number
-                        example: (byte:19:*)
-                        description: 經驗值(uint64)
-  /11:
-    post:
-      summary: 更新暱稱、頭像
-      tags:
-        - Send
-        - Get
-        - Information
-      requestBody:
-        description: 請求更新暱稱、頭像 `(僅更新自己的資料時，後端 server 才受理)`
-        content:
-          application/json:
-            schema:
-                allOf:
-                  - $ref: "#/components/schemas/EventData"
-                  - type: object
-                    properties:
-                      MEMBER_ID: 
-                        type: number
-                        example: (byte:3:*)
-                        description: 玩家 id 
-      responses:
-        "200":
-          description: ok
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: "#/components/schemas/EventData"
-                  - type: object
-                    properties:
-                      DATA:
-                        type: object
-                        example: (byte:3:*)
-                        description: 個人資料 json data
-                        properties:
-                          avatar:
-                            type: string
-                            description: 頭像
-                          nickname: 
-                            type: string
-                            description: 暱稱
-  /12:
-    post:
-      summary: 更新 avatar skin (單一項目)
-      tags:
-        - Get
-        - Information
-      requestBody:
-        description: 無請求
-        content:
-          application/json:
-            schema:
-              example: empty
-      responses:
-        "200":
-          description: ok
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: "#/components/schemas/EventData"
-                  - type: object
-                    properties:
-                      MEMBER_ID: 
-                        type: number
-                        example: (byte:3:11)
-                        description: 玩家 id 
-                      SKIN_TYPE:
-                        type: number
-                        example: (byte:11:12)
-                        description: skin 類型(uint8)
-                        allOf:
-                          - $ref: '#/components/schemas/AvatarSkinType'
-                      SKIN_ID:
-                        type: number
-                        example: (byte:12:20)
-                        description: avatar_skin.id (uint64)
-  /13:
-    post:
-      summary: 更新玩家遊戲位置 (position)
-      tags:
-        - Get
-        - Information
-      requestBody:
-        description: 無請求
-        content:
-          application/json:
-            schema:
-              example: empty
-      responses:
-        "200":
-          description: ok
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: "#/components/schemas/EventData"
-                  - type: object
-                    properties:
-                      MEMBER_ID: 
-                        type: number
-                        example: (byte:3:11)
-                        description: 玩家 id 
-                      POSITION:
-                        type: string
-                        example: (byte:11:*)
-                        description: 玩家目前位置
-  /14:
-    post:
-      tags:
-        - Get
-        - Send
-        - Information
-      summary: 取得個人詳細資訊(自己)
-      # description:
-      requestBody:
-        content:
-          application/json:
-            schema:
-              allOf:
-                - $ref: "#/components/schemas/EventData"
-      responses:
-        "200":
-          description: ok
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: "#/components/schemas/EventData"
-                  - type: object
-                    description: json data
-                    example: (byte:3:*)
-                    properties:
                       rank:
                         type: number
-                        description: 玩家階級
-                      playerCode:
+                      level:
+                        type: number
+                      experience:
+                        type: number
+                      diamondPoint:
+                        type: number
+                      gamePoint:
+                        type: number
+                      enabled:
+                        $ref: '#/components/schemas/EnabledType'
+                      updatedAt:
+                        $ref: '#/components/schemas/UpdatedAt'
+                      createdAt:
+                        $ref: '#/components/schemas/CreatedAt'
+                  information:
+                    type: object
+                    properties:
+                      id: 
+                        type: number
+                      invitedFrom:
+                        type: number
+                        description: 邀請人
+                      nickname: 
                         type: string
-                        description: 玩家唯一 code (hash code)
-                      email:
+                      avatar:
                         type: string
-                        description: 玩家綁定的 email
+                      avatarUrl: 
+                        type: string
+                        description: 頭像實際路徑
+                      introduction:
+                        type: string
+                      numLogins:
+                        type: number
+                        description: 登入次數
+                      lastLoginAt:
+                        type: number
+                        description: 最後登入時間, timestamp unix (秒)
+                        example: 1579247398
+                      updatedAt:
+                        $ref: '#/components/schemas/UpdatedAt'
+                      createdAt:
+                        $ref: '#/components/schemas/CreatedAt'
+    patch:
+      summary: 更新部分欄位 (有資料才更新), 目前僅 enabled 可更新
+      tags:
+        - Member
+      requestBody:
+        description: 啟/停用玩家
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                enabled:
+                  type: boolean
+      responses:
+        204:
+          description: ok 
+  /announcements:
+    get:
+      summary: 查詢公告(分頁)
+      tags:
+        - Announcement
+      requestBody:
+        description: 無資料
+        required: false
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/QueryList'
+              type: object
+              required:
+                - enabled
+              properties:
+                enabled: 
+                  $ref: '#/components/schemas/QueryParameterEnabled'
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ResponseList'
+                  - type: object
+                    properties:
+                      rows: 
+                        type: array
+                        items:
+                          type: object 
+                          properties:
+                            id:
+                              type: number
+                            type:
+                              $ref: '#/components/schemas/AnnouncementType'
+                            title:
+                              type: string
+                            enabled:
+                              $ref: '#/components/schemas/EnabledType'
+                            startAt:
+                              $ref: '#/components/schemas/StartAt'
+                            endAt: 
+                              $ref: '#/components/schemas/EndAt'
+                            updatedAt:
+                              $ref: '#/components/schemas/UpdatedAt'
+                            createdAt:
+                              $ref: '#/components/schemas/CreatedAt'
+    post:
+      summary: 新增公告
+      tags: 
+        - Announcement
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - type
+                - title
+                - content
+                - enabled
+                - startAt
+                - endAt
+              properties:
+                type:
+                  $ref: '#/components/schemas/AnnouncementType'
+                title:
+                  type: string
+                content: 
+                  type: string
+                enabled:
+                  $ref: '#/components/schemas/EnabledType'
+                startAt:
+                  $ref: '#/components/schemas/StartAt'
+                endAt:
+                  $ref: '#/components/schemas/EndAt'
+      responses:
+        200:
+          description: ok 
+  /announcements/{aid}: 
+    parameters:
+      - in: path
+        required: true
+        description: 公告 id
+        name: aid
+        schema:
+          type: number   
+    get:
+      summary: 查詢公告
+      tags: 
+        - Announcement
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: number
+                  type:
+                    $ref: '#/components/schemas/AnnouncementType'
+                  title:
+                    type: string
+                  content:
+                    type: string
+                  enabled:
+                    $ref: '#/components/schemas/EnabledType'
+                  startAt:
+                    type: number
+                    description: 公告時間 - 起 (0 代表不限制)
+                  endAt: 
+                    type: number
+                    description: 公告時間 - 訖 (0 代表不限制)
+                  updatedAt:
+                    $ref: '#/components/schemas/UpdatedAt'
+                  createdAt:
+                    $ref: '#/components/schemas/CreatedAt'
+    put:
+      summary: 公告資料更新
+      tags:
+        - Announcement
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - type
+                - title
+                - content
+                - enabled
+                - startAt
+                - endAt
+              properties:
+                type:
+                  $ref: '#/components/schemas/AnnouncementType'
+                title:
+                  type: string
+                content: 
+                  type: string
+                enabled:
+                  $ref: '#/components/schemas/EnabledType'
+                startAt:
+                  $ref: '#/components/schemas/StartAt'
+                endAt:
+                  $ref: '#/components/schemas/EndAt'
+                
+      responses:
+        200:
+          description: ok
+    patch:
+      summary: 公告資料更新(局部資料更新)
+      tags:
+        - Announcement
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                enabled:
+                  $ref: '#/components/schemas/EnabledType'
+      responses:
+        204:
+          description: ok
+    delete:
+      summary: 刪除公告
+      tags:
+        - Announcement
+      responses:
+        200:
+          description: ok
+  
+  /providers:
+    get:
+      summary: 提供商列表(分頁)
+      tags:
+        - Provider
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/QueryList'
+                - type: object
+                  properties:
+                    enabled:
+                      $ref: '#/components/schemas/QueryParameterEnabled'
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ResponseList'
+                  - type: object
+                    properties:
+                      rows:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            username: 
+                              type: string
+                              description: 訪問 api 的 username
+                            privateKey:
+                              type: string
+                              description: 用來加密的私鑰
+                            name:
+                              type: string
+                              description: 加盟商名稱
+                            whiteIp:
+                              type: string
+                              description: ip 白名單
+                            enabled:
+                              $ref: '#/components/schemas/EnabledType'
+                            updatedAt:
+                              $ref: '#/components/schemas/UpdatedAt'
+                            createdAt:
+                              $ref: '#/components/schemas/CreatedAt'
+    post:
+      summary: 新增提供商
+      tags:
+        - Provider
+      requestBody:
+        description: |
+          - `privateKey 由後台產生`
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                name:
+                  type: string
+                whiteIp:
+                  type: string
+                  description: |
+                    ip 白名單 (用 , 隔開)
+                    例：
+                    ```
+                      127.0.0.1,
+                      127.0.0.2,
+                      ... etc
+                    ```
+                enabled:
+                  $ref: '#/components/schemas/EnabledType'
+      responses:
+        204:
+          description: ok
+  /providers/{id}:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        description: 提供商 id
+        schema:
+          type: number
+    get:
+      summary: 取得資訊
+      tags: 
+        - Provider
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id: 
+                    type: number
+                  username: 
+                    type: string
+                    description: 訪問 api 的 username
+                  privateKey:
+                    type: string
+                    description: 用來加密的私鑰
+                  name:
+                    type: string
+                    description: 加盟商名稱
+                  whiteIp:
+                    type: string
+                    description: ip 白名單
+                  enabled:
+                    $ref: '#/components/schemas/EnabledType'
+                  updatedAt:
+                    $ref: '#/components/schemas/UpdatedAt'
+                  createdAt:
+                    $ref: '#/components/schemas/CreatedAt'
+    put:
+      summary: 更新資料
+      tags:
+        - Provider
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                username:
+                  type: string
+                name:
+                  type: string
+                whiteIp:
+                  type: string
+                  description: |
+                    ip 白名單 (用 , 隔開)
+                    例：
+                    ```
+                      127.0.0.1,
+                      127.0.0.2,
+                      ... etc
+                    ```
+                enabled:
+                  $ref: '#/components/schemas/EnabledType'
+      responses:
+        204:
+          description: ok
+  /items:
+    get:
+      summary: 道具、物品列表(分頁)
+      tags:
+        - ItemManager
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema: 
+              allOf:
+                - $ref: '#/components/schemas/QueryList'
+                - type: object
+                  required:
+                    - enabled
+                  properties:
+                    name: 
+                      type: string
+                      description: 道具名稱 (模糊查詢)
+                    key: 
+                      type: string  
+                      description: 道具代號 (模糊查詢) 
+                    enabled:
+                      $ref: '#/components/schemas/QueryParameterEnabled'
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ResponseList'
+                  - type: object
+                    properties:
+                      row:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: number
+                            moduleId:
+                              type: number
+                              description: 模組編號
+                            imageId:
+                              $ref: '#/components/schemas/ImageId'
+                            imageIndex:
+                              $ref: '#/components/schemas/ImageIndex'
+                            key: 
+                              type: string
+                              description: 道具代號
+                            name: 
+                              type: string
+                              description: 道具名稱
+                            transferable:
+                              type: boolean
+                              description: 是否可轉移
+                            enabled:
+                              type: boolean
+                              description: 是否啟用
+                            updatedAt:
+                              $ref: '#/components/schemas/UpdatedAt'
+                            createdAt:
+                              $ref: '#/components/schemas/CreatedAt'
+    post:
+      summary: 新增道具、物品
+      tags:
+        - ItemManager
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                imageId:
+                  $ref: '#/components/schemas/ImageId'
+                imageIndex:
+                  $ref: '#/components/schemas/ImageIndex'
+                key:
+                  type: string
+                  description: 道具代號
+                name:
+                  type: string  
+                  description: 道具名稱
+                transferable:
+                  type: boolean
+                  description: 是否可以轉讓
+                enabled:
+                  type: boolean
+                  description: 是否啟用
+                description:
+                  type: string
+                  description: 道具說明
+      responses:
+        204:
+          description: ok
+  /items/{id}:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema: 
+          type: number
+        description: 道具編號
+    get:
+      summary: 取得道具資訊
+      tags:
+        - ItemManager
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  imageId:
+                    $ref: '#/components/schemas/ImageId'
+                  imageIndex:
+                    $ref: '#/components/schemas/ImageIndex'
+                  key:
+                    type: string
+                    description: 道具代號
+                  name:
+                    type: string  
+                    description: 道具名稱
+                  transferable:
+                    type: boolean
+                    description: 是否可以轉讓
+                  enabled:
+                    type: boolean
+                    description: 是否停用
+                  description:
+                    type: string
+                    description: 道具說明
+                  updatedAt:
+                    $ref: '#/components/schemas/UpdatedAt'
+                  createdAt:
+                    $ref: '#/components/schemas/CreatedAt'
+    put:
+      summary: 更新道具資訊
+      tags:
+        - ItemManager
+      requestBody:
+        content:
+          application/json:
+              schema:
+                type: object
+                properties:
+                  imageId: 
+                    type: number
+                    description: 指定的圖片 id (0 代表未指定)
+                  imageIndex:
+                    type: number
+                    description: 指定的圖片位置
+                  key:
+                    type: string
+                    description: 道具代號
+                  name:
+                    type: string  
+                    description: 道具名稱
+                  transferable:
+                    type: boolean
+                    description: 是否可以轉讓
+                  description:
+                    type: string
+                    description: 道具說明
+      responses:
+        204:
+          description: ok (no content)
+    patch:
+      summary: 部分資料更新
+      tags:
+        - ItemManager
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                enabled: 
+                  type: boolean
+                  description: 是否啟用
+      responses:
+        204:
+          description: ok
+    delete:
+      summary: 刪除道具
+      tags:
+        - ItemManager
+      responses:
+        204:
+          description: ok
+            
+  /images:
+    get:
+      summary: 取得圖片列表(不分頁)
+      tags:
+        - ImageManager
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                dirPath:
+                  type: string
+                  description: 圖片路徑
+                  example: /items
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: number
+                    title:
+                      type: string
+                      description: 圖片說明
+                    filename:
+                      type: string
+                      description: 圖片名稱(hash)
+                    url:
+                      type: string
+                      description: 圖片實際路徑
+                    numWidths:
+                      type: number
+                      description: 圖片寬切等分
+                    numHeights:
+                      type: number
+                      description: 圖片高切等分
+    post:
+      summary: 新增圖片
+      tags:
+        - ImageManager
+      requestBody:
+        description: |
+          圖片 numWidths, numHeights 的切分等分預設 1
+        content:
+          multipart/form-data: # media type
+            schema:
+              type: object
+              required:
+                - dirPath
+                - image
+              properties:
+                dirPath:
+                  description: 圖片路徑 ( 根目錄 = / )
+                  type: string
+                image:
+                  type: string
+                  description: |
+                    #### 圖片資源 bytes
+                    - image/jpeg
+                    - image/png
+                  format: binary
+                title:
+                  type: string
+                  description: 圖片說明
+                numWidths:
+                  type: number
+                  description: 圖片寬切等分
+                numHeights:
+                  type: number
+                  description: 圖片高切等分
 
+      responses:
+        200:
+          description: ok
+  /images/{id}:
+    get:
+      summary: 取得圖片詳細資訊
+      tags:
+        - ImageManager
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: number
+                  filename:
+                    type: string
+                    description: 圖片名稱(hash)
+                  url:
+                    type: string
+                    description: 圖片實際路徑
+                  numWidths:
+                    type: number
+                    description: 圖片寬分切等分
+                  numHeights:
+                    type: number
+                    description: 圖片高分切等分
+                  description:
+                    type: string
+                    description: 圖片說明
+                  updatedAt:
+                    $ref: '#/components/schemas/UpdatedAt'
+                  createdAt:
+                    $ref: '#/components/schemas/CreatedAt'
+    patch:
+      summary: 更新部分資訊
+      tags: 
+        - ImageManager
+      requestBody:
+        description: |
+          後端僅更新有傳入資料的欄位, 若不需要更新，則傳入 null 或是不帶入參數
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                dirPath: 
+                  type: string
+                title:
+                  type: string
+                  description: 圖片說明
+                numWidths:
+                  type: number
+                  description: 圖片寬分切等分
+                numHeights:
+                  type: number
+                  description: 圖片高分切等分
+                
+      responses:
+        204:
+          description: ok
+    delete:
+      summary: 刪除圖片
+      tags:
+        - ImageManager
+      responses:
+        200:
+          description: ok
+
+  /level-configs:
+    get:
+      summary: 玩家等級管理(每等級需要的經驗值)
+      tags:
+        - LevelConfigManager
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/QueryList'
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ResponseList'
+                  - type: object
+                    properties:
+                      rows: 
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id: 
+                              type: number
+                            level: 
+                              type: number
+                              description: 等級
+                            rank: 
+                              $ref: '#/components/schemas/DataRank'
+                            experience:
+                              type: number
+                              description: 所需經驗值
+                            updatedAt:
+                              $ref: '#/components/schemas/UpdatedAt'
+                            createdAt:
+                              $ref: '#/components/schemas/CreatedAt' 
+    post:
+      summary: 新增等級
+      tags:
+        - LevelConfigManager
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                level:
+                  type: number
+                experience:
+                  type: number
+                rankId:
+                  type: number
+      responses:
+        204:
+          description: ok        
+  /level-configs/{id}:
+    parameters:
+      - in: path
+        required: true
+        name: id
+        description: 資料 id
+        schema:
+          type: number                      
+    get:
+      summary: 取得等級資料
+      tags:
+        - LevelConfigManager
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id: 
+                    type: number
+                  level:
+                    type: number
+                  experience:
+                    type: number
+                  rank: 
+                    $ref: '#/components/schemas/DataRank'
+                  updatedAt:
+                    $ref: '#/components/schemas/UpdatedAt'
+                  createdAt:
+                    $ref: '#/components/schemas/CreatedAt'
+    delete:
+      summary: 刪除等級資料
+      tags:
+        - LevelConfigManager
+      responses:
+        204:
+          description: ok
+            
+
+  /rank-configs:
+    get:
+      summary: 玩家階級(rank)管理(每等級需要的經驗值)
+      tags:
+        - RankConfigManager
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/QueryList'
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ResponseList'
+                  - type: object
+                    properties:
+                      rows: 
+                        type: array
+                        items:
+                          allOf:
+                            - $ref: '#/components/schemas/DataRank'
+                            - type: object
+                              properties:
+                                updatedAt:
+                                  $ref: '#/components/schemas/UpdatedAt'
+                                createdAt:
+                                  $ref: '#/components/schemas/CreatedAt' 
+    post:
+      summary: 新增階級(rank)
+      tags:
+        - RankConfigManager
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                rank:
+                  type: number
+                imageId:
+                  $ref: '#/components/schemas/ImageId'
+                imageIndex:
+                  $ref: '#/components/schemas/ImageIndex'
+      responses:
+        204:
+          description: ok        
+  /rank-configs/{id}:
+    parameters:
+      - in: path
+        required: true
+        name: id
+        description: 資料 id
+        schema:
+          type: number                      
+    get:
+      summary: 取得階級資料
+      tags:
+        - RankConfigManager
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id: 
+                    type: number
+                  rank:
+                    type: number
+                  imageId:
+                    $ref: '#/components/schemas/ImageId'
+                  imageIndex:
+                    $ref: '#/components/schemas/ImageIndex'
+                  updatedAt:
+                    $ref: '#/components/schemas/UpdatedAt'
+                  createdAt:
+                    $ref: '#/components/schemas/CreatedAt'
+    put:
+      summary: 更新 Rank 資料
+      tags: 
+        - RankConfigManager
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                rank:
+                  type: number
+                imageId:
+                  $ref: '#/components/schemas/ImageId'
+                imageIndex:
+                  $ref: '#/components/schemas/ImageIndex'
+      responses:
+        204:
+          description: ok
+    delete:
+      summary: 刪除等級資料
+      tags:
+        - RankConfigManager
+      responses:
+        204:
+          description: ok
+
+  /common/images:
+    get:
+      summary: 查詢圖片 (共各資料設定圖片資訊使用) 
+      tags:
+        - Common
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  description: 圖片名稱 (模糊查詢)
+                
+      responses:
+        200:
+          description: ok  
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id: 
+                      type: number
+                    title:
+                      type: string
+                      description: 圖片名稱
+                    url:
+                      type: string
+                      description: 圖片實體網址
+                    numWidths:
+                      type: number
+                      description: 圖片寬切等分
+                    numHeights:
+                      type: number
+                      description: 圖片高切等
 components:
   schemas:
-    EventData:
-      type: object
-      properties:
-        EVENT_CHANNEL:
-          type: string
-          maxLength: 1
-          description: |
-            #### 請求的頻道, 用來確認資料的回傳(0. 則代表 server 端的主動訊息)
-            - range: 1 ~ 255
-            - 每個 channel 編號同時只能發送一次
-            - 每個 channel 發送後，必需設定 timeout, 時間內未接到回傳時，認定失敗
-          example: (byte:0:1)
-        EVENT_ID:
-          type: string
-          maxLength: 2
-          description: |
-            #### 事件編號
-            - range: 1 ~ 65535
-            - 用來定義各請求 or 資料的編號
-          example: (byte:1:3)
-    Image:
+    CreatedAt:
+      type: number
+      description: 更新時間 timestamp unix (秒)
+      example: 1579247398
+    UpdatedAt:
+      type: number
+      description: 建立時間 timestamp unix (秒)
+      example: 1579247398
+    StartAt:
+      type: number
+      description: 時間 - 起 , 0 代表不限制, timestamp unix (秒)
+      example: 1579247398
+    EndAt:
+      type: number
+      description: 時間 - 訖 , 0 代表不限制, timestamp unix (秒)
+      example: 1579247398
+    ImageId:
+      type: number
+      description: 圖片 id
+    ImageIndex:
+      type: number
+      description: 圖片位置
+    DataRank:
       type: object
       properties:
         id: 
           type: number
-          description: 圖片編號
-        filename: 
-          type: string
-          description: 圖片名稱(檔名)
-        url: 
-          type: string
-          description: 圖片資源網址
-        numWidths:
-          type: number
-          description: 圖片切塊(寬)
-        numHeights:
-          type: number
-          description: 圖片切塊(高)
-    ImageIndex:
-      type: object
-      properties:
-        imageId:
-          type: number
-          description: 圖片編號
-        index:
-          type: number
-          description: 圖片位置  
-    Sticker:
-      type: object
-      properties:
-        name:
-          type: string
-          description: 貼圖名稱
-        filename:
-          type: string
-          description: 貼圖的圖片名稱
-        url: 
-          type: string
-          description: 圖片資源網址
-        numWidths:
-          type: number
-          description: 圖片切塊(寬)
-        numHeights:
-          type: number
-          description: 圖片切塊(高)
-    AvatarSkinType:
-      type: number
-      description: |
-        #### skin 類型
-        - 1 # 頭像
-        - 2 # 外框
-        - 3 # 特效
-        - 4 # 背景
-      enum:
-        - 1 # 頭像
-        - 2 # 外框
-        - 3 # 特效
-        - 4 # 背景
-    AvatarSkin:
-      type: object
-      properties:
-        type: 
-          $ref: '#/components/schemas/AvatarSkinType'
-        name:
-          type: string
-          description: 貼圖名稱
-        filename:
-          type: string
-          description: 貼圖的圖片名稱
-        url: 
-          type: string
-          description: 圖片資源網址
-    GameType:
-      type: string
-      description: |
-        #### 遊戲類型
-        - slot # Slot
-        - table # table game 
-      enum:
-        #### 遊戲類型
-        - slot # Slot
-        - table # table game 
-    Game:
-      type: object
-      properties:
-        id:
-          type: number
-          description: 遊戲 ID
-        type:
-          $ref: '#/components/schemas/GameType'
-        image: 
-          $ref: '#/components/schemas/ImageIndex'
-        name:
-          type: string
-          description: 遊戲名稱
-        minimumLevel:
-          type: number
-          description: 最低等級限制
-    MemberBaseData:
-      type: object
-      properties:
-        avatar: 
-          type: string
-          description: 頭像圖片路徑
-        nickname:
-          type: string
-          description: 玩家暱稱
         rank:
           type: number
-          description: 玩家階級
-        level:
+          description: 階級
+        imageId:
+          $ref: '#/components/schemas/ImageId'
+        imageIndex:
+          $ref: '#/components/schemas/ImageIndex'
+    AnnouncementType:
+      type: number
+      description: |
+        - 1 # 官方公告
+        - 2 # 遊戲公告
+      enum: 
+        - 1
+        - 2
+    EnabledType:
+      type: number
+      description: |
+        ## 啟/停用狀態
+        - 0 # 停用
+        - 1 # 啟用
+      enum:
+        - 0 # 停用
+        - 1 # 啟用
+    QueryParameterEnabled:
+      type: number
+      description: |
+        ## 啟/停用狀態
+        - -1 # 全部
+        - 0 # 停用
+        - 1 # 啟用
+      enum:
+        - -1 # 全部
+        - 0 # 停用
+        - 1 # 啟用
+    QueryList:
+      description: 分頁查詢
+      type: object
+      required:
+        - page
+        - size
+        - tota
+      properties:
+        page: 
           type: number
-          description: 等級
-        isFriend:
-          type: boolean
-          description: 是否為好友
-        isBlock:
-          type: boolean
-          description: 是否黑名單
-        experiencePercent:
+          description: 頁數
+          example: 1
+        size:
           type: number
-          description: 目前經驗值的百分比(小數 0.0 ~ 0.999) 
-        diamondPoint:
-          type: number
-          description: 玩家鑽石點數
-        gamePoint:
-          type: number
-          description: 玩家遊戲點數
-        numLogins:
-          type: number
-          description: 登入次數
-        position:
-          type: string
-          description: 玩家目前位置
-        skin: 
-          $ref: '#/components/schemas/MemberAvatarSkin'
-    MemberAvatarSkin:
+          description: 每頁資料筆數
+          example: 15
+        sorts:
+          type: array
+          description: 查詢資料排序
+          example: ["name desc", "id asc"]
+          items:
+            type: string
+    ResponseList:
+      description: 分頁查詢回傳結構
       type: object
       properties:
-        skinAvatar: 
+        page: 
           type: number
-          description: 頭像 skin 
-        skinAvatarFrame:
+          description: 頁碼
+          example: 1
+        size:
           type: number
-          description: 頭像外框 skin
-        skinAvatarEffects:
+          description: 每頁顯示筆數
+          example: 15
+        total: 
           type: number
-          description: 頭像特效 skin
-        skinAvatarBackground:
-          type: number
-          description: 頭像背景 skin
-          
-        
+          description: 總資料筆數
+          example: 120
+    ResponseErrorInvalid:
+      description: 參數錯誤
+      type: object
+      properties:
+        invalids: 
+          type: object
+          example: |
+            {
+              account: "Account 為必填",
+              name: "Name 長度不得超過 20 字"
+            }
+        code:
+          type: string
+        message: 
+          type: string
+  
+
