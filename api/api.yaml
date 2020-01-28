@@ -37,7 +37,9 @@ servers:
     description: 正式伺服器網址
   - url: "http://demo.project-host.net/v1"
     description: 測試伺服器網址
-tags:
+tags: 
+  - name: Update-0.0.5
+    description: 部分 API 更新&修正
   - name: Update-0.0.4
     description: 部分 API 更新&修正
   - name: Update-0.0.3
@@ -415,217 +417,59 @@ paths:
       - $ref: '#/components/parameters/ProviderPassword'
     post:
       tags: 
-        - Multiplayer
-        - Update-0.0.4
+        - Update-0.0.5
       summary: 多人連線建立房間
       description: |
-        #### Update-0.0.4
-        - 房間遊戲開始
-      operationId: MultiplayerCreate
-      requestBody:
-        description: |
-          房間遊戲開始
-        content:
-          application/json:
-            schema:
-              required:
-                - game
-                - room
-              allOf:
-                - $ref: '#/components/schemas/RequestData'
-                - $ref: '#/components/schemas/KeyGame'
-                - type: object
-                  properties:
-                    room: 
-                      type: string
-                      description: 房間 id
+        #### Update-0.0.5
+        - 移除此 API
       responses:
-        '200':
-          description: Ok
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: 'ok'
-                  expire: 
-                    type: number
-                    description: |
-                      <s>多人遊戲狀態過期時間 (秒)</s> <i style="color:red">棄用</i>
-                    example: '30(棄用)'
-        '401':
-          description: 401 Error
-          content:
-            application/json:
-              schema: 
-                type: object
-                example: 請參考 Schema
-                oneOf:
-                  - $ref: '#/components/schemas/ResponseErrorDirectIPAccessNotAllowed'
-                  - $ref: '#/components/schemas/ResponseErrorProviderNotFound'
-                  - $ref: '#/components/schemas/ResponseErrorIncorrectProviderPassword'
-                  - $ref: '#/components/schemas/ResponseErrorProviderIsDisabled'
-                  - $ref: '#/components/schemas/ResponseErrorIncorrectSessionToken'
-        '403':
-          description: 403 Error
-          content:
-            application/json:
-              schema: 
-                type: object
-                example: 請參考 Schema
-                oneOf:
-                  - $ref: '#/components/schemas/ResponseErrorMemberNotFound'
-                  - $ref: '#/components/schemas/ResponseErrorGameNotFound'
+        204:
+          description: 移除此 API
   /multiplayer/close:
     parameters:
       - $ref: '#/components/parameters/ProviderName'
       - $ref: '#/components/parameters/ProviderPassword'
+    description: 移除此 API
     post:
       tags: 
-        - Update-0.0.4
-        - Multiplayer
+        - Update-0.0.5
       summary: 關閉多人連線模式
       description: |
-        #### Update-0.0.4
-        - 移除參數 `game`, `room`, 將玩家相關的房間全部關閉(通常只會有一個)
-      operationId: MultiplayerClose
-      requestBody:
-        description: |
-          - 完成請求後，玩家(原房主)狀態會變為一般，不能邀請好友
-        content:
-          application/json:
-            schema:
-              allOf:
-                - $ref: '#/components/schemas/RequestData'
+        #### Update-0.0.5
+        - 移除此 api
       responses:
-        '200':
-          description: Ok (no content response)
-        '401':
-          description: 401 Error
-          content:
-            application/json:
-              schema: 
-                type: object
-                example: 請參考 Schema
-                oneOf:
-                  - $ref: '#/components/schemas/ResponseErrorDirectIPAccessNotAllowed'
-                  - $ref: '#/components/schemas/ResponseErrorProviderNotFound'
-                  - $ref: '#/components/schemas/ResponseErrorIncorrectProviderPassword'
-                  - $ref: '#/components/schemas/ResponseErrorProviderIsDisabled'
-        '403':
-          description: 403 Error
-          content:
-            application/json:
-              schema: 
-                type: object
-                example: 請參考 Schema
-                oneOf:
-                  - $ref: '#/components/schemas/ResponseErrorMemberNotFound'
+        204:
+          description: 移除
   /multiplayer/join:
     parameters:
       - $ref: '#/components/parameters/ProviderName'
       - $ref: '#/components/parameters/ProviderPassword'
+    description: 移除此 api
     post:
       tags: 
-        - Update-0.0.4
-        - Multiplayer
+        - Update-0.0.5
       summary: 玩家加入房間
       description: |
-        #### Update-0.0.4
-        - 新增 api
-      operationId: MultiplayerClose
-      requestBody:
-        description: |
-          - 玩家加入房間
-        content:
-          application/json:
-            schema:
-              required:
-                - game
-                - room
-              allOf:
-                - $ref: '#/components/schemas/RequestData'
-                - $ref: '#/components/schemas/KeyGame'
-                - type: object
-                  properties:
-                    room: 
-                      type: string
-                      description: 多人遊戲的房間 ID
+        #### Update-0.0.5
+        - 移除此 API
       responses:
-        '200':
-          description: Ok (no content response)
-        '401':
-          description: 401 Error
-          content:
-            application/json:
-              schema: 
-                type: object
-                example: 請參考 Schema
-                oneOf:
-                  - $ref: '#/components/schemas/ResponseErrorDirectIPAccessNotAllowed'
-                  - $ref: '#/components/schemas/ResponseErrorProviderNotFound'
-                  - $ref: '#/components/schemas/ResponseErrorIncorrectProviderPassword'
-                  - $ref: '#/components/schemas/ResponseErrorProviderIsDisabled'
-        '403':
-          description: 403 Error
-          content:
-            application/json:
-              schema: 
-                type: object
-                example: 請參考 Schema
-                oneOf:
-                  - $ref: '#/components/schemas/ResponseErrorMemberNotFound'
-                  - $ref: '#/components/schemas/ResponseErrorMemberIsDisabled'
-                  - $ref: '#/components/schemas/ResponseErrorGameNotFound'
-                  - $ref: '#/components/schemas/ResponseErrorGameIsDisabled'
+        204:
+          description: 移除
   /multiplayer/leave:
     parameters:
       - $ref: '#/components/parameters/ProviderName'
       - $ref: '#/components/parameters/ProviderPassword'
+    description: 移除此 API
     post:
       tags: 
-        - Update-0.0.4
-        - Multiplayer
+        - Update-0.0.5
       summary: 玩家離開房間
       description: |
-        #### Update-0.0.4
-        - 新增 api
-      operationId: MultiplayerClose
-      requestBody:
-        description: |
-          - 玩家離開房間
-        content:
-          application/json:
-            schema:
-              allOf:
-                - $ref: '#/components/schemas/RequestData'
+        #### Update-0.0.5
+        - 移除此 api
       responses:
-        '200':
-          description: Ok (no content response)
-        '401':
-          description: 401 Error
-          content:
-            application/json:
-              schema: 
-                type: object
-                example: 請參考 Schema
-                oneOf:
-                  - $ref: '#/components/schemas/ResponseErrorDirectIPAccessNotAllowed'
-                  - $ref: '#/components/schemas/ResponseErrorProviderNotFound'
-                  - $ref: '#/components/schemas/ResponseErrorIncorrectProviderPassword'
-                  - $ref: '#/components/schemas/ResponseErrorProviderIsDisabled'
-        '403':
-          description: 403 Error
-          content:
-            application/json:
-              schema: 
-                type: object
-                example: 請參考 Schema
-                oneOf:
-                  - $ref: '#/components/schemas/ResponseErrorMemberNotFound'
-
+        204:
+          description: 移除
             
   /slot/bet:
     parameters:

@@ -32,15 +32,38 @@ tags:
     description: 提供商遊戲
   - name: Announcement
     description: 公告管理
+  - name: Gashapon
+    description: 轉蛋(活動）管理
+  - name: GashaponCost
+    description: 轉蛋活動消費方法
+  - name: GashaponReward
+    description: 轉蛋活動獎勵
+  - name: Store
+    description: 商店管理
+  - name: StoreCommondityItem
+    description: 商品管理 - 道具商品
+  - name: StoreCommondityAvatar
+    description: 商品管理 - 頭像 skin 商品
+  - name: StoreModelCommonditySticker
+    description: 商品管理 - 貼圖商品
+  - name: Mission
+    description: 任務管理
+  - name: MissionReward
+    description: 任務獎勵道具
+  - name: Record
+    description: 各項記錄查詢
   - name: ImageManager
     description: 圖片管理 `/system/image`
   - name: ItemManager
     description: 道具管理 `/system/item`
+  - name: AvatarSkinManager
+    description: 頭象 skin 管理
+  - name: StickerManager
+    description: 貼圖管理
   - name: LevelConfigManager
     description: 玩家等級管理
   - name: RankConfigManager
     description: 玩家階級(Rank)管理
-
 paths:
   /login:
     post:
@@ -137,11 +160,12 @@ paths:
                               type: number
                             gamePoint:
                               type: number
-  /members/{uid}:
+  /members/{id}:
     parameters:
       - in: path
+        name: id
         required: true
-        name: uid
+        description: member.id
         schema:
           type: number
     get:
@@ -221,6 +245,8 @@ paths:
       responses:
         204:
           description: ok 
+
+
   /announcements:
     get:
       summary: 查詢公告(分頁)
@@ -518,6 +544,21 @@ paths:
                     $ref: '#/components/schemas/UpdatedAt'
                   createdAt:
                     $ref: '#/components/schemas/CreatedAt'
+    post:
+      summary: 重建 privatekey
+      tags: 
+        - Provider
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  primaryKey:
+                    type: string
+                    example: d04b98f48e8f8bcc15c6ae5ac050801cd6dcfd428fb5f9e65c4e16e7807340fa
     put:
       summary: 更新資料
       tags:
@@ -546,6 +587,1460 @@ paths:
       responses:
         204:
           description: ok
+    patch:
+      summary: 部分資料更新(啟/停用)
+      tags:
+        - Provider
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                enabled:
+                  $ref: '#/components/schemas/EnabledType'
+      responses:
+        204:
+          description: ok
+  /providers/delete:
+    delete:
+      summary: 刪除提供商
+      tags:
+        - Provider
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  description: 提供商 id
+                  items:
+                    type: number
+      responses:
+        204:
+          description: ok
+  /providers/{pid}/games:
+    parameters:
+      - in: path
+        name: pid
+        required: true
+        description: 提供商 id
+        schema:
+          type: number
+    get:
+      summary: 查詢提供商遊戲
+      tags:
+        - ProviderGame
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/QueryList'
+                - type: object
+                  properties:
+                    enabled:
+                      $ref: '#/components/schemas/QueryParameterEnabled'
+                    name:
+                      type: string
+                      description: 遊戲名稱
+                    type:
+                      $ref: '#/components/schemas/QueryParameterGameType'
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ResponseList'
+                  - type: object
+                    properties:
+                      rows:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: number
+                            providerId:
+                              type: number
+                            provider:
+                              $ref: '#/components/schemas/DataProvider'
+                            imageId:
+                              $ref: '#/components/schemas/ImageId'
+                            imageIndex:
+                              $ref: '#/components/schemas/ImageIndex'
+                            type:
+                              $ref: '#/components/schemas/GameType'
+                            code:
+                              type: string
+                              description: 遊戲代號
+                            name: 
+                              type: string
+                              description: 遊戲名稱
+                            enabled:
+                              $ref: '#/components/schemas/QueryParameterEnabled'
+                            experienceRate:
+                              type: number
+                              description: 經驗值比率
+                            minimumLevel:
+                              type: number
+                              description: 等級限制
+                            updatedAt:
+                              $ref: '#/components/schemas/UpdatedAt'
+                            createdAt:
+                              $ref: '#/components/schemas/CreatedAt'
+    post:
+      summary: 新增遊戲
+      tags:
+        - ProviderGame
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                imageId:
+                  $ref: '#/components/schemas/ImageIndex'
+                imageIndex:
+                  $ref: '#/components/schemas/ImageIndex'
+                type:
+                  $ref: '#/components/schemas/GameType'
+                code:
+                  type: string
+                  description: 遊戲代號
+                name:
+                  type: string
+                  description: 遊戲名稱
+                enabled:
+                  $ref: '#/components/schemas/EnabledType'
+                experienceRate:
+                  type: number
+                  minimum: 0
+                  description: 經驗值比率 .3f
+                minimumLevel:
+                  type: number
+                  minimum: 0
+                  description: 等級需求
+                
+      responses:
+        204:
+          description: ok
+  /providers/{pid}/games/{gid}:
+    parameters:
+      - in: path
+        name: pid
+        required: true
+        description: 提供商 id
+        schema:
+          type: number
+      - in: path
+        name: gid
+        required: true
+        description: 遊戲 id
+        schema:
+          type: number
+    get:
+      summary: 取得遊戲資料
+      tags:
+        - ProviderGame
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: number
+                  providerId:
+                    type: number
+                  provider:
+                    $ref: '#/components/schemas/DataProvider'
+                  imageId:
+                    $ref: '#/components/schemas/ImageId'
+                  imageIndex:
+                    $ref: '#/components/schemas/ImageIndex'
+                  type:
+                    $ref: '#/components/schemas/GameType'
+                  code:
+                    type: string
+                    description: 遊戲代號
+                  name: 
+                    type: string
+                    description: 遊戲名稱
+                  enabled:
+                    $ref: '#/components/schemas/QueryParameterEnabled'
+                  experienceRate:
+                    type: number
+                    description: 經驗值比率
+                  minimumLevel:
+                    type: number
+                    description: 等級限制
+                  updatedAt:
+                    $ref: '#/components/schemas/UpdatedAt'
+                  createdAt:
+                    $ref: '#/components/schemas/CreatedAt'
+    put:
+      summary: 更新遊戲資料
+      tags:
+        - ProviderGame
+      requestBody:
+        description: |
+          - providerId, type 無法修改，避免影響到 report 資料
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                imageId:
+                  $ref: '#/components/schemas/ImageIndex'
+                imageIndex:
+                  $ref: '#/components/schemas/ImageIndex'
+                code:
+                  type: string
+                  description: 遊戲代號
+                name:
+                  type: string
+                  description: 遊戲名稱
+                enabled:
+                  $ref: '#/components/schemas/EnabledType'
+                experienceRate:
+                  type: number
+                  description: 經驗值比率(0.000 ~ 1.000)
+                  minimum: 0
+                minimumLevel:
+                  type: number
+                  description: 等級需求
+                  minimum: 0
+      responses:
+        204:
+          description: ok
+    patch:
+      summary: 部分資料更新(啟/停用)
+      tags:
+        - ProviderGame
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                enabled:
+                  $ref: '#/components/schemas/EnabledType'
+      responses:
+        204:
+          description: ok
+  /providers/{pid}/games/delete:
+    delete:
+      summary: 刪除多項遊戲
+      tags:
+        - ProviderGame
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids: 
+                  type: array
+                  items:
+                    type: number
+      responses:
+        204:
+          description: ok
+  
+  /gashapons:
+    get:
+      summary: 查詢轉蛋活動
+      tags:
+        - Gashapon
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/QueryList'
+                - type: object
+                  properties:
+                    name:
+                      type: string
+                      description: 轉蛋活動名稱(模糊查詢)
+                    enabled:
+                      $ref: '#/components/schemas/QueryParameterEnabled'
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ResponseList'
+                  - type: object
+                    properties:
+                      rows:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ModelGashaponRow'
+    post:
+      summary: 新增轉蛋活動
+      tags:
+        - Gashapon
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 轉蛋活動名稱
+                enabled:
+                  $ref: '#/components/schemas/EnabledType'
+                description:
+                  type: string
+                  description: 活動說明
+                startAt:
+                  $ref: '#/components/schemas/StartAt'
+                endAt:
+                  $ref: '#/components/schemas/EndAt'
+      responses:
+        204:
+          description: ok
+  /gashapons/{id}:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        description: 轉蛋活動 id
+        schema:
+          type: number
+    get:
+      summary: 取得轉蛋活動資料
+      tags:
+        - Gashapon
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModelGashapon'
+    put:
+      summary: 更新轉蛋活動資料
+      tags:
+        - Gashapon
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                enabled:
+                  $ref: '#/components/schemas/EnabledType'
+                description:
+                  type: string
+                startAt:
+                  $ref: '#/components/schemas/StartAt'
+                endAt:
+                  $ref: '#/components/schemas/EndAt'
+      responses:
+        204:
+          description: ok
+  /gashapons/delete:
+    delete:
+      summary: 刪除多筆轉蛋活動資料
+      tags:
+        - Gashapon
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  description: 轉蛋活動 id
+                  items:
+                    type: number
+      responses:
+        204:
+          description: ok
+  /gashapons/{gid}/costs:
+    parameters:
+      - in: path
+        name: gid
+        required: true
+        description: 轉蛋活動 id
+        schema:
+          type: number
+    get:
+      summary: 查詢轉蛋活動消費方法
+      tags:
+        - GashaponCost
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/QueryList'
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ResponseList'
+                  - type: object
+                    properties:
+                      rows:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ModelGashaponCost'
+    post:
+      summary: 新增消費方式
+      tags:
+        - GashaponCost
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                itemId:
+                  type: number
+                numItems:
+                  type: number
+                times:
+                  type: number
+      responses:
+        204:
+          description: ok
+  /gashapons/{gid}/costs/{cid}:
+    parameters:
+      - in: path
+        name: gid
+        required: true
+        description: 轉蛋活動 id
+        schema:
+          type: number
+      - in: path
+        name: cid
+        required: true
+        description: 轉蛋活動消費方式 id
+        schema:
+          type: number
+    get:
+      summary: 取得轉蛋活動消費方式資料
+      tags:
+        - GashaponCost
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModelGashaponCost'
+    put:
+      summary: 更新轉蛋活動消費方式資料
+      tags:
+        - GashaponCost
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                itemId:
+                  type: number
+                numItems:
+                  type: number
+                times:
+                  type: number
+      responses:
+        204:
+          description: ok
+  /gashapons/{gid}/costs/delete:
+    parameters:
+      - in: path
+        name: gid
+        required: true
+        description: 轉蛋活動 id
+        schema:
+          type: number
+    delete:
+      summary: 刪除多項轉蛋活動消費方式
+      tags:
+        - GashaponCost
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  description: 消費方式 id
+                  items:
+                    type: number
+      responses:
+        204:
+          description: ok
+  /gashapons/{gid}/reward:
+    parameters:
+      - in: path
+        name: gid
+        required: true
+        description: 轉蛋活動 id
+        schema:
+          type: number
+    get:
+      summary: 查詢轉蛋獎勵
+      tags:
+        - GashaponReward
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/QueryList'
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ResponseList'
+                  - type: object
+                    properties:
+                      rows:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ModelGashaponReward'
+    post:
+      summary: 新增轉蛋獎勵
+      tags:
+        - GashaponReward
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                weight:
+                  type: number
+                itemId:
+                  type: number
+                numItems:
+                  type: number
+      responses:
+        204:
+          description: ok
+  /gashapons/{gid}/reward/{rid}:
+    parameters:
+      - in: path
+        name: gid
+        required: true
+        description: 轉蛋活動 id
+        schema:
+          type: number
+      - in: path
+        name: rid
+        required: true
+        description: 轉蛋獎勵 id
+        schema:
+          type: number
+    get:
+      summary: 取得轉蛋獎勵資料
+      tags:
+        - GashaponReward
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModelGashaponReward'
+    put:
+      summary: 更新轉蛋活獎勵資料
+      tags:
+        - GashaponReward
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                weight:
+                  type: number
+                itemId:
+                  type: number
+                numItems:
+                  type: number
+      responses:
+        204:
+          description: ok
+  /gashapons/{gid}/delete/reward:
+    parameters:
+      - in: path
+        name: gid
+        required: true
+        description: 轉蛋活動 id
+        schema:
+          type: number
+    delete:
+      summary: 刪除多項轉蛋獎勵方式
+      tags:
+        - GashaponReward
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  description: 轉蛋獎勵 id
+                  items:
+                    type: number
+      responses:
+        204:
+          description: ok
+
+
+  /missions:
+    get:
+      summary: 查詢任務列表
+      tags:
+        - Mission
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ResponseList'
+                  - type: object
+                    properties:
+                      rows:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ModelMissionRow'
+    post:
+      summary: 新增任務
+      tags:
+        - Mission
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                key: 
+                  type: string
+                  description: 任務代號
+                name:
+                  type: string
+                  description: 任務名稱
+                # daily:
+                #   type: boolean
+                #   description: 是否為每日任務(以 MissionTemplate 為主)
+                enabled:
+                  $ref: '#/components/schemas/EnabledType'
+                minimunLevel:
+                  type: number
+                  description: 等級限制
+                values:
+                  type: string
+                  description: |
+                    ## 任務參數 (json string)
+                    ```
+                    {
+                      // key. 任務參數中的 key (參數代號)
+                      [key]: value
+                    }
+                    ```
+                description:
+                  type: string
+                  description: 任務內容(詳細說明)
+                startAt:
+                  $ref: '#/components/schemas/StartAt'
+                endAt:
+                  $ref: '#/components/schemas/EndAt'
+      responses:
+        204:
+          description: ok
+  /missions/{id}:
+    get:
+      summary: 取得任務資料
+      tags:
+        - Mission
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModelMission'
+    put:
+      summary: 更新任務資料
+      tags:
+        - Mission
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name: 
+                  type: string
+                enabled:
+                  $ref: '#/components/schemas/EnabledType'
+                minimunLevel:
+                  type: number
+                  description: 等級限制
+                values:
+                  type: string
+                  description: 任務參數 (json string)
+                description:
+                  type: string
+                  description: 任務說明(詳細說明)
+                startAt:
+                  $ref: '#/components/schemas/StartAt'
+      responses:
+        204:
+          description: ok
+  /missions/delete:
+    delete:
+      summary: 刪除多個任務
+      tags:
+        - Mission
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  description: 任務 id 陣列
+                  items:
+                    type: number
+      responses:
+        204:
+          description: ok
+  /missions/{mid}/rewards:
+    parameters:
+      - in: path
+        name: mid
+        required: true
+        description: 任務 id
+        schema:
+          type: number
+    get:
+      summary: 任務獎勵
+      tags:
+        - MissionReward
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/QueryList'
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ResponseList'
+                  - type: object
+                    properties:
+                      rows:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ModelMissionReward'
+    post:
+      summary: 新增任務獎勵
+      tags:
+        - MissionReward
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                itemId:
+                  type: number
+                numItems:
+                  type: number
+      responses:
+        204:
+          description: ok
+  /missions/{mid}/rewards/{rid}:
+    parameters:
+      - in: path
+        name: mid
+        required: true
+        description: 任務 id
+        schema:
+          type: number
+      - in: path
+        name: rid
+        required: true
+        description: 獎勵 id
+        schema:
+          type: number
+    put:
+      summary: 更新獎勵
+      tags:
+        - MissionReward
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                itemId:
+                  type: number
+                numItems:
+                  type: number
+      responses:
+        204:
+          description: ok
+  /missions/{mid}/rewards/delete:
+    delete:
+      summary: 刪除多項獎勵
+      tags:
+        - MissionReward
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  description: 獎勵 id 陣列
+                  items:
+                    type: number
+      responses:
+        204:
+          description: ok
+  
+  /stores:
+    get:
+      summary: 查詢商店
+      tags:
+        - Store
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/QueryList'
+                - type: object
+                  properties:
+                    name: 
+                      type: string
+                      description: 商店名稱
+                    shopType:
+                      $ref: '#/components/schemas/QueryParameterShopType'
+                    enabled:
+                      $ref: '#/components/schemas/QueryParameterEnabled'
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ResponseList'
+                  - type: object
+                    properties:
+                      rows: 
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: number
+                            name:
+                              type: string
+                            description:
+                              type: string
+                              description: 商店說明
+                            enabled:
+                              $ref: '#/components/schemas/EnabledType'
+                            shopType:
+                              $ref: '#/components/schemas/ShopType'
+                            startAt:
+                              $ref: '#/components/schemas/StartAt'
+                            endAt:
+                              $ref: '#/components/schemas/EndAt'
+                            updatedAt:
+                              $ref: '#/components/schemas/UpdatedAt'
+                            createdAt:
+                              $ref: '#/components/schemas/CreatedAt'
+                          
+    post:
+      summary: 新增商店
+      tags:
+        - Store
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id: 
+                  type: number
+                name: 
+                  type: string
+                description:
+                  type: string
+                enabled:
+                  $ref: '#/components/schemas/EnabledType'
+                shopType:
+                  $ref: '#/components/schemas/ShopType'
+                startAt:
+                  $ref: '#/components/schemas/StartAt'
+                endAt: 
+                  $ref: '#/components/schemas/EndAt'
+      responses:
+        204:
+          description: ok
+  /stores/{sid}:
+    parameters:
+      - in: path  
+        name: sid
+        required: true
+        description: 商店 id
+        schema:
+          type: number
+    get:
+      summary: 取得商店詳細資訊
+      tags:
+        - Store
+      responses:
+        200: 
+          description: ok
+          content:
+            application/x-www-form-urlencoded:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: number
+                  name:
+                    type: string
+                  description:
+                    type: string
+                    description: 商店說明
+                  enabled:
+                    $ref: '#/components/schemas/EnabledType'
+                  shopType:
+                    $ref: '#/components/schemas/ShopType'
+                  startAt:
+                    $ref: '#/components/schemas/StartAt'
+                  endAt:
+                    $ref: '#/components/schemas/EndAt'
+                  updatedAt:
+                    $ref: '#/components/schemas/UpdatedAt'
+                  createdAt:
+                    $ref: '#/components/schemas/CreatedAt'
+    put:
+      summary: 更新資料
+      tags:
+        - Store
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name: 
+                  type: string
+                description:
+                  type: string
+                enabled:
+                  $ref: '#/components/schemas/EnabledType'
+                shopType:
+                  $ref: '#/components/schemas/ShopType'
+                startAt:
+                  $ref: '#/components/schemas/StartAt'
+                endAt: 
+                  $ref: '#/components/schemas/EndAt'
+      responses:
+        204:
+          description: ok
+    patch:
+      summary: 更新部分資料(啟/停用)
+      tags:
+        - Store
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                enabled: 
+                  $ref: '#/components/schemas/EnabledType'
+      responses:
+        204:
+          description: ok
+  /stores/delete:
+    delete:
+      summary: 刪除多個商店 `(後端使用 tx 執行)`
+      tags:
+        - Store
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  description: 商站編號
+                  items:
+                    type: number
+      responses:
+        204:
+          description: ok
+  /stores/{sid}/items:
+    parameters:
+      - in: path
+        name: sid
+        required: true
+        description: 商店 id
+        schema:
+          type: number
+    get:
+      summary: 取得(道具)商店道具
+      tags:
+        - StoreCommondityItem
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/QueryList'
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema: 
+                allOf:
+                  - $ref: '#/components/schemas/ResponseList'
+                  - type: object
+                    properties:
+                      rows:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ModelCommondityItem'
+    post:
+      summary: 新增(道具)商店道具
+      tags:
+        - StoreCommondityItem
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                itemId:
+                  type: number
+                numPackages:
+                  type: number
+                  description: 數量(每包數量)
+                pointType:
+                  $ref: '#/components/schemas/PointType'
+                price:
+                  type: number
+                enabled:
+                  $ref: '#/components/schemas/EnabledType'
+      responses:
+        204:
+          description: ok
+  /stores/{sid}/items/{aid}:
+    parameters:
+      - in: path
+        name: sid
+        required: true
+        description: 商店 id
+        schema:
+          type: number
+      - in: path
+        name: aid
+        required: true
+        description: 商品 id
+        schema:
+          type: number
+    get:
+      summary: 取得道具商品資料
+      tags:
+        - StoreCommondityItem
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModelCommondityItem'
+
+    put:
+      summary: 更新道具商品資料
+      tags:
+        - StoreCommondityItem
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                itemId:
+                  type: number
+                  description: 道具 id
+                numPackages:
+                  type: number
+                  description: 數量(每包數量)
+                pointType:
+                  $ref: '#/components/schemas/PointType'
+                price:
+                  type: number
+                  description: 商品價格
+      responses:
+        204:
+          description: ok
+  /stores/{sid}/items/delete:
+    parameters:
+      - in: path
+        name: sid
+        required: true
+        description: 商店 id
+        schema:
+          type: number
+    delete:
+      summary: 刪除多項道具商品
+      tags:
+        - StoreCommondityItem
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids: 
+                  type: array
+                  description: 道具商品編號 (後端使用 tx 處理)
+                  items:
+                    type: number
+      responses:
+        204:
+          description: ok
+
+  /stores/{sid}/avatars:
+    parameters:
+      - in: path
+        name: sid
+        required: true
+        description: 商店 id
+        schema:
+          type: number
+    get:
+      summary: 查詢商店的 avatar skin 商品 `(僅允許商店販售，不可回購)`
+      tags: 
+        - StoreCommondityAvatar
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/QueryList'
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ResponseList'
+                  - type: object
+                    properties:
+                      rows:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id: 
+                              type: number
+                            storeId:
+                              type: number
+                            skinId:
+                              type: number
+                            skin:
+                              $ref: '#/components/schemas/DataAvatarSkin'
+                            pointType:
+                              $ref: '#/components/schemas/PointType'
+                            price:
+                              type: number
+                              description: 價格
+                            updatedAt:
+                              $ref: '#/components/schemas/UpdatedAt'
+                            createdAt:
+                              $ref: '#/components/schemas/CreatedAt'
+    post:
+      summary: 新增 avatar skin 商品
+      tags:
+        - StoreCommondityAvatar
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - skinId
+                - pointType
+                - price
+              properties:
+                skinId: 
+                  type: number
+                  description: 新增的頭像 skin id
+                pointType:
+                  $ref: '#/components/schemas/PointType'
+                price:
+                  type: number
+                  description: 商品價格
+                  minimum: 1
+      responses:
+        204:
+          description: ok
+  /stores/{sid}/avatars/{aid}:
+    parameters:
+      - in: path
+        name: sid
+        required: true
+        description: 商店 id
+        schema:
+          type: number
+      - in: path
+        name: aid
+        required: true
+        description: avatar skin 商品 id
+        schema:
+          type: number
+    get:
+      summary: 取得 avatar skin 商品資料
+      tags:
+        - StoreCommondityAvatar
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id: 
+                    type: number
+                  storeId:
+                    type: number
+                  skinId: 
+                    type: number
+                  skin:
+                    $ref: '#/components/schemas/DataAvatarSkin'
+                  pointType:
+                    $ref: '#/components/schemas/PointType'
+                  price:
+                    type: number
+                    description: 商品價格
+                  updatedAt:
+                    $ref: '#/components/schemas/UpdatedAt'
+                  createdAt:
+                    $ref: '#/components/schemas/CreatedAt'
+    put:
+      summary: 更新 avatar skin 商品
+      tags:
+        - StoreCommondityAvatar
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                skinId:
+                  type: number
+                  description: avatar skin id 
+                pointType:
+                  $ref: '#/components/schemas/PointType'
+                price:
+                  type: number
+                  description: 商品價格
+      responses:
+        204:
+          description: ok
+  /stores/{sid}/avatars/delete:
+    parameters:
+      - in: path
+        name: sid
+        required: true
+        description: 商店 id
+        schema:
+          type: number
+    delete:
+      summary: 刪除多項 avatar skin 商品
+      tags:
+        - StoreCommondityAvatar
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids: 
+                  type: array
+                  description: avatar skin 商品編號 (後端使用 tx 處理)
+                  items:
+                    type: number
+      responses:
+        204:
+          description: ok
+
+  /stores/{sid}/stickers:
+    parameters:
+      - in: path
+        name: sid
+        required: true
+        description: 商店 id
+        schema:
+          type: number
+    get:
+      summary: 查詢貼圖包商品列表 
+      tags:
+        - StoreModelCommonditySticker
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/QueryList'
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ResponseList'
+                  - type: object
+                    properties:
+                      rows:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ModelCommonditySticker'
+    post:
+      summary: 新增貼圖片商品 `(僅允許商店販售，不可回購)`
+      tags:
+        - StoreModelCommonditySticker
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                stickerId:
+                  type: number
+                pointType:
+                  $ref: '#/components/schemas/PointType'
+                price:
+                  type: number
+                  description: 貼圖包商品價格
+      responses:
+        204:
+          description: ok
+  /stores/{sid}/stickers/{stid}:
+    parameters:
+      - in: path
+        name: sid
+        required: true
+        description: 商店 id
+        schema:
+          type: number
+      - in: path
+        name: stid
+        required: true
+        description: 貼圖包商品 id
+        schema:
+          type: number              
+    get:
+      summary: 取得貼圖包商品資訊
+      tags:
+        - StoreModelCommonditySticker
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModelCommonditySticker'
+    put:
+      summary: 更新貼圖包商品資訊
+      tags:
+        - StoreModelCommonditySticker
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                stickerId:
+                  type: number
+                pointType:
+                  $ref: '#/components/schemas/PointType'
+                price:
+                  type: number
+      responses:
+        204:
+          description: ok
+  /stores/{sid}/stickers/delete:
+    parameters:
+      - in: path
+        name: sid
+        required: true
+        description: 商店 id
+        schema:
+          type: number
+    delete:
+      summary: 刪除多項貼圖包商品
+      tags:
+        - StoreModelCommonditySticker
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids: 
+                  type: array
+                  description: 貼圖包商品編號 (後端使用 tx 處理)
+                  items:
+                    type: number
+      responses:
+        204:
+          description: ok
+
   /items:
     get:
       summary: 道具、物品列表(分頁)
@@ -586,9 +2081,6 @@ paths:
                           properties:
                             id:
                               type: number
-                            moduleId:
-                              type: number
-                              description: 模組編號
                             imageId:
                               $ref: '#/components/schemas/ImageId'
                             imageIndex:
@@ -738,7 +2230,169 @@ paths:
       responses:
         204:
           description: ok
-            
+
+  /avatar-skins:
+    get:
+      summary: 查詢頭像 skin 列表
+      tags:
+        - AvatarSkinManager
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/QueryList'
+                - type: object
+                  properties:
+                    name:
+                      type: string
+                      description: skin 名稱
+                    type:
+                      $ref: '#/components/schemas/QueryParameterAvatarSkinType'
+                    enabled:
+                      $ref: '#/components/schemas/QueryParameterEnabled'
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ResponseList'
+                  - type: object
+                    properties:
+                      rows:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id: 
+                              type: number
+                            type:
+                              $ref: '#/components/schemas/AvatarSkinType'
+                            imageId:
+                              $ref: '#/components/schemas/ImageId'
+                            imageIndex:
+                              $ref: '#/components/schemas/ImageIndex'
+                            name:
+                              type: string
+                              description: skin 名稱
+                            enabled:
+                              $ref: '#/components/schemas/EnabledType'
+                            updatedAt:
+                              $ref: '#/components/schemas/UpdatedAt'
+                            createdAt:
+                              $ref: '#/components/schemas/CreatedAt'
+    post:
+      summary: 新增頭像 skin
+      tags:
+        - AvatarSkinManager
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                type:
+                  $ref: '#/components/schemas/AvatarSkinType'
+                imageId:
+                  $ref: '#/components/schemas/ImageId'
+                imageIndex:
+                  $ref: '#/components/schemas/ImageIndex'
+                name:
+                  type: string
+                  description: skin 名稱
+                enabled:
+                  $ref: '#/components/schemas/EnabledType'
+      responses:
+        204:
+          description: ok
+  /avatar-skins/{id}:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        description: avatar skin id
+        schema:
+          type: number
+    get:
+      summary: 取得 avatar skin 資料
+      tags:
+        - AvatarSkinManager
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: object     
+                properties:
+                  id: 
+                    type: number
+                  type:
+                    $ref: '#/components/schemas/AvatarSkinType'
+                  imageId:
+                    $ref: '#/components/schemas/ImageId'
+                  imageIndex:
+                    $ref: '#/components/schemas/ImageIndex'
+                  name:
+                    type: string
+                    description: skin 名稱
+                  enabled:
+                    $ref: '#/components/schemas/EnabledType'
+                  updatedAt:
+                    $ref: '#/components/schemas/UpdatedAt'
+                  createdAt:
+                    $ref: '#/components/schemas/CreatedAt'
+    put:
+      summary: 更新資料
+      tags:
+        - AvatarSkinManager
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                type:
+                  $ref: '#/components/schemas/AvatarSkinType'
+                imageId:
+                  $ref: '#/components/schemas/ImageId'
+                imageIndex:
+                  $ref: '#/components/schemas/ImageIndex'
+                name:
+                  type: string  
+                  description: skin 名稱
+                enabled:
+                  $ref: '#/components/schemas/EnabledType'
+      responses:
+        204:
+          description: ok
+    patch:
+      summary: 更新部分資料 (啟/停用)
+      tags:
+        - AvatarSkinManager
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                enabled:
+                  $ref: '#/components/schemas/EnabledType'
+      responses:
+        204:
+          description: ok
+    delete:
+      summary: 刪除 skin
+      tags:
+        - AvatarSkinManager
+      description: |
+        - 刪除之前必需先檢查 member_skin, store_commondity_avatar 是否有使用此資料，若有則刪除失敗
+      responses:
+        204:
+          description: ok
+    
   /images:
     get:
       summary: 取得圖片列表(不分頁)
@@ -986,7 +2640,7 @@ paths:
       responses:
         204:
           description: ok
-            
+
 
   /rank-configs:
     get:
@@ -1098,9 +2752,124 @@ paths:
         204:
           description: ok
 
-  /common/images:
+  /stickers:
     get:
-      summary: 查詢圖片 (共各資料設定圖片資訊使用) 
+      summary: 查詢貼圖列表
+      tags:
+        - StickerManager
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/QueryList'
+                - type: object
+                  properties:
+                    name:
+                      type: string
+                      description: 貼圖包名稱
+                    enabled:
+                      $ref: '#/components/schemas/QueryParameterEnabled'
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ResponseList'
+                  - type: object
+                    properties:
+                      rows:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ModelSticker'
+    post:
+      summary: 新增貼圖包
+      tags:
+        - StickerManager
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name: 
+                  type: string
+                  description: 貼圖包名稱
+                imageId:
+                  $ref: '#/components/schemas/ImageId'
+                imageIndex:
+                  type: number
+                  description: 此貼圖包的預設的貼圖位置
+                enabled:
+                  $ref: '#/components/schemas/EnabledType'
+      responses:
+        204:
+          description: ok
+  /stickers/{id}:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        description: 貼圖包 id
+        schema:
+          type: number
+    get:
+      summary: 取得貼圖包資訊
+      tags:
+        - StickerManager
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModelSticker'
+    put:
+      summary: 更新貼圖包資料
+      tags:
+        - StickerManager
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name: 
+                  type: string
+                  description: 貼圖包名稱
+                imageId:
+                  $ref: '#/components/schemas/ImageId'
+                imageIndex:
+                  type: number
+                  description: 此貼圖包的預設的貼圖位置
+                enabled:
+                  $ref: '#/components/schemas/EnabledType'
+      responses:
+        204:
+          description: ok
+    patch:
+      summary: 更新部分資料(啟/停用)
+      tags:
+        - StickerManager
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                enabled:
+                  $ref: '#/components/schemas/EnabledType'
+      responses:
+        204:
+          description: ok
+
+                  
+
+  /common/image-dir-path:
+    get: 
+      summary: 查詢圖片所有路徑 
       tags:
         - Common
       requestBody:
@@ -1109,9 +2878,44 @@ paths:
             schema:
               type: object
               properties:
-                title:
+                dirPath: 
                   type: string
-                  description: 圖片名稱 (模糊查詢)
+                  description: 查詢 dir_path = '?%' 的路徑
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: array
+                description: 圖片路徑種類
+                items:
+                  type: string
+                  description: 圖片路徑
+                  example: /items
+                    
+  /common/images:
+    get:
+      summary: 查詢圖片
+      tags:
+        - Common
+      requestBody:
+        description: |
+          ## 查詢圖片 (分頁)
+          - 預設依 dir_path asc, id desc 排序
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/QueryList'
+                - type: object
+                  properties:
+                    dirPath: 
+                      type: string
+                      description: 路徑
+                    title:
+                      type: string
+                      description: 圖片名稱 (模糊查詢)
                 
       responses:
         200:
@@ -1119,24 +2923,334 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  type: object
+                allOf:
+                  - $ref: '#/components/schemas/ResponseList'
+                  - type: object
+                    properties:
+                      rows:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id: 
+                              type: number
+                            dirPath:
+                              type: string
+                              description: 圖片路徑
+                            title:
+                              type: string
+                              description: 圖片名稱
+                            url:
+                              type: string
+                              description: 圖片實體網址
+                            numWidths:
+                              type: number
+                              description: 圖片寬切等分
+                            numHeights:
+                              type: number
+                              description: 圖片高切等
+  /common/images/{id}:
+    parameters:
+      - in: path  
+        name: id
+        required: true
+        description: 圖片 id
+        schema:
+          type: number
+    get:
+      summary: 取得圖片資料
+      tags:
+        - Common
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id: 
+                    type: number
+                  dirPath:
+                    type: string
+                    description: 圖片路徑
+                  title:
+                    type: string
+                    description: 圖片名稱
+                  url:
+                    type: string
+                    description: 圖片實體網址
+                  numWidths:
+                    type: number
+                    description: 圖片寬切等分
+                  numHeights:
+                    type: number
+                    description: 圖片高切等
+  /common/providers:
+    get:
+      summary: 查詢提供商
+      tags:
+        - Common
+      requestBody:
+        description: |
+          ## 查詢提供商 (分頁)
+          - 預設依 username asc 排序
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/QueryList'
+                - type: object
                   properties:
-                    id: 
-                      type: number
-                    title:
+                    username: 
                       type: string
-                      description: 圖片名稱
-                    url:
+                      description: 提供商 username
+                    name: 
                       type: string
-                      description: 圖片實體網址
-                    numWidths:
-                      type: number
-                      description: 圖片寬切等分
-                    numHeights:
-                      type: number
-                      description: 圖片高切等
+                      description: 提供商名稱
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ResponseList'
+                  - type: object
+                    properties:
+                      rows:
+                        type: array
+                        items:
+                          type: object
+                          properties: 
+                            id: 
+                              type: number
+                            username: 
+                              type: string
+                            name: 
+                              type: string
+  /common/items:
+    get:
+      summary: 查詢道具
+      tags:
+        - Common
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/QueryList'
+                - type: object
+                  properties:
+                    name:
+                      type: string
+                      description: 道具名稱(模糊查詢)
+                    key:
+                      type: string
+                      description: 道具代號(模糊查詢)
+                    enabled:
+                      $ref: '#/components/schemas/QueryParameterEnabled'
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ResponseList'
+                  - type: object
+                    properties:
+                      rows:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: number
+                            imageId:
+                              $ref: '#/components/schemas/ImageId'
+                            imageIndex:
+                              $ref: '#/components/schemas/ImageIndex'
+                            key: 
+                              type: string
+                              description: 道具代號
+                            name: 
+                              type: string
+                              description: 道具名稱
+                            enabled:
+                              type: boolean
+                              description: 是否啟用
+  /common/avatar-skins:
+    get:
+      summary: 查詢頭像 skin
+      tags:
+        - Common
+      requestBody:
+        description: |
+          ## 查詢頭像 skin 
+          - 預設依 type asc, name asc 排序
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/QueryList'
+                - type: object
+                  properties:
+                    name: 
+                      type: string
+                      description: skin 名稱
+                    type:
+                      $ref: '#/components/schemas/AvatarSkinType'
+                    enabled:
+                      $ref: '#/components/schemas/QueryParameterEnabled'
+      responses:
+        200:
+          description: ok 
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ResponseList'
+                  - type: object
+                    properties:
+                      rows:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id: 
+                              type: number
+                            type:
+                              $ref: '#/components/schemas/AvatarSkinType'
+                            imageId:
+                              $ref: '#/components/schemas/ImageId'
+                            imageIndex:
+                              $ref: '#/components/schemas/ImageIndex'
+                            name:
+                              type: string
+                              description: skin 名稱
+                            enabled:
+                              $ref: '#/components/schemas/EnabledType'
+  /common/stickers:
+    get:
+      summary: 查詢貼圖包
+      tags:
+        - Common
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/QueryList'
+                - type: object
+                  properties:
+                    name:
+                      type: string
+                    enabled:
+                      $ref: '#/components/schemas/QueryParameterEnabled'
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ResponseList'
+                  - type: object
+                    properties:
+                      rows:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id: 
+                              type: number
+                            name:
+                              type: string
+                            imageId:
+                              $ref: '#/components/schemas/ImageId'
+                            defaultIndex:
+                              type: number
+                              description: 此貼圖包的預設的貼圖位置
+                            enabled:
+                              $ref: '#/components/schemas/EnabledType'
+  /common/mission-templates:
+    get:
+      summary: 任務類型列表
+      tags:
+        - Common
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/QueryList'
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ResponseList'
+                  - type: object
+                    properties:
+                      rows:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            key:
+                              type: string
+                              description: 任務代號
+                            name: 
+                              type: string
+                              description: 任務名稱
+                            daily:
+                              type: boolean
+                              description: 是否為每日任務
+  /common/mission-templates/{key}:
+    get:
+      summary: 取得任務類型的結構參數
+      tags:
+        - Common
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  key:
+                    type: string
+                    description: 任務代號
+                  name: 
+                    type: string
+                  daily:
+                    type: boolean
+                    description: 是否為每日任務
+                  description:
+                    type: string
+                    description: 任務說明
+                  values:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        label:
+                          type: string
+                          description: 參數名稱
+                        required:
+                          type: boolean
+                          description: 是否為必填
+                        default:
+                          type: string
+                          description: 參數預設值
+                        type: 
+                          $ref: '#/components/schemas/MissionTemplateValueType'
+
+
 components:
   schemas:
     CreatedAt:
@@ -1161,6 +3275,266 @@ components:
     ImageIndex:
       type: number
       description: 圖片位置
+    PointType:
+      type: number
+      description: |
+        ## 點數類型
+        - 1 # diamond point 
+        - 2 # game point
+      enum:
+        - 1 # diamond point 
+        - 2 # game point
+    ShopType:
+      type: number
+      description: |
+        ## 商店
+        - 1 # buy
+        - 2 # sell
+      enum:
+        - 1 # buy (供玩家購買的商品)
+        - 2 # sell (供玩家販賣的商品)
+    AvatarSkinType:
+      type: number
+      description: |
+        ## Skin 類型
+        - 1 # avatar 頭像
+        - 2 # frame 像框
+        - 3 # effects 特效
+        - 4 # background 背景
+      enum:
+        - 1 # avatar 頭像
+        - 2 # frame 像框
+        - 3 # effects 特效
+        - 4 # background 背景
+    MissionTemplateValueType:
+      type: string
+      description: |
+        ## 任務類型 - 參數型態
+        - integer
+        - float
+        - string
+        - boolean
+        - game-id # 代表必需輸入 遊戲 id (provider_game.id)
+        - game-type # 代表必需輸入 遊戲類型 (gameType)
+      enum:
+        - integer
+        - float
+        - string
+        - boolean
+        - game-id # 代表必需輸入 遊戲 id (provider_game.id)
+        - game-type # 代表必需輸入 遊戲類型 (gameType)
+              
+            
+    ModelMissionRow:
+      type: object
+      properties:
+        id:
+          type: number
+        key:
+          type: string
+          description: 任務代號
+        name:
+          type: string
+          description: 任務名稱
+        daily:
+          type: boolean
+          description: 是否為每日任務
+        enabled:
+          $ref: '#/components/schemas/EnabledType'
+        minimumLevel:
+          type: number
+          description: 最低等級限制
+        values: 
+          type: string
+          description: 任務數值 (json string)
+        startAt:
+          $ref: '#/components/schemas/StartAt'
+        endAt:
+          $ref: '#/components/schemas/EndAt'
+        updatedAt:
+          $ref: '#/components/schemas/UpdatedAt'
+        createdAt:
+          $ref: '#/components/schemas/CreatedAt'
+    ModelMission:
+      type: object
+      properties:
+        id:
+          type: number
+        key:
+          type: string
+          description: 任務代號
+        name:
+          type: string
+          description: 任務名稱
+        daily:
+          type: boolean
+          description: 是否為每日任務
+        enabled:
+          $ref: '#/components/schemas/EnabledType'
+        minimumLevel:
+          type: number
+          description: 最低等級限制
+        values: 
+          type: string
+          description: 任務數值 (json string)
+        description: 
+          type: string
+          description: 任務說明
+        startAt:
+          $ref: '#/components/schemas/StartAt'
+        endAt:
+          $ref: '#/components/schemas/EndAt'
+        updatedAt:
+          $ref: '#/components/schemas/UpdatedAt'
+        createdAt:
+          $ref: '#/components/schemas/CreatedAt'
+    ModelMissionReward:
+      type: object
+      properties:
+        id:
+          type: number
+        missionId:
+          type: number
+        itemId:
+          type: number
+        numItems:
+          type: number
+        updatedAt:
+          $ref: '#/components/schemas/UpdatedAt'
+        createdAt:
+          $ref: '#/components/schemas/CreatedAt'
+          
+    ModelGashaponRow:
+      type: object
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+          description: 轉蛋名稱
+        enabled:
+          $ref: '#/components/schemas/EnabledType'
+        startAt:
+          $ref: '#/components/schemas/StartAt'
+        endAt:
+          $ref: '#/components/schemas/EndAt'
+        updatedAt:
+          $ref: '#/components/schemas/UpdatedAt'
+        createdAt:
+          $ref: '#/components/schemas/CreatedAt'
+    ModelGashapon:
+      allOf:
+        - $ref: '#/components/schemas/ModelGashaponRow'
+        - type: object
+          properties:
+            description:
+              type: string
+              description: 轉蛋介紹
+    ModelGashaponCost:
+      type: object
+      properties:
+        id: 
+          type: number
+        gashaponId:
+          type: number
+        itemId:
+          description: 消費道具 id
+          type: number
+        item:
+          $ref: '#/components/schemas/DataItem'
+        numItems:
+          type: number
+          description: 消費數量
+        times:
+          type: number
+          description: 消費後可轉蛋的次數
+        updatedAt:
+          $ref: '#/components/schemas/UpdatedAt'
+        createdAt:
+          $ref: '#/components/schemas/CreatedAt'
+    ModelGashaponReward:
+      type: object
+      properties:
+        id:
+          type: number
+        gashaponId:
+          type: number
+        weight:
+          type: number
+          description: 中獎比重, 機率為 (比重 / 各獎勵比重合)
+        itemId:
+          type: number
+          description: 道具 id
+        item:
+          $ref: '#/components/schemas/DataItem'
+        numItems:
+          type: number
+          description: 道具數量
+        updatedAt:
+          $ref: '#/components/schemas/UpdatedAt'
+        createdAt:
+          $ref: '#/components/schemas/CreatedAt'
+    ModelSticker:
+      type: object
+      properties:
+        id: 
+          type: number
+        name:
+          type: string
+          description: 貼圖名稱
+        imageId:
+          $ref: '#/components/schemas/ImageId'
+        defaultIndex:
+          type: number
+          description: 此貼圖包的預設的貼圖位置 
+        enabled:
+          $ref: '#/components/schemas/EnabledType'
+        updatedAt:
+          $ref: '#/components/schemas/UpdatedAt'
+        createdAt:
+          $ref: '#/components/schemas/CreatedAt'
+    ModelCommondityItem:                          
+      type: object
+      properties:
+        id: 
+          type: number
+        storeId:
+          type: number
+        itemId:
+          type: number
+        item:
+          $ref: '#/components/schemas/DataItem'
+        numPackages:
+          type: number
+          description: 每包數量 (單一次買數的數量)
+        pointType:
+          $ref: '#/components/schemas/PointType'
+        price:
+          type: number
+          description: 商品價格
+        enabled:
+          $ref: '#/components/schemas/EnabledType'
+        updatedAt:
+          $ref: '#/components/schemas/UpdatedAt'
+        createdAt:
+          $ref: '#/components/schemas/CreatedAt'
+    ModelCommonditySticker:
+      type: object
+      properties:
+        id:
+          type: number
+        storeId:
+          type: number
+        stickerId:
+          type: number
+        sticker:
+          $ref: '#/components/schemas/DataSticker'
+        pointType:
+          $ref: '#/components/schemas/PointType'
+        price:
+          type: number
+          description: 貼圖包商品價格
+
     DataRank:
       type: object
       properties:
@@ -1173,6 +3547,70 @@ components:
           $ref: '#/components/schemas/ImageId'
         imageIndex:
           $ref: '#/components/schemas/ImageIndex'
+    DataProvider:
+      type: object
+      properties:
+        id: 
+          type: number
+        username: 
+          type: string
+          description: 提供商 key
+        name:
+          type: string
+          description: 提供商名稱
+    DataStore:
+      type: object
+      properties:
+        id: 
+          type: number
+        name:
+          type: string
+        enabled:
+          $ref: '#/components/schemas/EnabledType'
+    DataItem:
+      type: object
+      properties:
+        id: 
+          type: number
+        imageId:
+          $ref: '#/components/schemas/ImageId'
+        imageIndex:
+          $ref: '#/components/schemas/ImageIndex'
+        key:
+          type: string
+          description: 道具代號
+        name:
+          type: string
+          description: 道具名稱
+    DataAvatarSkin:
+      type: object
+      properties:
+        id:
+          type: number
+        type:
+          $ref: '#/components/schemas/AvatarSkinType'
+        name:
+          type: string
+          description: skin 名稱
+        imageId:
+          $ref: '#/components/schemas/ImageId'
+        imageIndex:
+          $ref: '#/components/schemas/ImageIndex'
+    DataSticker:
+      type: object
+      properties:
+        id: 
+          type: number
+        imageId:
+          $ref: '#/components/schemas/ImageId'
+        defaultIndex:
+          type: number        
+          description: 此貼圖包的預設的貼圖位置
+        name:
+          type: string
+          description: 貼圖包名稱
+        enabled:
+          $ref: '#/components/schemas/EnabledType'
     AnnouncementType:
       type: number
       description: |
@@ -1182,25 +3620,77 @@ components:
         - 1
         - 2
     EnabledType:
-      type: number
+      type: boolean
       description: |
         ## 啟/停用狀態
-        - 0 # 停用
-        - 1 # 啟用
+    GameType:
+      type: number
+      description: |
+        ## 遊戲類型
+        - 1 # slot 
+        - 2 # table
       enum:
-        - 0 # 停用
-        - 1 # 啟用
+        - 1 # slot 
+        - 2 # table
+    QueryParameterMissionType:
+      type: number
+      description: |
+        ## 任務類型
+        - -1 # 全部
+        - 1 # slot 轉數
+      enum:
+        - -1 # 全部
+        - 1 # slot 轉數
+
     QueryParameterEnabled:
-      type: number
+      type: string
       description: |
         ## 啟/停用狀態
+        - all # 全部
+        - enabled # 停用
+        - disabled # 啟用
+      enum:
+        - all # 全部
+        - enabled # 停用
+        - disabled # 啟用
+    QueryParameterGameType:
+      type: number
+      description: |
+        ## 遊戲類型
+        - 0 # 查詢全部
+        - 1 # slot 
+        - 2 # table
+      enum:
+        - 0 # 查詢全部
+        - 1 # slot 
+        - 2 # table
+    QueryParameterShopType:
+      type: number
+      description: |
+        ## 商店
         - -1 # 全部
-        - 0 # 停用
-        - 1 # 啟用
+        - 1 # buy
+        - 2 # sell
       enum:
         - -1 # 全部
-        - 0 # 停用
-        - 1 # 啟用
+        - 1 # buy (供玩家購買的商品)
+        - 2 # sell (供玩家販賣的商品)
+    QueryParameterAvatarSkinType:
+      type: number
+      description: |
+        ## Skin 類型
+        - -1 # 全部
+        - 1 # avatar 頭像
+        - 2 # frame 像框
+        - 3 # effects 特效
+        - 4 # background 背景
+      enum:
+        - -1 # 全部
+        - 1 # avatar 頭像
+        - 2 # frame 像框
+        - 3 # effects 特效
+        - 4 # background 背景
+
     QueryList:
       description: 分頁查詢
       type: object
