@@ -109,7 +109,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  message: 
+                  message:
                     type: string
                     example: ok
   /members:
@@ -143,7 +143,7 @@ paths:
                   - $ref: '#/components/schemas/ResponseList'
                   - type: object
                     properties:
-                      rows: 
+                      rows:
                         type: array
                         items:
                           type: object
@@ -204,16 +204,16 @@ paths:
                   information:
                     type: object
                     properties:
-                      id: 
+                      id:
                         type: number
                       invitedFrom:
                         type: number
                         description: 邀請人
-                      nickname: 
+                      nickname:
                         type: string
                       avatar:
                         type: string
-                      avatarUrl: 
+                      avatarUrl:
                         type: string
                         description: 頭像實際路徑
                       introduction:
@@ -244,7 +244,7 @@ paths:
                   type: boolean
       responses:
         204:
-          description: ok 
+          description: ok
 
 
   /announcements:
@@ -264,7 +264,7 @@ paths:
               required:
                 - enabled
               properties:
-                enabled: 
+                enabled:
                   $ref: '#/components/schemas/QueryParameterEnabled'
       responses:
         200:
@@ -276,10 +276,10 @@ paths:
                   - $ref: '#/components/schemas/ResponseList'
                   - type: object
                     properties:
-                      rows: 
+                      rows:
                         type: array
                         items:
-                          type: object 
+                          type: object
                           properties:
                             id:
                               type: number
@@ -291,7 +291,7 @@ paths:
                               $ref: '#/components/schemas/EnabledType'
                             startAt:
                               $ref: '#/components/schemas/StartAt'
-                            endAt: 
+                            endAt:
                               $ref: '#/components/schemas/EndAt'
                             updatedAt:
                               $ref: '#/components/schemas/UpdatedAt'
@@ -299,7 +299,7 @@ paths:
                               $ref: '#/components/schemas/CreatedAt'
     post:
       summary: 新增公告
-      tags: 
+      tags:
         - Announcement
       requestBody:
         content:
@@ -318,7 +318,7 @@ paths:
                   $ref: '#/components/schemas/AnnouncementType'
                 title:
                   type: string
-                content: 
+                content:
                   type: string
                 enabled:
                   $ref: '#/components/schemas/EnabledType'
@@ -328,18 +328,18 @@ paths:
                   $ref: '#/components/schemas/EndAt'
       responses:
         200:
-          description: ok 
-  /announcements/{aid}: 
+          description: ok
+  /announcements/{aid}:
     parameters:
       - in: path
         required: true
         description: 公告 id
         name: aid
         schema:
-          type: number   
+          type: number
     get:
       summary: 查詢公告
-      tags: 
+      tags:
         - Announcement
       responses:
         200:
@@ -362,7 +362,7 @@ paths:
                   startAt:
                     type: number
                     description: 公告時間 - 起 (0 代表不限制)
-                  endAt: 
+                  endAt:
                     type: number
                     description: 公告時間 - 訖 (0 代表不限制)
                   updatedAt:
@@ -390,7 +390,7 @@ paths:
                   $ref: '#/components/schemas/AnnouncementType'
                 title:
                   type: string
-                content: 
+                content:
                   type: string
                 enabled:
                   $ref: '#/components/schemas/EnabledType'
@@ -398,7 +398,7 @@ paths:
                   $ref: '#/components/schemas/StartAt'
                 endAt:
                   $ref: '#/components/schemas/EndAt'
-                
+
       responses:
         200:
           description: ok
@@ -424,7 +424,7 @@ paths:
       responses:
         200:
           description: ok
-  
+
   /providers:
     get:
       summary: 提供商列表(分頁)
@@ -455,7 +455,7 @@ paths:
                         items:
                           type: object
                           properties:
-                            username: 
+                            username:
                               type: string
                               description: 訪問 api 的 username
                             privateKey:
@@ -514,7 +514,7 @@ paths:
           type: number
     get:
       summary: 取得資訊
-      tags: 
+      tags:
         - Provider
       responses:
         200:
@@ -524,9 +524,9 @@ paths:
               schema:
                 type: object
                 properties:
-                  id: 
+                  id:
                     type: number
-                  username: 
+                  username:
                     type: string
                     description: 訪問 api 的 username
                   privateKey:
@@ -546,7 +546,7 @@ paths:
                     $ref: '#/components/schemas/CreatedAt'
     post:
       summary: 重建 privatekey
-      tags: 
+      tags:
         - Provider
       responses:
         200:
@@ -678,7 +678,7 @@ paths:
                             code:
                               type: string
                               description: 遊戲代號
-                            name: 
+                            name:
                               type: string
                               description: 遊戲名稱
                             enabled:
@@ -725,7 +725,7 @@ paths:
                   type: number
                   minimum: 0
                   description: 等級需求
-                
+
       responses:
         204:
           description: ok
@@ -770,7 +770,7 @@ paths:
                   code:
                     type: string
                     description: 遊戲代號
-                  name: 
+                  name:
                     type: string
                     description: 遊戲名稱
                   enabled:
@@ -846,14 +846,14 @@ paths:
             schema:
               type: object
               properties:
-                ids: 
+                ids:
                   type: array
                   items:
                     type: number
       responses:
         204:
           description: ok
-  
+
   /gashapons:
     get:
       summary: 查詢轉蛋活動
@@ -1245,7 +1245,7 @@ paths:
             schema:
               type: object
               properties:
-                key: 
+                key:
                   type: string
                   description: 任務代號
                 name:
@@ -1301,7 +1301,7 @@ paths:
             schema:
               type: object
               properties:
-                name: 
+                name:
                   type: string
                 enabled:
                   $ref: '#/components/schemas/EnabledType'
@@ -1437,7 +1437,7 @@ paths:
       responses:
         204:
           description: ok
-  
+
   /stores:
     get:
       summary: 查詢商店
@@ -1451,7 +1451,7 @@ paths:
                 - $ref: '#/components/schemas/QueryList'
                 - type: object
                   properties:
-                    name: 
+                    name:
                       type: string
                       description: 商店名稱
                     shopType:
@@ -1468,7 +1468,7 @@ paths:
                   - $ref: '#/components/schemas/ResponseList'
                   - type: object
                     properties:
-                      rows: 
+                      rows:
                         type: array
                         items:
                           type: object
@@ -1492,7 +1492,7 @@ paths:
                               $ref: '#/components/schemas/UpdatedAt'
                             createdAt:
                               $ref: '#/components/schemas/CreatedAt'
-                          
+
     post:
       summary: 新增商店
       tags:
@@ -1503,9 +1503,9 @@ paths:
             schema:
               type: object
               properties:
-                id: 
+                id:
                   type: number
-                name: 
+                name:
                   type: string
                 description:
                   type: string
@@ -1515,14 +1515,14 @@ paths:
                   $ref: '#/components/schemas/ShopType'
                 startAt:
                   $ref: '#/components/schemas/StartAt'
-                endAt: 
+                endAt:
                   $ref: '#/components/schemas/EndAt'
       responses:
         204:
           description: ok
   /stores/{sid}:
     parameters:
-      - in: path  
+      - in: path
         name: sid
         required: true
         description: 商店 id
@@ -1533,7 +1533,7 @@ paths:
       tags:
         - Store
       responses:
-        200: 
+        200:
           description: ok
           content:
             application/x-www-form-urlencoded:
@@ -1569,7 +1569,7 @@ paths:
             schema:
               type: object
               properties:
-                name: 
+                name:
                   type: string
                 description:
                   type: string
@@ -1579,7 +1579,7 @@ paths:
                   $ref: '#/components/schemas/ShopType'
                 startAt:
                   $ref: '#/components/schemas/StartAt'
-                endAt: 
+                endAt:
                   $ref: '#/components/schemas/EndAt'
       responses:
         204:
@@ -1594,7 +1594,7 @@ paths:
             schema:
               type: object
               properties:
-                enabled: 
+                enabled:
                   $ref: '#/components/schemas/EnabledType'
       responses:
         204:
@@ -1641,7 +1641,7 @@ paths:
           description: ok
           content:
             application/json:
-              schema: 
+              schema:
                 allOf:
                   - $ref: '#/components/schemas/ResponseList'
                   - type: object
@@ -1742,7 +1742,7 @@ paths:
             schema:
               type: object
               properties:
-                ids: 
+                ids:
                   type: array
                   description: 道具商品編號 (後端使用 tx 處理)
                   items:
@@ -1761,7 +1761,7 @@ paths:
           type: number
     get:
       summary: 查詢商店的 avatar skin 商品 `(僅允許商店販售，不可回購)`
-      tags: 
+      tags:
         - StoreCommondityAvatar
       requestBody:
         content:
@@ -1784,7 +1784,7 @@ paths:
                         items:
                           type: object
                           properties:
-                            id: 
+                            id:
                               type: number
                             storeId:
                               type: number
@@ -1815,7 +1815,7 @@ paths:
                 - pointType
                 - price
               properties:
-                skinId: 
+                skinId:
                   type: number
                   description: 新增的頭像 skin id
                 pointType:
@@ -1853,11 +1853,11 @@ paths:
               schema:
                 type: object
                 properties:
-                  id: 
+                  id:
                     type: number
                   storeId:
                     type: number
-                  skinId: 
+                  skinId:
                     type: number
                   skin:
                     $ref: '#/components/schemas/DataAvatarSkin'
@@ -1882,7 +1882,7 @@ paths:
               properties:
                 skinId:
                   type: number
-                  description: avatar skin id 
+                  description: avatar skin id
                 pointType:
                   $ref: '#/components/schemas/PointType'
                 price:
@@ -1909,7 +1909,7 @@ paths:
             schema:
               type: object
               properties:
-                ids: 
+                ids:
                   type: array
                   description: avatar skin 商品編號 (後端使用 tx 處理)
                   items:
@@ -1927,7 +1927,7 @@ paths:
         schema:
           type: number
     get:
-      summary: 查詢貼圖包商品列表 
+      summary: 查詢貼圖包商品列表
       tags:
         - StoreModelCommonditySticker
       requestBody:
@@ -1983,7 +1983,7 @@ paths:
         required: true
         description: 貼圖包商品 id
         schema:
-          type: number              
+          type: number
     get:
       summary: 取得貼圖包商品資訊
       tags:
@@ -2032,7 +2032,7 @@ paths:
             schema:
               type: object
               properties:
-                ids: 
+                ids:
                   type: array
                   description: 貼圖包商品編號 (後端使用 tx 處理)
                   items:
@@ -2049,19 +2049,19 @@ paths:
       requestBody:
         content:
           application/x-www-form-urlencoded:
-            schema: 
+            schema:
               allOf:
                 - $ref: '#/components/schemas/QueryList'
                 - type: object
                   required:
                     - enabled
                   properties:
-                    name: 
+                    name:
                       type: string
                       description: 道具名稱 (模糊查詢)
-                    key: 
-                      type: string  
-                      description: 道具代號 (模糊查詢) 
+                    key:
+                      type: string
+                      description: 道具代號 (模糊查詢)
                     enabled:
                       $ref: '#/components/schemas/QueryParameterEnabled'
       responses:
@@ -2085,10 +2085,10 @@ paths:
                               $ref: '#/components/schemas/ImageId'
                             imageIndex:
                               $ref: '#/components/schemas/ImageIndex'
-                            key: 
+                            key:
                               type: string
                               description: 道具代號
-                            name: 
+                            name:
                               type: string
                               description: 道具名稱
                             transferable:
@@ -2119,7 +2119,7 @@ paths:
                   type: string
                   description: 道具代號
                 name:
-                  type: string  
+                  type: string
                   description: 道具名稱
                 transferable:
                   type: boolean
@@ -2138,7 +2138,7 @@ paths:
       - in: path
         name: id
         required: true
-        schema: 
+        schema:
           type: number
         description: 道具編號
     get:
@@ -2161,7 +2161,7 @@ paths:
                     type: string
                     description: 道具代號
                   name:
-                    type: string  
+                    type: string
                     description: 道具名稱
                   transferable:
                     type: boolean
@@ -2186,7 +2186,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  imageId: 
+                  imageId:
                     type: number
                     description: 指定的圖片 id (0 代表未指定)
                   imageIndex:
@@ -2196,7 +2196,7 @@ paths:
                     type: string
                     description: 道具代號
                   name:
-                    type: string  
+                    type: string
                     description: 道具名稱
                   transferable:
                     type: boolean
@@ -2217,7 +2217,7 @@ paths:
             schema:
               type: object
               properties:
-                enabled: 
+                enabled:
                   type: boolean
                   description: 是否啟用
       responses:
@@ -2266,7 +2266,7 @@ paths:
                         items:
                           type: object
                           properties:
-                            id: 
+                            id:
                               type: number
                             type:
                               $ref: '#/components/schemas/AvatarSkinType'
@@ -2325,9 +2325,9 @@ paths:
           content:
             application/json:
               schema:
-                type: object     
+                type: object
                 properties:
-                  id: 
+                  id:
                     type: number
                   type:
                     $ref: '#/components/schemas/AvatarSkinType'
@@ -2361,7 +2361,7 @@ paths:
                 imageIndex:
                   $ref: '#/components/schemas/ImageIndex'
                 name:
-                  type: string  
+                  type: string
                   description: skin 名稱
                 enabled:
                   $ref: '#/components/schemas/EnabledType'
@@ -2392,7 +2392,7 @@ paths:
       responses:
         204:
           description: ok
-    
+
   /images:
     get:
       summary: 取得圖片列表(不分頁)
@@ -2509,7 +2509,7 @@ paths:
                     $ref: '#/components/schemas/CreatedAt'
     patch:
       summary: 更新部分資訊
-      tags: 
+      tags:
         - ImageManager
       requestBody:
         description: |
@@ -2519,7 +2519,7 @@ paths:
             schema:
               type: object
               properties:
-                dirPath: 
+                dirPath:
                   type: string
                 title:
                   type: string
@@ -2530,16 +2530,28 @@ paths:
                 numHeights:
                   type: number
                   description: 圖片高分切等分
-                
+
       responses:
         204:
           description: ok
+  /images/delete:
     delete:
       summary: 刪除圖片
       tags:
         - ImageManager
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  description: 圖片 id 陣列
+                  items:
+                    type: number
       responses:
-        200:
+        204:
           description: ok
 
   /level-configs:
@@ -2563,17 +2575,17 @@ paths:
                   - $ref: '#/components/schemas/ResponseList'
                   - type: object
                     properties:
-                      rows: 
+                      rows:
                         type: array
                         items:
                           type: object
                           properties:
-                            id: 
+                            id:
                               type: number
-                            level: 
+                            level:
                               type: number
                               description: 等級
-                            rank: 
+                            rank:
                               $ref: '#/components/schemas/DataRank'
                             experience:
                               type: number
@@ -2581,7 +2593,7 @@ paths:
                             updatedAt:
                               $ref: '#/components/schemas/UpdatedAt'
                             createdAt:
-                              $ref: '#/components/schemas/CreatedAt' 
+                              $ref: '#/components/schemas/CreatedAt'
     post:
       summary: 新增等級
       tags:
@@ -2600,7 +2612,7 @@ paths:
                   type: number
       responses:
         204:
-          description: ok        
+          description: ok
   /level-configs/{id}:
     parameters:
       - in: path
@@ -2608,7 +2620,7 @@ paths:
         name: id
         description: 資料 id
         schema:
-          type: number                      
+          type: number
     get:
       summary: 取得等級資料
       tags:
@@ -2621,13 +2633,13 @@ paths:
               schema:
                 type: object
                 properties:
-                  id: 
+                  id:
                     type: number
                   level:
                     type: number
                   experience:
                     type: number
-                  rank: 
+                  rank:
                     $ref: '#/components/schemas/DataRank'
                   updatedAt:
                     $ref: '#/components/schemas/UpdatedAt'
@@ -2663,7 +2675,7 @@ paths:
                   - $ref: '#/components/schemas/ResponseList'
                   - type: object
                     properties:
-                      rows: 
+                      rows:
                         type: array
                         items:
                           allOf:
@@ -2673,7 +2685,7 @@ paths:
                                 updatedAt:
                                   $ref: '#/components/schemas/UpdatedAt'
                                 createdAt:
-                                  $ref: '#/components/schemas/CreatedAt' 
+                                  $ref: '#/components/schemas/CreatedAt'
     post:
       summary: 新增階級(rank)
       tags:
@@ -2692,7 +2704,7 @@ paths:
                   $ref: '#/components/schemas/ImageIndex'
       responses:
         204:
-          description: ok        
+          description: ok
   /rank-configs/{id}:
     parameters:
       - in: path
@@ -2700,7 +2712,7 @@ paths:
         name: id
         description: 資料 id
         schema:
-          type: number                      
+          type: number
     get:
       summary: 取得階級資料
       tags:
@@ -2713,7 +2725,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  id: 
+                  id:
                     type: number
                   rank:
                     type: number
@@ -2727,7 +2739,7 @@ paths:
                     $ref: '#/components/schemas/CreatedAt'
     put:
       summary: 更新 Rank 資料
-      tags: 
+      tags:
         - RankConfigManager
       requestBody:
         content:
@@ -2794,7 +2806,7 @@ paths:
             schema:
               type: object
               properties:
-                name: 
+                name:
                   type: string
                   description: 貼圖包名稱
                 imageId:
@@ -2836,7 +2848,7 @@ paths:
             schema:
               type: object
               properties:
-                name: 
+                name:
                   type: string
                   description: 貼圖包名稱
                 imageId:
@@ -2865,11 +2877,11 @@ paths:
         204:
           description: ok
 
-                  
+
 
   /common/image-dir-path:
-    get: 
-      summary: 查詢圖片所有路徑 
+    get:
+      summary: 查詢圖片所有路徑
       tags:
         - Common
       requestBody:
@@ -2878,7 +2890,7 @@ paths:
             schema:
               type: object
               properties:
-                dirPath: 
+                dirPath:
                   type: string
                   description: 查詢 dir_path = '?%' 的路徑
       responses:
@@ -2893,7 +2905,7 @@ paths:
                   type: string
                   description: 圖片路徑
                   example: /items
-                    
+
   /common/images:
     get:
       summary: 查詢圖片
@@ -2910,16 +2922,16 @@ paths:
                 - $ref: '#/components/schemas/QueryList'
                 - type: object
                   properties:
-                    dirPath: 
+                    dirPath:
                       type: string
                       description: 路徑
                     title:
                       type: string
                       description: 圖片名稱 (模糊查詢)
-                
+
       responses:
         200:
-          description: ok  
+          description: ok
           content:
             application/json:
               schema:
@@ -2932,7 +2944,7 @@ paths:
                         items:
                           type: object
                           properties:
-                            id: 
+                            id:
                               type: number
                             dirPath:
                               type: string
@@ -2951,7 +2963,7 @@ paths:
                               description: 圖片高切等
   /common/images/{id}:
     parameters:
-      - in: path  
+      - in: path
         name: id
         required: true
         description: 圖片 id
@@ -2969,7 +2981,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  id: 
+                  id:
                     type: number
                   dirPath:
                     type: string
@@ -3002,10 +3014,10 @@ paths:
                 - $ref: '#/components/schemas/QueryList'
                 - type: object
                   properties:
-                    username: 
+                    username:
                       type: string
                       description: 提供商 username
-                    name: 
+                    name:
                       type: string
                       description: 提供商名稱
       responses:
@@ -3022,12 +3034,12 @@ paths:
                         type: array
                         items:
                           type: object
-                          properties: 
-                            id: 
+                          properties:
+                            id:
                               type: number
-                            username: 
+                            username:
                               type: string
-                            name: 
+                            name:
                               type: string
   /common/items:
     get:
@@ -3071,10 +3083,10 @@ paths:
                               $ref: '#/components/schemas/ImageId'
                             imageIndex:
                               $ref: '#/components/schemas/ImageIndex'
-                            key: 
+                            key:
                               type: string
                               description: 道具代號
-                            name: 
+                            name:
                               type: string
                               description: 道具名稱
                             enabled:
@@ -3087,7 +3099,7 @@ paths:
         - Common
       requestBody:
         description: |
-          ## 查詢頭像 skin 
+          ## 查詢頭像 skin
           - 預設依 type asc, name asc 排序
         content:
           application/x-www-form-urlencoded:
@@ -3096,7 +3108,7 @@ paths:
                 - $ref: '#/components/schemas/QueryList'
                 - type: object
                   properties:
-                    name: 
+                    name:
                       type: string
                       description: skin 名稱
                     type:
@@ -3105,7 +3117,7 @@ paths:
                       $ref: '#/components/schemas/QueryParameterEnabled'
       responses:
         200:
-          description: ok 
+          description: ok
           content:
             application/json:
               schema:
@@ -3118,7 +3130,7 @@ paths:
                         items:
                           type: object
                           properties:
-                            id: 
+                            id:
                               type: number
                             type:
                               $ref: '#/components/schemas/AvatarSkinType'
@@ -3163,7 +3175,7 @@ paths:
                         items:
                           type: object
                           properties:
-                            id: 
+                            id:
                               type: number
                             name:
                               type: string
@@ -3203,7 +3215,7 @@ paths:
                             key:
                               type: string
                               description: 任務代號
-                            name: 
+                            name:
                               type: string
                               description: 任務名稱
                             daily:
@@ -3225,7 +3237,7 @@ paths:
                   key:
                     type: string
                     description: 任務代號
-                  name: 
+                  name:
                     type: string
                   daily:
                     type: boolean
@@ -3244,12 +3256,28 @@ paths:
                         required:
                           type: boolean
                           description: 是否為必填
-                        default:
-                          type: string
+                        defaultValue:
                           description: 參數預設值
-                        type: 
+                          oneOf:
+                            - type: number
+                            - type: string
+                        multiple:
+                          type:  boolean
+                          description: 是否多選
+                        type:
                           $ref: '#/components/schemas/MissionTemplateValueType'
-
+                        enums:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              label:
+                                description: 參數名稱
+                              value:
+                                description: 參數值
+                                oneOf:
+                                  - type: number
+                                  - type: string
 
 components:
   schemas:
@@ -3279,10 +3307,10 @@ components:
       type: number
       description: |
         ## 點數類型
-        - 1 # diamond point 
+        - 1 # diamond point
         - 2 # game point
       enum:
-        - 1 # diamond point 
+        - 1 # diamond point
         - 2 # game point
     ShopType:
       type: number
@@ -3314,17 +3342,15 @@ components:
         - float
         - string
         - boolean
-        - game-id # 代表必需輸入 遊戲 id (provider_game.id)
-        - game-type # 代表必需輸入 遊戲類型 (gameType)
+        - enum # 列舉
       enum:
+        ## 任務類型 - 參數型態
         - integer
         - float
         - string
         - boolean
-        - game-id # 代表必需輸入 遊戲 id (provider_game.id)
-        - game-type # 代表必需輸入 遊戲類型 (gameType)
-              
-            
+        - enum # 列舉
+
     ModelMissionRow:
       type: object
       properties:
@@ -3344,7 +3370,7 @@ components:
         minimumLevel:
           type: number
           description: 最低等級限制
-        values: 
+        values:
           type: string
           description: 任務數值 (json string)
         startAt:
@@ -3374,10 +3400,10 @@ components:
         minimumLevel:
           type: number
           description: 最低等級限制
-        values: 
+        values:
           type: string
           description: 任務數值 (json string)
-        description: 
+        description:
           type: string
           description: 任務說明
         startAt:
@@ -3403,7 +3429,7 @@ components:
           $ref: '#/components/schemas/UpdatedAt'
         createdAt:
           $ref: '#/components/schemas/CreatedAt'
-          
+
     ModelGashaponRow:
       type: object
       properties:
@@ -3433,7 +3459,7 @@ components:
     ModelGashaponCost:
       type: object
       properties:
-        id: 
+        id:
           type: number
         gashaponId:
           type: number
@@ -3477,7 +3503,7 @@ components:
     ModelSticker:
       type: object
       properties:
-        id: 
+        id:
           type: number
         name:
           type: string
@@ -3486,17 +3512,17 @@ components:
           $ref: '#/components/schemas/ImageId'
         defaultIndex:
           type: number
-          description: 此貼圖包的預設的貼圖位置 
+          description: 此貼圖包的預設的貼圖位置
         enabled:
           $ref: '#/components/schemas/EnabledType'
         updatedAt:
           $ref: '#/components/schemas/UpdatedAt'
         createdAt:
           $ref: '#/components/schemas/CreatedAt'
-    ModelCommondityItem:                          
+    ModelCommondityItem:
       type: object
       properties:
-        id: 
+        id:
           type: number
         storeId:
           type: number
@@ -3538,7 +3564,7 @@ components:
     DataRank:
       type: object
       properties:
-        id: 
+        id:
           type: number
         rank:
           type: number
@@ -3550,9 +3576,9 @@ components:
     DataProvider:
       type: object
       properties:
-        id: 
+        id:
           type: number
-        username: 
+        username:
           type: string
           description: 提供商 key
         name:
@@ -3561,7 +3587,7 @@ components:
     DataStore:
       type: object
       properties:
-        id: 
+        id:
           type: number
         name:
           type: string
@@ -3570,7 +3596,7 @@ components:
     DataItem:
       type: object
       properties:
-        id: 
+        id:
           type: number
         imageId:
           $ref: '#/components/schemas/ImageId'
@@ -3599,12 +3625,12 @@ components:
     DataSticker:
       type: object
       properties:
-        id: 
+        id:
           type: number
         imageId:
           $ref: '#/components/schemas/ImageId'
         defaultIndex:
-          type: number        
+          type: number
           description: 此貼圖包的預設的貼圖位置
         name:
           type: string
@@ -3616,7 +3642,7 @@ components:
       description: |
         - 1 # 官方公告
         - 2 # 遊戲公告
-      enum: 
+      enum:
         - 1
         - 2
     EnabledType:
@@ -3627,10 +3653,10 @@ components:
       type: number
       description: |
         ## 遊戲類型
-        - 1 # slot 
+        - 1 # slot
         - 2 # table
       enum:
-        - 1 # slot 
+        - 1 # slot
         - 2 # table
     QueryParameterMissionType:
       type: number
@@ -3658,11 +3684,11 @@ components:
       description: |
         ## 遊戲類型
         - 0 # 查詢全部
-        - 1 # slot 
+        - 1 # slot
         - 2 # table
       enum:
         - 0 # 查詢全部
-        - 1 # slot 
+        - 1 # slot
         - 2 # table
     QueryParameterShopType:
       type: number
@@ -3699,7 +3725,7 @@ components:
         - size
         - tota
       properties:
-        page: 
+        page:
           type: number
           description: 頁數
           example: 1
@@ -3717,7 +3743,7 @@ components:
       description: 分頁查詢回傳結構
       type: object
       properties:
-        page: 
+        page:
           type: number
           description: 頁碼
           example: 1
@@ -3725,7 +3751,7 @@ components:
           type: number
           description: 每頁顯示筆數
           example: 15
-        total: 
+        total:
           type: number
           description: 總資料筆數
           example: 120
@@ -3733,7 +3759,7 @@ components:
       description: 參數錯誤
       type: object
       properties:
-        invalids: 
+        invalids:
           type: object
           example: |
             {
@@ -3742,7 +3768,7 @@ components:
             }
         code:
           type: string
-        message: 
+        message:
           type: string
-  
+
 
