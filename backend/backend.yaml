@@ -146,20 +146,7 @@ paths:
                       rows:
                         type: array
                         items:
-                          type: object
-                          properties:
-                            id:
-                              type: number
-                            nickname:
-                              type: string
-                            level:
-                              type: number
-                            rank:
-                              type: number
-                            diamondPoint:
-                              type: number
-                            gamePoint:
-                              type: number
+                          $ref: '#/components/schemas/ModelMemberRow'
   /members/{id}:
     parameters:
       - in: path
@@ -202,33 +189,7 @@ paths:
                       createdAt:
                         $ref: '#/components/schemas/CreatedAt'
                   information:
-                    type: object
-                    properties:
-                      id:
-                        type: number
-                      invitedFrom:
-                        type: number
-                        description: 邀請人
-                      nickname:
-                        type: string
-                      avatar:
-                        type: string
-                      avatarUrl:
-                        type: string
-                        description: 頭像實際路徑
-                      introduction:
-                        type: string
-                      numLogins:
-                        type: number
-                        description: 登入次數
-                      lastLoginAt:
-                        type: number
-                        description: 最後登入時間, timestamp unix (秒)
-                        example: 1579247398
-                      updatedAt:
-                        $ref: '#/components/schemas/UpdatedAt'
-                      createdAt:
-                        $ref: '#/components/schemas/CreatedAt'
+                    $ref: '#/components/schemas/ModelMemberInformation'
     patch:
       summary: 更新部分欄位 (有資料才更新), 目前僅 enabled 可更新
       tags:
@@ -3210,17 +3171,8 @@ paths:
                       rows:
                         type: array
                         items:
-                          type: object
-                          properties:
-                            key:
-                              type: string
-                              description: 任務代號
-                            name:
-                              type: string
-                              description: 任務名稱
-                            daily:
-                              type: boolean
-                              description: 是否為每日任務
+                          $ref: '#/components/schemas/MissionTemplateModuleRow'
+                            
   /common/mission-templates/{key}:
     get:
       summary: 取得任務類型的結構參數
@@ -3232,58 +3184,13 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  key:
-                    type: string
-                    description: 任務代號
-                  name:
-                    type: string
-                  daily:
-                    type: boolean
-                    description: 是否為每日任務
-                  description:
-                    type: string
-                    description: 任務說明
-                  values:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        label:
-                          type: string
-                          description: 參數名稱
-                        required:
-                          type: boolean
-                          description: 是否為必填
-                        defaultValue:
-                          description: 參數預設值
-                          oneOf:
-                            - type: number
-                            - type: string
-                        multiple:
-                          type:  boolean
-                          description: 是否多選
-                        type:
-                          $ref: '#/components/schemas/MissionTemplateValueType'
-                        enums:
-                          type: array
-                          items:
-                            type: object
-                            properties:
-                              label:
-                                description: 參數名稱
-                              value:
-                                description: 參數值
-                                oneOf:
-                                  - type: number
-                                  - type: string
+                $ref: '#/components/schemas/MissionTemplateModule'
 
 components:
   schemas:
     CreatedAt:
       type: number
-      description: 更新時間 timestamp unix (秒)
+      description: 建立時間 timestamp unix (秒)
       example: 1579247398
     UpdatedAt:
       type: number
@@ -3350,7 +3257,69 @@ components:
         - string
         - boolean
         - enum # 列舉
-
+    MissionTemplateValueEnum:
+      type: object
+      description: 列舉項目(若 type = enum 時, 由此選擇數值)
+      properties:
+        label: 
+          type: string
+          description: 名稱
+        value:
+          description: 數值
+          oneOf:
+            - type: string
+            - type: number
+      
+    MissionTemplateValue:
+      type: object
+      properties:
+        label:
+          type: string
+          description: 參數名稱
+        key: 
+          type: string
+          description: 參數代號
+        required:
+          type: boolean
+          description: 是否為必填
+        multiple:
+          type:  boolean
+          description: 是否多選
+        defaultValue:
+          description: 參數預設值
+          oneOf:
+            - type: string
+            - type: number
+        type:
+          $ref: '#/components/schemas/MissionTemplateValueType'
+        enums:
+          type: array
+          items:
+            $ref: '#/components/schemas/MissionTemplateValueEnum'
+    MissionTemplateModuleRow:
+      type: object
+      properties:
+        key:
+          type: string
+          description: 任務代號
+        name:
+          type: string
+          description: 任務名稱
+        isDaily:
+          type: boolean
+          description: 是否為每日任務
+        description:
+          type: string
+          description: 任務說明
+    MissionTemplateModule:
+      allOf:
+        - $ref: '#/components/schemas/MissionTemplateModuleRow'
+        - type: object
+          properties:
+            values:
+              type: array
+              items:
+                $ref: '#/components/schemas/MissionTemplateValue'
     ModelMissionRow:
       type: object
       properties:
@@ -3362,7 +3331,7 @@ components:
         name:
           type: string
           description: 任務名稱
-        daily:
+        isDaily:
           type: boolean
           description: 是否為每日任務
         enabled:
@@ -3425,6 +3394,73 @@ components:
           type: number
         numItems:
           type: number
+        updatedAt:
+          $ref: '#/components/schemas/UpdatedAt'
+        createdAt:
+          $ref: '#/components/schemas/CreatedAt'
+    ModelMemberRow:
+      type: object
+      properties:
+        id:
+          type: number
+        nickname:
+          type: string
+        level:
+          type: number
+        rank:
+          type: number
+        diamondPoint:
+          type: number
+        gamePoint:
+          type: number
+        enabled:
+          $ref: '#/components/schemas/EnabledType'
+        updatedAt:
+          $ref: '#/components/schemas/UpdatedAt'
+        createdAt:
+          $ref: '#/components/schemas/CreatedAt'
+    ModelMember:
+      type: object
+      properties:
+        id:
+          type: number
+        level:
+          type: number
+        rank:
+          type: number
+        diamondPoint:
+          type: number
+        gamePoint:
+          type: number
+        enabled:
+          $ref: '#/components/schemas/EnabledType'
+    ModelMemberInformation:
+      type: object
+      properties:
+        id:
+          type: number
+        invitedFrom:
+          type: number
+          description: 邀請人
+        nickname:
+          description: 暱稱
+          type: string
+        avatar:
+          description: 頭像檔名
+          type: string
+        avatarUrl:
+          type: string
+          description: 頭像實際路徑
+        introduction:
+          description: 簡介
+          type: string
+        numLogins:
+          type: number
+          description: 登入次數
+        lastLoginAt:
+          type: number
+          description: 最後登入時間, timestamp unix (秒)
+          example: 1579247398
         updatedAt:
           $ref: '#/components/schemas/UpdatedAt'
         createdAt:
