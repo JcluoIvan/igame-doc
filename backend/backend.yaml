@@ -38,6 +38,8 @@ tags:
     description: 轉蛋活動消費方法
   - name: GashaponReward
     description: 轉蛋活動獎勵
+  - name: GashaponGame
+    description: 轉蛋適用遊戲管理
   - name: Store
     description: 商店管理
   - name: StoreCommondityItem
@@ -1054,7 +1056,7 @@ paths:
       responses:
         204:
           description: ok
-  /gashapons/{gid}/reward:
+  /gashapons/{gid}/reward/delete:
     parameters:
       - in: path
         name: gid
@@ -1105,6 +1107,24 @@ paths:
       responses:
         204:
           description: ok
+    delete:
+      summary: 刪除多項轉蛋獎勵方式
+      tags:
+        - GashaponReward
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  description: 轉蛋獎勵 id
+                  items:
+                    type: number
+      responses:
+        204:
+          description: ok
   /gashapons/{gid}/reward/{rid}:
     parameters:
       - in: path
@@ -1149,7 +1169,7 @@ paths:
       responses:
         204:
           description: ok
-  /gashapons/{gid}/delete/reward:
+  /gashapons/{gid}/games:
     parameters:
       - in: path
         name: gid
@@ -1157,25 +1177,66 @@ paths:
         description: 轉蛋活動 id
         schema:
           type: number
-    delete:
-      summary: 刪除多項轉蛋獎勵方式
+    get:
+      summary: 取得轉蛋適用的遊戲列表
       tags:
-        - GashaponReward
+        - GashaponGame
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/QueryList'
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ResponseList'
+                  - type: object
+                    properties:
+                      rows:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ModelGashaponGame'
+    post:
+      summary: 新增適用遊戲
+      tags:
+        - GashaponGame
       requestBody:
         content:
           application/json:
             schema:
               type: object
               properties:
-                ids:
+                ids: 
+                  description: 遊戲 id (provider_game.id array)
                   type: array
-                  description: 轉蛋獎勵 id
                   items:
                     type: number
       responses:
         204:
           description: ok
-
+    delete:
+      summary: 刪除多筆適用遊戲
+      tags:
+        - GashaponGame
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids: 
+                  description: gashapon_game.id array
+                  type: array
+                  items:
+                    type: number
+      responses:
+        204:
+          description: ok
 
   /missions:
     get:
@@ -3536,6 +3597,21 @@ components:
           $ref: '#/components/schemas/UpdatedAt'
         createdAt:
           $ref: '#/components/schemas/CreatedAt'
+    ModelGashaponGame:
+      type: object
+      properties:
+        id: 
+          type: number
+        providerId:
+          type: number
+        provider:
+          $ref: '#/components/schemas/DataProvider'
+        gameId:
+          type: number
+        game:
+          $ref: '#/components/schemas/DataProviderGame'
+        createdAt:
+          $ref: '#/components/schemas/CreatedAt'
     ModelSticker:
       type: object
       properties:
@@ -3620,6 +3696,25 @@ components:
         name:
           type: string
           description: 提供商名稱
+    DataProviderGame:
+      type: object
+      properties:
+        id: 
+          type: number
+        providerId:
+          type: number
+        imageId:
+          $ref: '#/components/schemas/ImageId'
+        imageIndex:
+          $ref: '#/components/schemas/ImageIndex'
+        name:
+          type: string
+        type:
+          $ref: '#/components/schemas/GameType'
+        code:
+          type: string
+        enabled:
+          $ref: '#/components/schemas/EnabledType'
     DataStore:
       type: object
       properties:
