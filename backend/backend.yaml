@@ -20,6 +20,8 @@ servers:
   - url: "http://demo.project-host.net/v1"
     description: 測試伺服器網址
 tags:
+  - name: Ver20200205
+    description: API 更新
   - name: Public
     description: 不需登入驗證
   - name: Common
@@ -2580,7 +2582,11 @@ paths:
     get:
       summary: 玩家等級管理(每等級需要的經驗值)
       tags:
+        - Ver20200205
         - LevelConfigManager
+      description: |
+        ## Ver20200205
+        - 移除 rank 參數
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -2608,7 +2614,8 @@ paths:
                               type: number
                               description: 等級
                             rank:
-                              $ref: '#/components/schemas/DataRank'
+                              description: 移除此參數
+                              # $ref: '#/components/schemas/DataRank'
                             experience:
                               type: number
                               description: 所需經驗值
@@ -2619,7 +2626,12 @@ paths:
     post:
       summary: 新增等級
       tags:
+        - Ver20200205
         - LevelConfigManager
+      description:  |
+        ## Ver20200205
+        - 移除 rankId 參數
+
       requestBody:
         content:
           application/json:
@@ -2631,6 +2643,7 @@ paths:
                 experience:
                   type: number
                 rankId:
+                  description: 移除此參數
                   type: number
       responses:
         204:
@@ -2646,7 +2659,11 @@ paths:
     get:
       summary: 取得等級資料
       tags:
+        - Ver20200205
         - LevelConfigManager
+      description: |
+        ## Ver20200205
+        - 移除 rank 參數
       responses:
         200:
           description: ok
@@ -2662,11 +2679,34 @@ paths:
                   experience:
                     type: number
                   rank:
-                    $ref: '#/components/schemas/DataRank'
+                    description: 移除此參數
+                    # $ref: '#/components/schemas/DataRank'
                   updatedAt:
                     $ref: '#/components/schemas/UpdatedAt'
                   createdAt:
                     $ref: '#/components/schemas/CreatedAt'
+
+    put:
+      summary: 更新等級
+      tags:
+        - Ver20200205
+        - LevelConfigManager
+      description: |
+        ## Ver20200205
+        - 新增 API
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                level:
+                  type: number
+                experience:
+                  type: number
+      responses:
+        204:
+          description: OK
     delete:
       summary: 刪除等級資料
       tags:
@@ -2680,7 +2720,11 @@ paths:
     get:
       summary: 玩家階級(rank)管理(每等級需要的經驗值)
       tags:
+        - Ver20200205
         - RankConfigManager
+      description: |
+        ## Ver20200205
+        - 新增 minimumLevel 參數
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -2711,7 +2755,11 @@ paths:
     post:
       summary: 新增階級(rank)
       tags:
+        - Ver20200205
         - RankConfigManager
+      description: |
+        ## Ver20200205
+        - 新增 minimumLevel 參數
       requestBody:
         content:
           application/json:
@@ -2719,6 +2767,8 @@ paths:
               type: object
               properties:
                 rank:
+                  type: number
+                minimumLevel:
                   type: number
                 imageId:
                   $ref: '#/components/schemas/ImageId'
@@ -2738,7 +2788,11 @@ paths:
     get:
       summary: 取得階級資料
       tags:
+        - Ver20200205
         - RankConfigManager
+      description: |
+        ## Ver20200205
+        - 新增 minimumLevel 參數
       responses:
         200:
           description: ok
@@ -2751,6 +2805,9 @@ paths:
                     type: number
                   rank:
                     type: number
+                  minimumLevel:
+                    type: number
+                    description: 最低等級限制，高於此設定則為此 rank 
                   imageId:
                     $ref: '#/components/schemas/ImageId'
                   imageIndex:
@@ -2762,7 +2819,11 @@ paths:
     put:
       summary: 更新 Rank 資料
       tags:
+        - Ver20200205
         - RankConfigManager
+      description: |
+        ## Ver20200205
+        - 新增 minimumLevel 參數
       requestBody:
         content:
           application/json:
@@ -2770,6 +2831,8 @@ paths:
               type: object
               properties:
                 rank:
+                  type: number
+                minimumLevel:
                   type: number
                 imageId:
                   $ref: '#/components/schemas/ImageId'
@@ -3681,6 +3744,9 @@ components:
         rank:
           type: number
           description: 階級
+        minimumLevel:
+          type: number
+          description: 最低等級限制，高於此設定則為此 rank 
         imageId:
           $ref: '#/components/schemas/ImageId'
         imageIndex:
