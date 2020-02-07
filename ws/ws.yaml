@@ -9,6 +9,7 @@ info:
       - uint16 (1 ~ 65535) 為請求類型, 請參考下方 api 說明
     - 參數名稱為(大寫)代表為 byte 資料，於「備註」說明佔位大小，以 byte:{strart}:{end}表示
       - 例如開頭的 channel 為 1byte, 以 byte:0:1 表示， event id 為 byte:1:3
+    - 由於 js 無法直接讀取 bit 資料, 所以 boolean 也使用 1 byte 長度(0 or 1)
   termsOfService: "http://swagger.io/terms/"
   contact:
     email: apiteam@swagger.io
@@ -32,7 +33,7 @@ tags:
     description: 可發出請求更新
   - name: Home
     description: 首頁
-  - name: Information
+  - name: Personal
     description: 個人
 paths:
   /1:
@@ -173,12 +174,6 @@ paths:
       tags:
         - Get
         - Home
-      requestBody:
-        description: "`無請求處理`"
-        content:
-          application/json:
-            schema:
-              example: empty
       responses:
         "200":
           description: ok
@@ -207,13 +202,7 @@ paths:
           application/json:
             schema:
               allOf:
-                - $ref: "#/components/schemas/EventData"
-                - type: object
-                  properties:
-                    MEMBER_ID:
-                      type: number
-                      description: 玩家 id (uint64)
-                      example: (byte:3:11)
+                - $ref: "#/components/schemas/EventMemberData"
                   
       responses:
         "200":
@@ -288,27 +277,19 @@ paths:
                       ERROR_MESSAGE:
                         example: (byte:5:*)
                         type: string
-    
   /9:
     post:
-      summary: 更新玩家點數 (Diamond Point & Game Point)
       tags:
-        - Send
         - Get
-        - Information
+        - Send
+        - Home
+      summary: 更新 Diamond Point
       requestBody:
-        description: 請求更新點數錢包 `(僅更新自己的資料時，後端 server 才受理)`
         content:
           application/json:
             schema:
-                allOf:
-                  - $ref: "#/components/schemas/EventData"
-                  - type: object
-                    properties:
-                      MEMBER_ID: 
-                        type: number
-                        example: (byte:3:*)
-                        description: 玩家 id 
+              allOf:
+                - $ref: '#/components/schemas/EventData'
       responses:
         "200":
           description: ok
@@ -316,42 +297,56 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/EventData"
+                  - $ref: "#/components/schemas/EventMemberData"
                   - type: object
                     properties:
-                      MEMBER_ID: 
-                        type: number
-                        example: (byte:3:11)
-                        description: 玩家 id (int64)
                       DIAMOND_POINT:
                         type: number                
-                        example: (byte:11:19)
-                        description: Diamond point (int64)
-                      GAME_POINT:
-                        type: number                
-                        example: (byte:19:*)
-                        description: Diamond point (int64)
+                        example: (byte:11:*)
+                        description: Diamond point (int64)                       
   /10:
     post:
-      summary: 更新玩家等級、經驗值、階級(Level, Experience, Rank)
+      tags:
+        - Get
+        - Home
+      summary: 更新 Game Point
+      requestBody:
+        content:
+          application/json:
+            description: 僅允許更新自己的額度
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/EventData'
+      responses:
+        "200":
+          description: ok
+          content:
+            application/json:
+              description: 除了自己額度以外， server 也會主動通知其他玩家額度更新
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/EventMemberData"
+                  - type: object
+                    properties:
+                      GAME_POINT:
+                        type: number                
+                        example: (byte:11:*)
+                        description: Game point (int64)
+  
+  /11:
+    post:
+      summary: 更新玩家等級
       tags:
         - Send
         - Get
-        - Information
+        - Personal
       requestBody:
-        description: 請求更新 等級、經驗值、階級 `(僅更新自己的資料時，後端 server 才受理)`
+        description: 請求更新 等級
         content:
           application/json:
             schema:
                 allOf:
                   - $ref: "#/components/schemas/EventData"
-                  - type: object
-                    properties:
-                      MEMBER_ID: 
-                        type: number
-                        example: (byte:3:*)
-                        description: 玩家 id 
-                        
       responses:
         "200":
           description: ok
@@ -359,32 +354,48 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/EventData"
+                  - $ref: "#/components/schemas/EventMemberData"
                   - type: object
                     properties:
-                      MEMBER_ID: 
-                        type: number
-                        example: (byte:3:11)
-                        description: 玩家 id (int64)
-                      RANK:
-                        type: number
-                        example: (byte:11:15)
-                        description: 階級 (uint32)
                       LEVEL:
                         type: number
-                        example: (byte:15:19)
+                        example: (byte:11:15)
                         description: 等級 (uint32)
-                      EXPERIENCE:
-                        type: number
-                        example: (byte:19:*)
-                        description: 經驗值(uint64)
-  /11:
+  /12:
     post:
-      summary: 更新暱稱、頭像
+      summary: 更新玩家經驗值(Experience)
       tags:
         - Send
         - Get
-        - Information
+        - Personal
+      requestBody:
+        description: 請求更新 經驗值
+        content:
+          application/json:
+            schema:
+                allOf:
+                  - $ref: "#/components/schemas/EventData"
+      responses:
+        "200":
+          description: ok
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/EventMemberData"
+                  - type: object
+                    properties:
+                      EXPERIENCE:
+                        type: number
+                        example: (byte:11:*)
+                        description: 經驗值(uint64)
+  /13:
+    post:
+      summary: 更新暱稱, Code
+      tags:
+        - Send
+        - Get
+        - Personal
       requestBody:
         description: 請求更新暱稱、頭像 `(僅更新自己的資料時，後端 server 才受理)`
         content:
@@ -411,26 +422,55 @@ paths:
                       DATA:
                         type: object
                         example: (byte:3:*)
-                        description: 個人資料 json data
+                        description: 暱稱、 code
                         properties:
-                          avatar:
-                            type: string
-                            description: 頭像
                           nickname: 
                             type: string
                             description: 暱稱
-  /12:
+                          code:
+                            type: string
+                            description: 玩家 code
+
+    /14:
+      post:
+        summary: 更新頭像
+        tags:
+          - Get
+          - Send
+          - Personal
+        requestBody:
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EventData'
+        responses:
+          "200":
+            description: ok
+            content:
+              application/json:
+                schema:
+                  allOf:
+                    - $ref: "#/components/schemas/EventMemberData"
+                    - type: object
+                      properties:
+                        AVATAR_URL:
+                          type: string
+                          example: (byte:11:*)
+                          description: 頭像網址
+  /15:
     post:
-      summary: 更新 avatar skin (單一項目)
+      summary: 更新 avatar skin
       tags:
         - Get
-        - Information
+        - Send
+        - Personal
       requestBody:
-        description: 無請求
         content:
           application/json:
             schema:
-              example: empty
+              allOf:
+                - $ref: '#/components/schemas/EventData'
       responses:
         "200":
           description: ok
@@ -455,18 +495,59 @@ paths:
                         type: number
                         example: (byte:12:20)
                         description: avatar_skin.id (uint64)
-  /13:
+  /16:
+    post:
+      summary: 更新簡介
+      tags:
+        - Send
+        - Get
+        - Personal
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/EventData'
+                - type: object
+                  properties:
+                    INTRODUCTION:
+                      type: string
+                      example: (byte:3:*)
+                      description: 簡介
+  /17:
+    post:
+      summary: 更新 email
+      tags:
+        - Send
+        - Get
+        - Personal
+      description: 僅會更新自己的 email 資料
+      requestBody:
+        content:
+          application/json:
+            schema:
+                allOf:
+                  - $ref: "#/components/schemas/EventData"
+      responses:
+        "200":
+          description: ok
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/EventData"
+                  - type: object
+                    properties:
+                      EMAIL:
+                        type: string
+                        example: (byte:3:*)
+                        description: 玩家 Email
+  /18:
     post:
       summary: 更新玩家遊戲位置 (position)
       tags:
         - Get
-        - Information
-      requestBody:
-        description: 無請求
-        content:
-          application/json:
-            schema:
-              example: empty
+        - Personal
       responses:
         "200":
           description: ok
@@ -485,42 +566,180 @@ paths:
                         type: string
                         example: (byte:11:*)
                         description: 玩家目前位置
-  /14:
+  /19:
     post:
-      tags:
+      summary: 檢查暱稱重複
+      tags: 
         - Get
         - Send
-        - Information
-      summary: 取得個人詳細資訊(自己)
-      # description:
+        - Personal
       requestBody:
         content:
           application/json:
             schema:
               allOf:
-                - $ref: "#/components/schemas/EventData"
+                - $ref: '#/components/schemas/EventData' 
+                - type: object
+                  properties:
+                    NICKNAME:
+                      type: string
+                      example: (byte:3:*)
+                      description: 暱稱
       responses:
-        "200":
+        200:
           description: ok
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/EventData"
+                  - $ref: '#/components/schemas/EventData'
                   - type: object
-                    description: json data
-                    example: (byte:3:*)
                     properties:
-                      rank:
+                      NUM_REPEATS: 
                         type: number
-                        description: 玩家階級
-                      playerCode:
-                        type: string
-                        description: 玩家唯一 code (hash code)
-                      email:
-                        type: string
-                        description: 玩家綁定的 email
+                        example: (byte:3:*)
+                        description: 暱稱重複次數
+  /20:
+    post:
+      summary: 修改暱稱
+      tags:
+        - Get
+        - Send
+        - Personal
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/EventData'
+                - type: object
+                  properties:
+                    NICKNAME:
+                      type: string
+                      example: (byte:3:*)
+                      description: 暱稱
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                allOf: 
+                  - $ref: '#/components/schemas/EventData'
+  /21:
+    post:
+      summary: 修改簡介
+      tags:
+        - Get
+        - Send
+        - Personal
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/EventData'
+                - type: object
+                  properties:
+                    INTRODUCTION:
+                      type: string
+                      example: (byte:3:*)
+                      description: 簡介
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                allOf: 
+                  - $ref: '#/components/schemas/EventData'
 
+  /22:
+    post:
+      summary: 更新累積回饋、介紹人、在線玩家
+      tags:
+        - Get
+        - Send
+        - Personal
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/EventData'
+      responses:
+        200:
+          description: 'ok'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EventData'
+                  - type: object
+                    properties:
+                      DATA: 
+                        description: json data
+                        example: (byte:3:*)
+                        type: object
+                        properties:
+                          bonusPoint:
+                            type: number
+                            description: 累計回鐀
+                          invitedFrom:
+                            type: string 
+                            description: 推薦人名稱
+                          invitedUsers:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                avatar:
+                                  type: string
+                                skin:
+                                  $ref: '#/components/schemas/MemberAvatarSkin'
+                                nickname:
+                                  type: string
+                                code:
+                                  type: string
+                                gamePoint:
+                                  type: number
+
+  /23:
+    post:
+      summary: 更新個人設定
+      tags:
+        - Get
+        - Send
+        - Personal
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/EventData'
+      responses:
+        200:
+          description: 僅更新自己的資料
+          content:
+            application/json:
+              schema:
+                allOf: 
+                  - $ref: '#/components/schemas/EventData'
+                  - type: object
+                    properties:
+                      ALLOW_TALK_STRANGER:
+                        type: boolean
+                        example: (byte:3:4)
+                        description: 是否接受陌生人密語
+                      ALLOW_INVITE_FRIEND:
+                        type: boolean
+                        example: (byte:4:5)
+                        description: 是否允許好友邀請
+                      TRANSACTION_PASSWORD_SETTED:
+                        type: boolean
+                        example: (byte:5:6)
+                        description: 是否已設定交易密碼
+                          
 components:
   schemas:
     EventData:
@@ -543,6 +762,15 @@ components:
             - range: 1 ~ 65535
             - 用來定義各請求 or 資料的編號
           example: (byte:1:3)
+    EventMemberData: 
+      allOf:
+        - $ref: '#/components/schemas/EventData'
+        - type: object
+          properties:
+            MEMBER_ID: 
+              type: number
+              example: (byte:3:11)
+              description: 玩家 id (int64)
     Image:
       type: object
       properties:
@@ -650,21 +878,24 @@ components:
         nickname:
           type: string
           description: 玩家暱稱
-        rank:
-          type: number
-          description: 玩家階級
+        code:
+          type: string
+          description: 玩家 code
+        introduction:
+          type: string
+          description: 簡介
         level:
           type: number
           description: 等級
-        isFriend:
-          type: boolean
-          description: 是否為好友
+        experience:
+          type: number
+          description: 經驗值
+        inviteStatus:
+          type: number
+          description: 邀請狀態 (1. 互為好友, 2.已邀請, 3.被邀請)
         isBlock:
           type: boolean
           description: 是否黑名單
-        experiencePercent:
-          type: number
-          description: 目前經驗值的百分比(小數 0.0 ~ 0.999) 
         diamondPoint:
           type: number
           description: 玩家鑽石點數
