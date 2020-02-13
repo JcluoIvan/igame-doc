@@ -176,8 +176,6 @@ paths:
                     properties:
                       id:
                         type: number
-                      rank:
-                        type: number
                       level:
                         type: number
                       experience:
@@ -3531,8 +3529,6 @@ components:
           type: string
         level:
           type: number
-        rank:
-          type: number
         diamondPoint:
           type: number
         gamePoint:
@@ -3549,8 +3545,6 @@ components:
         id:
           type: number
         level:
-          type: number
-        rank:
           type: number
         diamondPoint:
           type: number
