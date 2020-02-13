@@ -38,7 +38,7 @@ servers:
   - url: "http://demo.project-host.net/v1"
     description: 測試伺服器網址
 tags:
-  - name: Update-0.0.6
+  - name: Update-0.0.7
     description: 部分 API 更新&修正
   - name: Common
     description: 共用 API
@@ -48,6 +48,8 @@ tags:
     description: 老虎機遊戲類型
   - name: Table
     description: Table Game 類型
+  - name: Update-0.0.6
+    description: 部分 API 更新&修正
   - name: Update-0.0.5
     description: 部分 API 更新&修正
   - name: Update-0.0.4
@@ -675,10 +677,13 @@ paths:
       - $ref: "#/components/parameters/ProviderPassword"
     post:
       tags:
+        - Update-0.0.7
         - Update-0.0.6
         - Slot
       summary: 開獎
       description: |
+        #### Update-0.0.7
+        - 新增 400 `ResponseErrorInvalidBetAmount` 錯誤
         #### Update-0.0.6
         - 新增 `resultAmount` 說明「(resultAmount = winAmount + bonusAmount - betAmount)」
         - 新增 `winAmount` 傳入參數
@@ -720,6 +725,14 @@ paths:
               schema:
                 allOf:
                   - $ref: "#/components/schemas/TransactionResponse"
+        "400":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/#/components/schemas/ResponseErrorInvalidBetAmount"
+
         "401":
           description: 401 Error
           content:
@@ -749,10 +762,13 @@ paths:
       - $ref: "#/components/parameters/ProviderPassword"
     post:
       tags:
-        - Table
+        - Update-0.0.7
         - Update-0.0.3
+        - Table
       summary: 下注
       description: |
+        #### Update-0.0.7
+        - 新增 403 `ResponseErrorBetConflict` 錯誤
         #### Update-0.0.3
         - 新增 403 回傳錯誤
           - 遊戲已用
@@ -830,16 +846,20 @@ paths:
                   - $ref: "#/components/schemas/ResponseErrorGameNotFound"
                   - $ref: "#/components/schemas/ResponseErrorRoundNotFound"
                   - $ref: "#/components/schemas/ResponseErrorGameIsDisabled"
+                  - $ref: "#/components/schemas/ResponseErrorBetConflict"
   /table/reserve:
     parameters:
       - $ref: "#/components/parameters/ProviderName"
       - $ref: "#/components/parameters/ProviderPassword"
     post:
       tags:
-        - Table
+        - Update-0.0.7
         - Update-0.0.3
+        - Table
       summary: 遊戲開始時的保留額度
       description: |
+        #### Update-0.0.7
+        - 新增 403 `ResponseErrorBetConflict` 錯誤
         #### Update-0.0.3
         - 新增 403 回傳錯誤
           - 遊戲已用
@@ -912,6 +932,7 @@ paths:
                   - $ref: "#/components/schemas/ResponseErrorMemberIsDisabled"
                   - $ref: "#/components/schemas/ResponseErrorGameNotFound"
                   - $ref: "#/components/schemas/ResponseErrorGameIsDisabled"
+                  - $ref: "#/components/schemas/ResponseErrorBetConflict"
   /table/result:
     parameters:
       - $ref: "#/components/parameters/ProviderName"
@@ -922,6 +943,8 @@ paths:
         - Table
       summary: 開獎
       description: |
+        #### Update-0.0.7
+        - 新增 400 `ResponseErrorInvalidBetAmount` 錯誤
         #### Update-0.0.2
         - 新增 400 response 錯誤回應: 參數中的額度計算不正確
       requestBody:
@@ -981,6 +1004,7 @@ paths:
                 example: 請參考 Schema
                 oneOf:
                   - $ref: "#/components/schemas/ResponseErrorInvalidResultAmount"
+                  - $ref: "#/components/schemas/ResponseErrorInvalidBetAmount"
 
         "401":
           description: 401 Error
@@ -1233,6 +1257,7 @@ components:
         ### 400 
         - E400001 # 不正確的額度結果
         - E400002 # 不正確的資料型態 (/provider/game/record/save @value)
+        - E400003 # 注額不正確
         ### 401
         - E401001 # 非法 IP 請求
         - E401002 # Provider 不存在
@@ -1247,6 +1272,7 @@ components:
         - E403004 # 遊戲編號不存在 (Game not found)
         - E403005 # 遊戲局不存在 (Round not found)
         - E403006 # 遊戲已停用 (Game Disabled)
+        - E403007 # 下注衝突, 同局不能同時下注 & 保留額
         ### 404
         - E404001 # 路徑不存在
         ### 405
@@ -1255,6 +1281,7 @@ components:
         ### 400
         - E400001 # 不正確的額度結果
         - E400002 # 不正確的資料型態 (/provider/game/record/save @value)
+        - E400003 # 注額不正確
         ### 401
         - E401001 # 非法 IP 請求
         - E401002 # Provider 不存在
@@ -1269,6 +1296,7 @@ components:
         - E403004 # 遊戲編號不存在 (Game not found)
         - E403005 # 遊戲局不存在 (Round not found)
         - E403006 # 遊戲已停用 (Game Disabled)
+        - E403007 # 下注衝突, 同局不能同時下注 & 保留額
         ### 404
         - E404001 # 路徑不存在
         ### 405
@@ -1312,6 +1340,19 @@ components:
           type: string
           description: 錯誤原因、錯誤訊息
           example: "value 型態不正確, 必需為字串"
+    ResponseErrorInvalidBetAmount:
+      description: 注額與該局不同
+      type: object
+      properties:
+        code:
+          type: string
+          description: 錯誤碼  E400003, 參考 [ErrorCode](#model-ErrorCode)
+          example: E400003
+        message:
+          type: string
+          description: 錯誤原因、錯誤訊息
+          example: "注額不正確"
+
     ResponseErrorDirectIPAccessNotAllowed:
       description: 連線 IP 不被允許
       type: object
@@ -1450,11 +1491,23 @@ components:
         code:
           type: string
           description: 錯誤編號 E403006, 參考 [ErrorCode](#model-ErrorCode)
-          example: E403004
+          example: E403006
         message:
           type: string
           description: 錯誤原因、錯誤訊息
           example: 遊戲已停用
+    ResponseErrorBetConflict:
+      description: 下注衝突, 同局不能同時下注 & 保留額
+      type: object
+      properties:
+        code:
+          type: string
+          description: 錯誤編號 E403007, 參考 [ErrorCode](#model-ErrorCode)
+          example: E403007
+        message:
+          type: string
+          description: 錯誤原因、錯誤訊息
+          example: 下注衝突, 同局不能同時下注 & 保留額
   parameters:
     ProviderName:
       name: provider-name

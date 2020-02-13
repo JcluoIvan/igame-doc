@@ -27,6 +27,8 @@ servers:
   - url: "http://demo.project-host.net/v1"
     description: 測試伺服器網址
 tags:
+  - name: None
+    description: 功能從缺
   - name: All
     description: 所有會收到的類型
   - name: Home
@@ -35,6 +37,20 @@ tags:
     description: 個人
   - name: Mission 
     description: 任務
+  - name: Mail
+    description: 信箱
+  - name: Friend
+    description: 好友
+  - name: Chat
+    description: 聊天
+  - name: Store
+    description: 商店
+  - name: Exchange
+    description: 交換
+  - name: Gashapon
+    description: 轉蛋
+  - name: Announcement
+    description: 公告
 paths:
   /1:
     post:
@@ -213,7 +229,7 @@ paths:
                         example: (byte:3:*)
                         type: object
                         allOf:
-                          - $ref: '#/components/schemas/MemberBaseData'
+                          - $ref: '#/components/schemas/Member'
 
   /7:
     post:
@@ -241,7 +257,7 @@ paths:
                         example: (byte:3:*)
                         type: object
                         allOf:
-                          - $ref: '#/components/schemas/MemberBaseData'
+                          - $ref: '#/components/schemas/Member'
     
   /8:
     post:
@@ -323,37 +339,18 @@ paths:
                         type: number                
                         example: (byte:11:*)
                         description: Game point (int64)
-  
   /11:
     post:
-      summary: 更新玩家等級
+      summary: 無功能
       tags:
-        - All
-        - Personal
-      requestBody:
-        description: 請求更新 等級
-        content:
-          application/json:
-            schema:
-                allOf:
-                  - $ref: "#/components/schemas/EventData"
+        - None
       responses:
-        "200":
+        200:
           description: ok
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: "#/components/schemas/EventMemberData"
-                  - type: object
-                    properties:
-                      LEVEL:
-                        type: number
-                        example: (byte:11:15)
-                        description: 等級 (uint32)
+
   /12:
     post:
-      summary: 更新玩家經驗值(Experience)
+      summary: 更新玩家等級 & 經驗值(Experience)
       tags:
         - All
         - Personal
@@ -782,7 +779,7 @@ paths:
                         example: (byte:3:*)
                         description: 個人 skin 列表 (json data)
                         items:
-                          type: objeect
+                          type: object
                           properties:
                             id:
                               type: number
@@ -866,8 +863,8 @@ paths:
       requestBody:
         content:
           application/json:
-            description: 僅更新自己 & 已承接的任務資料
             schema:
+              description: 僅更新自己 & 已承接的任務資料
               allOf:
                 - $ref: '#/components/schemas/EventData'
                 - type: object
@@ -1149,7 +1146,7 @@ paths:
       responses:
         200:
           description: ok
-          contente:
+          content:
             application/json:
               schema:
                 allOf:
@@ -1300,7 +1297,7 @@ paths:
                               rows:
                                 type: array
                                 items: 
-                                  $ref: '#/components/schemas/Friend'
+                                  $ref: '#/components/schemas/Member'
   /40:
     post:
       summary: 邀請好友 / 同意邀請
@@ -1310,8 +1307,8 @@ paths:
       requestBody:
         content:
           application/json:
-            description: 邀請對方成為好友, 若是等待回應的狀態, 則同意成為好友
             schema:
+              description: 邀請對方成為好友, 若是等待回應的狀態, 則同意成為好友
               allOf:
                 - $ref: '#/components/schemas/EventData'
                 - type: object
@@ -1340,8 +1337,6 @@ paths:
                           - $ref: '#/components/schemas/InviteStatus'
                           - type: number
                             example: (byte:11:12)
-                      
-
   /41:
     post:
       summary: 解除好友 / 取消邀請 / 拒絕好友邀請
@@ -1351,12 +1346,12 @@ paths:
       requestBody:
         content:
           application/json:
-            description: |
-              各狀態處理行為：
-              - 好友 : 解除雙方好友狀態
-              - 邀請對方 : 取消邀請
-              - 等待回應 : 拒絕邀請
             schema:
+              description: |
+                各狀態處理行為：
+                - 好友 : 解除雙方好友狀態
+                - 邀請對方 : 取消邀請
+                - 等待回應 : 拒絕邀請
               allOf:
                 - $ref: '#/components/schemas/EventData'
                 - type: object
@@ -1393,8 +1388,8 @@ paths:
       requestBody:
         content:
           application/json:
-            description: 邀請對方成為好友, 若是等待回應的狀態, 則同意成為好友
             schema:
+              description: 邀請對方成為好友, 若是等待回應的狀態, 則同意成為好友
               allOf:
                 - $ref: '#/components/schemas/EventData'
                 - type: object
@@ -1498,8 +1493,40 @@ paths:
                               rows:
                                 type: array
                                 items: 
-                                  $ref: '#/components/schemas/Friend'
+                                  $ref: '#/components/schemas/Member'
   /45:
+    post:
+      summary: 進入 / 離開聊天室
+      tags:
+        - All
+        - Chat
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/EventData'
+                - type: object
+                  properties:
+                    ENTER_OR_LEAVE: 
+                      type: boolean
+                      example: (byte:3:4)
+                      description: true. 進入, false. 離開
+      responses:
+        200:
+          description: ok
+          content: 
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EventData'
+                  - type: object
+                    properties:
+                      ENTER_OR_LEAVE: 
+                        type: boolean
+                        example: (byte:3:4)
+                        description: true. 進入, false. 離開
+  /46:
     post:
       summary: 取得公開頻道列表
       tags:
@@ -1527,9 +1554,9 @@ paths:
                         description: 公開頻道列表
                         items:
                           $ref: '#/components/schemas/ChatPublic'
-  /46:
+  /47:
     post:
-      summary: 收到聊天訊息
+      summary: 收到聊天訊息(聊天室)
       tags:
         - All
         - Chat
@@ -1546,10 +1573,532 @@ paths:
                       DATA: 
                         type: object
                         example: (byte:3:*)
-                        description: 訊息內容
+                        description: 訊息內容 (json data)
+                        allOf:
+                          - $ref: '#/components/schemas/ChatMessage'
+  /48:
+    post:
+      summary: 發送訊息(聊天室)
+      tags:
+        - All
+        - Chat
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/EventData'
+                - type: object
+                  properties:
+                    DATA:
+                      type: object
+                      example: (byte:3:*)
+                      description: 訊息資料(json data)
+                      properties:
+                        chatId:
+                          type: number
+                        messageType:
+                          $ref: '#/components/schemas/MessageType'
+                        message: 
+                          type: string
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EventData'
+                  - type: object
+                    properties:
+                      DATA: 
+                        type: object
+                        example: (byte:3:*)
+                        description: 訊息內容 (json data)
+                        allOf:
+                          - $ref: '#/components/schemas/ChatMessage'
+  /49:
+    post:
+      summary: 收到私人訊息(1 對 1 訊息)
+      tags:
+        - All
+        - Chat
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EventData'
+                  - type: object
+                    properties:
+                      DATA:
+                        type: object
+                        example: (byte:3:*)
+                        description: 訊息內容 (json data)
+                        allOf:
+                          - $ref: '#/components/schemas/PrivateMessage'
 
+  /50:
+    post:
+      summary: 發送私人訊息(1 對 1 訊息)
+      tags:
+        - All
+        - Chat
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/EventData'
+                - type: object
+                  properties:
+                    DATA:
+                      type: object
+                      example: (byte:3:*)
+                      description: 訊息資料(json data)
+                      properties:
+                        toId:
+                          type: number
+                        messageType:
+                          $ref: '#/components/schemas/MessageType'
+                        message: 
+                          type: string
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EventData'
+                  - type: object
+                    properties:
+                      DATA:
+                        type: object
+                        example: (byte:3:*)
+                        description: 訊息內容 (json data)
+                        allOf:
+                          - $ref: '#/components/schemas/PrivateMessage'
 
+  /51:
+    post:
+      summary: 查詢在線玩家
+      tags:
+        - All
+        - Chat
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/EventData'
+                - type: object
+                  properties:
+                    SEARCH:
+                      type: string
+                      example: (byte:3:*)
+                      description: 查詢名稱
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EventData'
+                  - type: object
+                    properties:
+                      DATA:
+                        type: array
+                        example: (byte:3:*)
+                        description: 玩家列表 (json data)
+                        items:
+                          $ref: '#/components/schemas/Member'
+  /52:
+    post:
+      summary: 取得商店列表
+      tags:
+        - All
+        - Store
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/EventData'
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EventData'
+                  - type: object
+                    properties:
+                      DATA:
+                        type: array
+                        example: (byte:3:*)
+                        description: 商店列表
+                        items:
+                          $ref: '#/components/schemas/Store'
+  /53:
+    post:
+      summary: 購入
+      tags:
+        - All
+        - Store
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/EventData'
+                - type: object
+                  properties:
+                    COMMODITY_TYPE:
+                      allOf:
+                        - $ref: '#/components/schemas/CommodityType'
+                        - type: number
+                          example: (byte:3:4)
+                    ID:
+                      type: number
+                      example: (byte:4:12)
+                      description: 商品 id (uint64)
+                    COUNT:
+                      type: number
+                      example: (byte:12:16)
+                      description: 購買數量 (uint32)
+      responses:
+        200: 
+          description: ok
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EventData'
+                  - type: object
+                    properties:
+                      DIAMOND_POINT:
+                        type: number
+                        example: (byte:3:11)
+                        description: 售出後 diamond point 餘額 (int64)
+                      GAME_POINT:
+                        type: number
+                        example: (byte:11:19)
+                        description: 售出後 game point 餘額 (int64)
+  /54:
+    post:
+      summary: 售出
+      tags:
+        - All
+        - Store
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/EventData'
+                - type: object
+                  properties:
+                    ITEMS:
+                      type: array
+                      example: (byte:3:*)
+                      description: 售出的道具商品編號, 只有道具可賣出 (json data)
+                      items:
+                        type: number
+                        description: 商品編號
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EventData'
+                  - type: object
+                    properties:
+                      DIAMOND_POINT:
+                        type: number
+                        example: (byte:3:11)
+                        description: 售出後 diamond point 餘額 (int64)
+                      GAME_POINT:
+                        type: number
+                        example: (byte:11:19)
+                        description: 售出後 game point 餘額 (int64)
+  /55:
+    post:
+      summary: 送出交換邀請
+      tags:
+        - All
+        - Exchange
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/EventData'
+                - type: object
+                  properties:
+                    ID:
+                      type: number
+                      example: (byte:3:11)
+                      description: 交易對象 id
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EventData'
+                  
 
+  /56:
+    post:
+      summary: 收到交換邀請
+      tags:
+        - All
+        - Exchange
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EventData'
+                  - type: object
+                    properties:
+                      DATA:
+                        type: object
+                        example: (byte:3:*)
+                        description: 來自某人的交換邀請 (json data)
+                        allOf:
+                          - $ref: '#/components/schemas/Member'
+
+  /57:
+    post:
+      summary: 接受交換邀請
+      tags:
+        - All
+        - Exchange
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/EventData'
+                - type: object
+                  properties:
+                    ID:
+                      type: number
+                      example: (byte:3:11)
+                      description: 接受某玩家的交請 (uint64)
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EventData'
+                  - type: object
+                    properties:
+                      ID:
+                        type: number
+                        example: (byte:3:11)
+                        description: 交換對象的 id (若有問題即中斷)
+  /58:
+    post:
+      summary: 取消 / 中斷 / 拒絕交換邀請、狀態
+      tags:
+        - All
+        - Exchange
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/EventData'
+                - type: object
+                  properties:
+                    ID:
+                      type: number
+                      example: (byte:3:*)
+                      description: 拒絕的對象 id (uint64), 0 則全部拒絕
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                allOf:
+                  -  $ref: '#/components/schemas/EventData'
+  /59:
+    post:
+      summary: 交易密碼驗證 (取得交易 token)
+      tags:
+        - All
+        - Exchange
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf: 
+                - $ref: '#/components/schemas/EventData'
+                - type: object
+                  properties:
+                    PASSWORD:
+                      type: string
+                      example: (byte:3:*)
+                      description: 交易密碼
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EventData'
+                  - type: object
+                    properties:
+                      EXCHANGE_TOKEN:
+                        type: string
+                        example: (byte:3:*)
+                        description: 一次性 token 
+  /60:
+    post:
+      summary: 更新交易狀態
+      tags:
+        - All
+        - Exchange
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/EventData'
+                - type: object
+                  properties:
+                    DATA: 
+                      type: object
+                      example: (byte:3:*)
+                      description: 提交交換內容 (json data)
+                      properties:
+                        locked:
+                          type: boolean
+                          description: 是否鎖定 (鎖定後無法解除)
+                        gamePoint: 
+                          type: number
+                        itemId:
+                          type: number
+                        numItem:  
+                          type: number
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EventData'
+                  - type: object
+                    properties:
+                      DATA:
+                        type: array
+                        example: (byte:3:*)
+                        description: 交換內容 (json data)
+                        items:
+                          $ref: '#/components/schemas/ExchangeContent'
+  /61:
+    post:
+      summary: 確定交換
+      tags:
+        - All
+        - Exchange
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EventData'
+                  - type: object
+                    properties:
+                      STATUS: 
+                        type: number
+                        example: (byte:3:4)
+                        description: 1. 交換完成, 2. 等待對方完成
+  /62:
+    post:
+      summary: 取得轉蛋活動
+      tags:
+        - All
+        - Gashapon
+      requestBody:
+        content:
+          application/json:
+            schema: 
+              allOf:
+                - $ref: '#/components/schemas/EventData'
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EventData'
+                  - type: object
+                    properties:
+                      DATA:
+                        type: array
+                        example: (byte:3:*)
+                        description: 轉蛋活動 (json data)
+                        items:
+                          $ref: '#/components/schemas/Gashapon'
+  /63:
+    post:
+      summary: 抽轉蛋
+      tags:
+        - All
+        - Gashapon
+      requestBody:
+        content:
+          application/json:
+            schema: 
+              allOf:
+                - $ref: '#/components/schemas/EventData'
+                - type: object
+                  properties:
+                    GASHAPON_ID:
+                      type: number
+                      example: (byte:3:11)
+                      description: 轉蛋活動 id
+                    GASHAPON_COST_ID:
+                      type: number
+                      example: (byte:11:19)
+                      description: 消費方式
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/EventData'
+                  - type: object
+                    properties:
+                      ITEMS:
+                        type: array
+                        example: (byte:3:*)
+                        description: 獲得的道具
+                        items:
+                          $ref: '#/components/schemas/Item'
         
 components:
   schemas:
@@ -1638,15 +2187,6 @@ components:
         numHeights:
           type: number
           description: 圖片切塊(高)
-    ImageIndex:
-      type: object
-      properties:
-        imageId:
-          type: number
-          description: 圖片編號
-        index:
-          type: number
-          description: 圖片位置  
     Sticker:
       type: object
       properties:
@@ -1686,12 +2226,12 @@ components:
         name:
           type: string
           description: 貼圖名稱
-        filename:
-          type: string
-          description: 貼圖的圖片名稱
-        url: 
-          type: string
-          description: 圖片資源網址
+        imageId:
+          type: number
+          description: 圖片編號
+        index:
+          type: number
+          description: 圖片位置  
     GameType:
       type: string
       description: |
@@ -1710,15 +2250,40 @@ components:
           description: 遊戲 ID
         type:
           $ref: '#/components/schemas/GameType'
-        image: 
-          $ref: '#/components/schemas/ImageIndex'
+        imageId:
+          type: number
+          description: 圖片編號
+        index:
+          type: number
+          description: 圖片位置  
         name:
           type: string
           description: 遊戲名稱
         minimumLevel:
           type: number
           description: 最低等級限制
-    
+    Item:
+      type: object
+      description: 道具
+      properties:
+        id: 
+          type: number
+        name: 
+          type: string
+        key: 
+          type: string
+        transferable:
+          type: boolean
+          description: 是否可轉讓
+        description:
+          type: string
+          description: 道具描述
+        imageId:
+          type: number
+          description: 圖片編號
+        index:
+          type: number
+          description: 圖片位置  
     InviteStatus:
       type: number
       description: |
@@ -1729,7 +2294,7 @@ components:
         - 1 # 互為好友
         - 2 # 已邀請
         - 3 # 被邀請
-    MemberBaseData:
+    Member:
       type: object
       properties:
         avatar: 
@@ -1899,34 +2464,21 @@ components:
                   numItems:
                     type: number
                     description: 道具數量
-    Friend: 
-      type: object
-      properties:
-        id:
-          type: number
-        avatar: 
-          type: string
-          description: 頭像圖片路徑
-        nickname:
-          type: string
-          description: 玩家暱稱
-        code:
-          type: string
-          description: 玩家 code
-        level:
-          type: number
-          description: 等級
-        introduction:
-          type: string
-          description: 簡介
-        inviteStatus:
-          type: number
-          description: 邀請狀態 (1. 互為好友, 2.已邀請, 3.被邀請)
-        isBlock:
-          type: boolean
-          description: 是否黑名單
-        skin: 
-          $ref: '#/components/schemas/MemberAvatarSkin'
+ 
+    MessageType:
+      type: number
+      description: |
+        - 1 # text 
+        - 2 # sticker
+        - 3 # image
+        - 4 # autdio
+        - 5 # video
+      enum:
+        - 1 # text 
+        - 2 # sticker
+        - 3 # image
+        - 4 # autdio
+        - 5 # video
     ChatPublic:
       type: object
       properties:
@@ -1938,5 +2490,224 @@ components:
         description:
           type: string
           description: 聊天室說明
-        
+    ChatMessage:
+      type: object
+      properties:
+        id: 
+          type: number
+        chatId:
+          type: number
+        memberId:
+          type: number
+        messageType:
+          $ref: '#/components/schemas/MessageType'
+        message:
+          type: string
+        createdAt:
+          type: number
+    PrivateMessage:
+      type: object
+      properties:
+        id:
+          type: number
+        fromId:
+          type: number
+        messageType:
+          $ref: '#/components/schemas/MessageType'
+        message:
+          type: string
+        createdAt:
+          type: number
+    StoreType:
+      type: number
+      description: |
+        #### 商店類型
+        - 1 # buy (玩家購買)
+        - 2 # sell (玩家售出)
+      enum:
+        #### 商店類型
+        - 1 # buy (玩家購買)
+        - 2 # sell (玩家售出)
+
+    PointType:
+      type: number
+      description: |
+        #### 點數類型
+        - 1 # diamond point
+        - 2 # game point
+      enum:
+        #### 點數類型
+        - 1 # diamond point
+        - 2 # game point
+    CommodityType:
+      type: number
+      description: |
+        #### 商品類型
+        - 1 # avatar skin
+        - 2 # item
+        - 3 # sticker
+      enum:
+        #### 商品類型
+        - 1 # avatar skin
+        - 2 # item
+        - 3 # sticker
+    Store:
+      type: object
+      properties: 
+        name: 
+          type: string
+          description: 商店名稱
+        description:
+          type: string
+          description: 商店說明
+        StoreType:
+          $ref: '#/components/schemas/StoreType'
+        startAt:
+          type: number
+          description: 商店活動時間 - 起 (0 則無限制)
+        endAt:
+          type: number
+          description: 商店活動時間 - 訖 (0 則無限制)
+        commodityAvatars:
+          type: array
+          items: 
+            $ref: '#/components/schemas/CommodityAvatar'
+        commodityItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/CommodityItem'
+        commodityStickers:
+          type: array
+          items:
+            $ref: '#/components/schemas/CommoditySticker'
+    CommodityAvatar:
+      type: object
+      description: 商品 - 頭像 skin 
+      properties:
+        id: 
+          type: number
+        storeId:
+          type: number
+        skinId:
+          type: number
+        pointType:
+          $ref: '#/components/schemas/PointType'
+        price:
+          type: number
+          description: 價格
+    CommodityItem:
+      type: object
+      description: 商品 - 道具
+      properties:
+        id: 
+          type: number
+        storeId:
+          type: number
+        itemId:
+          type: number
+        item:
+          $ref: '#/components/schemas/Item'
+        numPackages:
+          type: number
+          description: 每包數量
+        pointType:
+          $ref: '#/components/schemas/PointType'
+        price:
+          type: number
+          description: 價格
+    CommoditySticker:
+      type: object
+      description: 商品 - 道具
+      properties:
+        id: 
+          type: number
+        stickerId:
+          type: number
+        pointType:
+          $ref: '#/components/schemas/PointType'
+        price:
+          type: number
+          description: 價格
+    ExchangeContent: 
+      type: object
+      properties:
+        id:
+          type: number
+          description: 玩家 id
+        locked:
+          type: boolean
+          description: 是否鎖定 (鎖定後無法解除)
+        gamePoint: 
+          type: number
+        itemId:
+          type: number
+        numItem:  
+          type: number
+    GashaponCost:
+      type: object
+      properties:
+        id:
+          type: number
+        gashaponId:
+          type: number
+        itemId:
+          type: number
+          description: 消費的道具
+        numItems:
+          type: number
+          description: 每一次消費的數量
+        times:
+          type: number
+          description: 每次消費可轉幾次
+    Gashapon:
+      type: object
+      properties:
+        id: 
+          type: number
+        name:
+          type: string
+          description: 活動名稱
+        description:
+          type: string
+          description: 活動說明
+        startAt:
+          type: number
+          description: 活動時間 - 起 (0 則無限制)
+        endAt:
+          type: number
+          description: 活動時間 - 訖 (0 則無限制)
+        costs:
+          type: array
+          description: 消費方式
+          items:
+            $ref: '#/components/schemas/GashaponCost'
+    AnnouncementType:
+      type: number
+      description: |
+        #### 公告類型
+        - 1 # 官方
+        - 2 # 遊戲
+      enum:
+        #### 公告類型
+        - 1 # 官方
+        - 2 # 遊戲
+
+    Announcement:
+      type: object
+      properties:
+        id: 
+          type: number
+        title:
+          type: string
+        content:
+          type: string
+        type:
+          $ref: '#/components/schemas/AnnouncementType'
+        startAt:
+          type: number
+          description: 商店活動時間 - 起 (0 則無限制)
+        endAt:
+          type: number
+          description: 商店活動時間 - 訖 (0 則無限制)
+
 
