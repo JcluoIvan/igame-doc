@@ -70,16 +70,15 @@ paths:
           description: ok
           content:
             application/json:
-              content:
-                schema:
-                  type: object
-                  properties:
-                    sessid:
-                      type: string
-                      description: session id
-                    id:
-                      type: number
-                      description: member id
+              schema:
+                type: object
+                properties:
+                  sessid:
+                    type: string
+                    description: session id
+                  id:
+                    type: number
+                    description: member id
 
   /module/client-websocket/ws:
     post:
