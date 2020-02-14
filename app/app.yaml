@@ -66,10 +66,35 @@ paths:
                 password:
                   type: string
       responses:
-        204:
+        200:
+          description: ok
+          content:
+            application/json:
+              content:
+                schema:
+                  type: object
+                  properties:
+                    sessid:
+                      type: string
+                      description: session id
+                    id:
+                      type: number
+                      description: member id
+
+  /module/client-websocket/ws:
+    post:
+      summary: WebSocket 連線 (請使用 ws:// or wss://)
+      tags:
+        - Init
+      requestBody:
+        content:
+          application/json:
+            schema:
+      responses:
+        200:
           description: ok
 
-  /app/images:
+  /app/sources/images:
     get:
       summary: 更新圖片資源
       tags:
@@ -97,7 +122,7 @@ paths:
                     numWidths:
                       type: number
                       description: 圖片寬度分割數
-  /app/stickers:
+  /app/sources/stickers:
     get:
       summary: 貼圖
       tags:
@@ -122,7 +147,7 @@ paths:
                     defaultIndex:
                       type: number
                       description: 預設圖 index
-  /app/items:
+  /app/sources/items:
     get:
       summary: 道具
       tags:
@@ -153,7 +178,7 @@ paths:
                     description:
                       type: string
                       description: 道具說明
-  /app/skin/avatars:
+  /app/sources/skin-avatars:
     get:
       summary: 頭像樣式
       tags:

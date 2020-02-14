@@ -54,47 +54,41 @@ tags:
 paths:
   /1:
     post:
-      summary: 更新圖片資源
+      summary: 心跳確認
       tags:
         - All
         - Home
       requestBody:
-        description: 更新圖片資源
         content:
           application/json:
             schema:
               allOf:
                 - $ref: '#/components/schemas/EventData'
-                - type: object
-                  properties:
-                    HASH_CODE:
-                      type: string
-                      example: (byte:3:*)
-                      description: 圖片資源的 hash code, 用來檢查是否更新
       responses:
-        "200":
+        200:
           description: ok
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/EventData"
-                  - type: object
-                    properties:
-                      DATA:
-                        type: object
-                        description: 圖片資源的資料 json data
-                        example: (byte:3:*)
-                        properties:
-                          hashCode: 
-                            type: string
-                            description: 圖片資源的 hash code, 用來檢查是否更新
-                          images:
-                            type: array
-                            description: 圖片資源列表
-                            items:
-                              $ref: '#/components/schemas/Image'
+                  - $ref: '#/components/schemas/EventData'
   /2:
+    post:
+      summary: 功能從缺
+      tags:
+        - None
+      responses:
+        200:
+          description: ok
+  /3:
+    post:
+      summary: 功能從缺
+      tags:
+        - None
+      responses:
+        200:
+          description: ok
+  /4:
     post:
       summary: 遊戲列表
       tags:
@@ -108,7 +102,7 @@ paths:
               allOf:
                 - $ref: '#/components/schemas/EventData'
       responses:
-        "200":
+        200:
           description: ok
           content:
             application/json:
@@ -123,63 +117,7 @@ paths:
                         example: (byte:3:*) 
                         items:
                           $ref: '#/components/schemas/Game'
-                          
-  /3:
-    post:
-      summary: 取得貼圖列表
-      tags:
-        - All
-        - Home
-      requestBody:
-        content:
-          application/json:
-            schema:
-              allOf:
-                - $ref: "#/components/schemas/EventData"
-      responses:
-        "200":
-          description: ok
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: "#/components/schemas/EventData"
-                  - type: object
-                    properties:
-                      SKICKER: 
-                        description: 貼圖列表 json data
-                        example: (byte:3:*)
-                        type: array
-                        items: 
-                          $ref: '#/components/schemas/Sticker'
-  /4:
-    post:
-      summary: 取得頭像 skin 列表 (avatar skin)
-      tags:
-        - All
-        - Home
-      requestBody:
-        content:
-          application/json:
-            schema:
-              allOf:
-                - $ref: "#/components/schemas/EventData"
-      responses:
-        "200":
-          description: ok
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: "#/components/schemas/EventData"
-                  - type: object
-                    properties:
-                      AVATAR_SKINS: 
-                        description: 頭像 skin 列表 json data
-                        example: (byte:3:*)
-                        type: array
-                        items: 
-                          $ref: '#/components/schemas/AvatarSkin'
+  
   /5:
     post:
       summary: 跑馬燈資訊
@@ -187,7 +125,7 @@ paths:
         - All
         - Home
       responses:
-        "200":
+        200:
           description: ok
           content:
             application/json:
@@ -216,7 +154,7 @@ paths:
                 - $ref: "#/components/schemas/EventMemberData"
                   
       responses:
-        "200":
+        200:
           description: ok
           content:
             application/json:
@@ -244,7 +182,7 @@ paths:
               allOf:
                 - $ref: "#/components/schemas/EventData"
       responses:
-        "200":
+        200:
           description: ok
           content:
             application/json:
@@ -271,7 +209,7 @@ paths:
             schema:
               example: empty
       responses:
-        "200":
+        200:
           description: 當任何請求發生失敗的時後，都以此事件回傳錯誤內容
           content:
             application/json:
@@ -288,10 +226,10 @@ paths:
                         type: string
   /9:
     post:
+      summary: 更新 Diamond Point
       tags:
         - All
         - Home
-      summary: 更新 Diamond Point
       requestBody:
         content:
           application/json:
@@ -299,7 +237,7 @@ paths:
               allOf:
                 - $ref: '#/components/schemas/EventData'
       responses:
-        "200":
+        200:
           description: ok
           content:
             application/json:
@@ -314,10 +252,10 @@ paths:
                         description: Diamond point (int64)                       
   /10:
     post:
+      summary: 更新 Game Point
       tags:
         - All
         - Home
-      summary: 更新 Game Point
       requestBody:
         description: 僅允許更新自己的點數
         content:
@@ -326,7 +264,7 @@ paths:
               allOf:
                 - $ref: '#/components/schemas/EventData'
       responses:
-        "200":
+        200:
           description: 除了自己遊戲點數以外， server 也會主動通知其他玩家遊戲點數更新
           content:
             application/json:
@@ -362,7 +300,7 @@ paths:
                 allOf:
                   - $ref: "#/components/schemas/EventData"
       responses:
-        "200":
+        200:
           description: ok
           content:
             application/json:
@@ -371,9 +309,13 @@ paths:
                   - $ref: "#/components/schemas/EventMemberData"
                   - type: object
                     properties:
+                      LEVEL:
+                        type: number
+                        example: (byte:11:15)
+                        description: 經驗值(uint32)
                       EXPERIENCE:
                         type: number
-                        example: (byte:11:*)
+                        example: (byte:15:23)
                         description: 經驗值(uint64)
   /13:
     post:
@@ -395,7 +337,7 @@ paths:
                         example: (byte:3:*)
                         description: 玩家 id 
       responses:
-        "200":
+        200:
           description: ok
           content:
             application/json:
@@ -428,7 +370,7 @@ paths:
               allOf:
                 - $ref: '#/components/schemas/EventData'
       responses:
-        "200":
+        200:
           description: ok
           content:
             application/json:
@@ -443,7 +385,7 @@ paths:
                         description: 頭像網址
   /15:
     post:
-      summary: 更新 avatar skin
+      summary: 更新 skin
       tags:
         - All
         - Personal
@@ -454,7 +396,7 @@ paths:
               allOf:
                 - $ref: '#/components/schemas/EventData'
       responses:
-        "200":
+        200:
           description: ok
           content:
             application/json:
@@ -472,7 +414,7 @@ paths:
                         example: (byte:11:12)
                         description: skin 類型(uint8)
                         allOf:
-                          - $ref: '#/components/schemas/AvatarSkinType'
+                          - $ref: '#/components/schemas/SkinType'
                       SKIN_ID:
                         type: number
                         example: (byte:12:20)
@@ -512,7 +454,7 @@ paths:
                 allOf:
                   - $ref: "#/components/schemas/EventData"
       responses:
-        "200":
+        200:
           description: ok
           content:
             application/json:
@@ -532,7 +474,7 @@ paths:
         - All
         - Personal
       responses:
-        "200":
+        200:
           description: ok
           content:
             application/json:
@@ -675,7 +617,7 @@ paths:
                                 avatar:
                                   type: string
                                 skin:
-                                  $ref: '#/components/schemas/MemberAvatarSkin'
+                                  $ref: '#/components/schemas/MemberSkin'
                                 nickname:
                                   type: string
                                 code:
@@ -2106,8 +2048,7 @@ components:
       type: object
       properties:
         EVENT_CHANNEL:
-          type: string
-          maxLength: 1
+          type: number
           description: |
             #### 請求的頻道, 用來確認資料的回傳(0. 則代表 server 端的主動訊息)
             - range: 1 ~ 255
@@ -2115,8 +2056,7 @@ components:
             - 每個 channel 發送後，必需設定 timeout, 時間內未接到回傳時，認定失敗
           example: (byte:0:1)
         EVENT_ID:
-          type: string
-          maxLength: 2
+          type: number
           description: |
             #### 事件編號
             - range: 1 ~ 65535
@@ -2130,7 +2070,7 @@ components:
             MEMBER_ID: 
               type: number
               example: (byte:3:11)
-              description: 玩家 id (int64)
+              description: 玩家 id (uint64)
     QueryList:
       description: 分頁查詢
       type: object
@@ -2205,7 +2145,7 @@ components:
         numHeights:
           type: number
           description: 圖片切塊(高)
-    AvatarSkinType:
+    SkinType:
       type: number
       description: |
         #### skin 類型
@@ -2222,7 +2162,7 @@ components:
       type: object
       properties:
         type: 
-          $ref: '#/components/schemas/AvatarSkinType'
+          $ref: '#/components/schemas/SkinType'
         name:
           type: string
           description: 貼圖名稱
@@ -2256,6 +2196,9 @@ components:
         index:
           type: number
           description: 圖片位置  
+        multiplayer:
+          type: boolean
+          description: 是否為多人遊戲
         name:
           type: string
           description: 遊戲名稱
@@ -2287,16 +2230,21 @@ components:
     InviteStatus:
       type: number
       description: |
+        - 0 # 未設定
         - 1 # 互為好友
         - 2 # 已邀請
         - 3 # 被邀請
       enum:
+        - 0 # 未設定
         - 1 # 互為好友
         - 2 # 已邀請
         - 3 # 被邀請
     Member:
       type: object
       properties:
+        id: 
+          type: number
+          description: 玩家 id
         avatar: 
           type: string
           description: 頭像圖片路徑
@@ -2333,20 +2281,20 @@ components:
           type: string
           description: 玩家目前位置
         skin: 
-          $ref: '#/components/schemas/MemberAvatarSkin'
-    MemberAvatarSkin:
+          $ref: '#/components/schemas/MemberSkin'
+    MemberSkin:
       type: object
       properties:
-        skinAvatar: 
+        avatar: 
           type: number
           description: 頭像 skin 
-        skinAvatarFrame:
+        avatarFrame:
           type: number
           description: 頭像外框 skin
-        skinAvatarEffects:
+        avatarEffects:
           type: number
           description: 頭像特效 skin
-        skinAvatarBackground:
+        avatarBackground:
           type: number
           description: 頭像背景 skin
     GameRecord:
