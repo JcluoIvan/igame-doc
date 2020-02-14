@@ -92,175 +92,143 @@ paths:
       responses:
         200:
           description: ok
-
-  /app/sources/images:
+  /sources/all:
     get:
-      summary: 更新圖片資源
+      summary: 取得所有資源
       tags:
         - Source
       responses:
         200:
-          description: ok
+          description:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: number
-                    url:
-                      type: string
-                    title:
-                      type: string
-                      description: 圖片說明
-                    numHeights:
-                      type: number
-                      description: 圖片高度分割數
-                    numWidths:
-                      type: number
-                      description: 圖片寬度分割數
-  /app/sources/stickers:
-    get:
-      summary: 貼圖
-      tags:
-        - Source
-      responses:
-        200:
-          description: ok
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: number
-                    name:
-                      type: string
-                    imageId:
-                      type: number
-                      description: 圖片 id
-                    defaultIndex:
-                      type: number
-                      description: 預設圖 index
-  /app/sources/items:
-    get:
-      summary: 道具
-      tags:
-        - Source
-      responses:
-        200:
-          description: ok
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: number
-                    name:
-                      type: string
-                    imageId:
-                      type: number
-                      description: 圖片 id
-                    imageIndex:
-                      type: number
-                      description: 圖片 index
-                    transferable:
-                      type: boolean
-                      description: 是否可轉移
-                    description:
-                      type: string
-                      description: 道具說明
-  /app/sources/skin-avatars:
-    get:
-      summary: 頭像樣式
-      tags:
-        - Source
-      responses:
-        200:
-          description: ok
-          content:
-            application/json:
-              schema:
-                type: array
+                type: object
                 properties:
-                  type:
-                    type: number
-                    description: |
-                      #### Skin 類型
-                      - 1 # 頭像
-                      - 2 # 外框
-                      - 3 # 特效
-                      - 4 # 背景
-                    enum:
-                      - 1 # 頭像
-                      - 2 # 外框
-                      - 3 # 特效
-                      - 4 # 背景
-                  name:
-                    type: string
-                    description: 名稱
-                  imageId:
-                    type: number
-                    description: 圖片 id
-                  imageIndex:
-                    type: number
-                    description: 圖片 index
-  /app/sources/levels:
-    get:
-      summary: 等級列表
-      tags:
-        - Source
-      responses:
-        200:
-          description: ok
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id: 
-                      type: number
-                    level:
-                      type: number
-                      description: 等級
-                    experience:
-                      type: number
-                      description: 升到下一等級所需經驗值
-  /app/sources/ranks:
-    get:
-      summary: 階級列表
-      tags:
-        - Source
-      responses:
-        200:
-          description: ok
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id: 
-                      type: number
-                    rank:
-                      type: string
-                      description: 階級名稱
-                    minimumLevel:
-                      type: number
-                      description: 最低套用等級
-                    imageId:
-                      type: number
-                    imageIndex:
-                      type: number
-# components:
-#   schemas:
+                  images:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SourceImage'
+                  stickers: 
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SourceSticker'
+                  items: 
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SourceItem'
+                  avatarSkins: 
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SourceAvatarSkin'
+                  levels: 
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SourceLevel'
+                  ranks: 
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SourceRank'
+components:
+  schemas:
+    SourceImage:
+      type: object
+      properties:
+        id:
+          type: number
+        url:
+          type: string
+        title:
+          type: string
+          description: 圖片說明
+        numHeights:
+          type: number
+          description: 圖片高度分割數
+        numWidths:
+          type: number
+          description: 圖片寬度分割數
+    SourceSticker:
+      type: object
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+        imageId:
+          type: number
+          description: 圖片 id
+        defaultIndex:
+          type: number
+          description: 預設圖 index
+    SourceItem:
+      type: object
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+        imageId:
+          type: number
+          description: 圖片 id
+        imageIndex:
+          type: number
+          description: 圖片 index
+        transferable:
+          type: boolean
+          description: 是否可轉移
+        description:
+          type: string
+          description: 道具說明
+    SourceAvatarSkin:
+      type: object
+      properties:
+        id:
+          type: number
+        type:
+          type: number
+          description: |
+            #### Skin 類型
+            - 1 # 頭像
+            - 2 # 外框
+            - 3 # 特效
+            - 4 # 背景
+          enum:
+            - 1 # 頭像
+            - 2 # 外框
+            - 3 # 特效
+            - 4 # 背景
+        name:
+          type: string
+          description: 名稱
+        imageId:
+          type: number
+          description: 圖片 id
+        imageIndex:
+          type: number
+          description: 圖片 index
+    SourceLevel:
+      type: object
+      properties:
+        id: 
+          type: number
+        level:
+          type: number
+          description: 等級
+        experience:
+          type: number
+          description: 升到下一等級所需經驗值
+    SourceRank:
+      type: object
+      properties:
+        id: 
+          type: number
+        rank:
+          type: string
+          description: 階級名稱
+        minimumLevel:
+          type: number
+          description: 最低套用等級
+        imageId:
+          type: number
+        imageIndex:
+          type: number
