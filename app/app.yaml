@@ -212,5 +212,55 @@ paths:
                   imageIndex:
                     type: number
                     description: 圖片 index
+  /app/sources/levels:
+    get:
+      summary: 等級列表
+      tags:
+        - Source
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id: 
+                      type: number
+                    level:
+                      type: number
+                      description: 等級
+                    experience:
+                      type: number
+                      description: 升到下一等級所需經驗值
+  /app/sources/ranks:
+    get:
+      summary: 階級列表
+      tags:
+        - Source
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id: 
+                      type: number
+                    rank:
+                      type: string
+                      description: 階級名稱
+                    minimumLevel:
+                      type: number
+                      description: 最低套用等級
+                    imageId:
+                      type: number
+                    imageIndex:
+                      type: number
 # components:
 #   schemas:
