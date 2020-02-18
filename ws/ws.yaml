@@ -517,6 +517,10 @@ paths:
                         type: number
                         example: (byte:4)
                         description: 暱稱重複次數(uint32)
+                      NICKNAME:
+                        type: string
+                        example: (byte:*)
+                        description: 暱稱
   /20:
     post:
       summary: 修改暱稱
