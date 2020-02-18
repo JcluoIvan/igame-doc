@@ -614,7 +614,7 @@ paths:
                               properties:
                                 avatar:
                                   type: string
-                                skin:
+                                skins:
                                   $ref: '#/components/schemas/MemberSkin'
                                 nickname:
                                   type: string
@@ -2317,23 +2317,13 @@ components:
         position:
           type: string
           description: 玩家目前位置
-        skin: 
+        skins: 
           $ref: '#/components/schemas/MemberSkin'
     MemberSkin:
-      type: object
-      properties:
-        avatar: 
-          type: number
-          description: 頭像 skin 
-        avatarFrame:
-          type: number
-          description: 頭像外框 skin
-        avatarEffects:
-          type: number
-          description: 頭像特效 skin
-        avatarBackground:
-          type: number
-          description: 頭像背景 skin
+      type: array
+      description: 已套用的 skin id
+      items:
+        type: number
     GameRecord:
       type: object
       properties:
