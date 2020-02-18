@@ -114,7 +114,7 @@ paths:
                       GAME_LIST:
                         type: array
                         description: 遊戲列表 json data 
-                        example: (byte:3:*) 
+                        example: (byte:*) 
                         items:
                           $ref: '#/components/schemas/Game'
   
@@ -133,12 +133,12 @@ paths:
                 allOf:
                   - $ref: "#/components/schemas/EventData"
                   - type: object
-                    example: (byte:3:*)
+                    example: (byte:*)
                     properties:
                       MARQUEE:
                         type: string
                         description: 跑馬燈內容 (string)
-                        example: (byte:3:*) string
+                        example: (byte:*) string
   
   /6:
     post:
@@ -164,7 +164,7 @@ paths:
                   - type: object
                     properties:
                       MEMBER_BASE_DATA: 
-                        example: (byte:3:*)
+                        example: (byte:*)
                         type: object
                         allOf:
                           - $ref: '#/components/schemas/Member'
@@ -192,7 +192,7 @@ paths:
                   - type: object
                     properties:
                       MEMBER_BASE_DATA: 
-                        example: (byte:3:*)
+                        example: (byte:*)
                         type: object
                         allOf:
                           - $ref: '#/components/schemas/Member'
@@ -219,10 +219,11 @@ paths:
                   - type: object
                     properties:
                       ERROR_CODE: 
-                        example: (byte:3:5)
+                        example: (byte:4)
+                        description: uint32
                         type: number
                       ERROR_MESSAGE:
-                        example: (byte:5:*)
+                        example: (byte:*)
                         type: string
   /9:
     post:
@@ -248,7 +249,7 @@ paths:
                     properties:
                       DIAMOND_POINT:
                         type: number                
-                        example: (byte:11:*)
+                        example: (byte:8)
                         description: Diamond point (int64)                       
   /10:
     post:
@@ -275,7 +276,7 @@ paths:
                     properties:
                       GAME_POINT:
                         type: number                
-                        example: (byte:11:*)
+                        example: (byte:8)
                         description: Game point (int64)
   /11:
     post:
@@ -311,11 +312,11 @@ paths:
                     properties:
                       LEVEL:
                         type: number
-                        example: (byte:11:15)
+                        example: (byte:4)
                         description: 經驗值(uint32)
                       EXPERIENCE:
                         type: number
-                        example: (byte:15:23)
+                        example: (byte:8)
                         description: 經驗值(uint64)
   /13:
     post:
@@ -334,7 +335,7 @@ paths:
                     properties:
                       MEMBER_ID: 
                         type: number
-                        example: (byte:3:*)
+                        example: (byte:8)
                         description: 玩家 id 
       responses:
         200:
@@ -348,7 +349,7 @@ paths:
                     properties:
                       DATA:
                         type: object
-                        example: (byte:3:*)
+                        example: (byte:*)
                         description: 暱稱、 code
                         properties:
                           nickname: 
@@ -381,7 +382,7 @@ paths:
                     properties:
                       AVATAR_URL:
                         type: string
-                        example: (byte:11:*)
+                        example: (byte:*)
                         description: 頭像網址
   /15:
     post:
@@ -407,17 +408,17 @@ paths:
                     properties:
                       MEMBER_ID: 
                         type: number
-                        example: (byte:3:11)
-                        description: 玩家 id 
+                        example: (byte:8)
+                        description: 玩家 id (uint64)
                       SKIN_TYPE:
                         type: number
-                        example: (byte:11:12)
+                        example: (byte:1)
                         description: skin 類型(uint8)
                         allOf:
                           - $ref: '#/components/schemas/SkinType'
                       SKIN_ID:
                         type: number
-                        example: (byte:12:20)
+                        example: (byte:8)
                         description: avatar_skin.id (uint64)
   /16:
     post:
@@ -435,7 +436,7 @@ paths:
                   properties:
                     INTRODUCTION:
                       type: string
-                      example: (byte:3:*)
+                      example: (byte:*)
                       description: 簡介
       responses:
         200:
@@ -465,7 +466,7 @@ paths:
                     properties:
                       EMAIL:
                         type: string
-                        example: (byte:3:*)
+                        example: (byte:*)
                         description: 玩家 Email
   /18:
     post:
@@ -485,11 +486,11 @@ paths:
                     properties:
                       MEMBER_ID: 
                         type: number
-                        example: (byte:3:11)
-                        description: 玩家 id 
+                        example: (byte:8)
+                        description: 玩家 id (uint64)
                       POSITION:
                         type: string
-                        example: (byte:11:*)
+                        example: (byte:*)
                         description: 玩家目前位置
   /19:
     post:
@@ -507,7 +508,7 @@ paths:
                   properties:
                     NICKNAME:
                       type: string
-                      example: (byte:3:*)
+                      example: (byte:*)
                       description: 暱稱
       responses:
         200:
@@ -521,8 +522,8 @@ paths:
                     properties:
                       NUM_REPEATS: 
                         type: number
-                        example: (byte:3:*)
-                        description: 暱稱重複次數
+                        example: (byte:4)
+                        description: 暱稱重複次數(uint32)
   /20:
     post:
       summary: 修改暱稱
@@ -539,7 +540,7 @@ paths:
                   properties:
                     NICKNAME:
                       type: string
-                      example: (byte:3:*)
+                      example: (byte:*)
                       description: 暱稱
       responses:
         200:
@@ -565,7 +566,7 @@ paths:
                   properties:
                     INTRODUCTION:
                       type: string
-                      example: (byte:3:*)
+                      example: (byte:*)
                       description: 簡介
       responses:
         200:
@@ -578,7 +579,7 @@ paths:
 
   /22:
     post:
-      summary: 更新累積回饋、介紹人、在線玩家
+      summary: 取得累積回饋、介紹人、在線玩家
       tags:
         - All
         - Personal
@@ -600,7 +601,7 @@ paths:
                     properties:
                       DATA: 
                         description: json data
-                        example: (byte:3:*)
+                        example: (byte:*)
                         type: object
                         properties:
                           bonusPoint:
@@ -627,7 +628,7 @@ paths:
 
   /23:
     post:
-      summary: 更新個人設定
+      summary: 取得 / 儲存 個人設定
       tags:
         - All
         - Personal
@@ -637,9 +638,27 @@ paths:
             schema:
               allOf:
                 - $ref: '#/components/schemas/EventData'
+                - type: object
+                  properties:
+                    SAVE:
+                      type: boolean
+                      example: (byte:1)
+                      description: 是否儲存設定 (若為否, 後面的資訊可省略)
+                    ALLOW_TALK_STRANGER:
+                      type: boolean
+                      example: (byte:1)
+                      description: 是否接受陌生人密語
+                    ALLOW_INVITE_FRIEND:
+                      type: boolean
+                      example: (byte:1)
+                      description: 是否允許好友邀請
+                    TRANSACTION_PASSWORD_SETTED:
+                      type: boolean
+                      example: (byte:1)
+                      description: 是否已設定交易密碼
       responses:
         200:
-          description: 僅更新自己的資料
+          description: 取得個人設定資料
           content:
             application/json:
               schema:
@@ -649,15 +668,15 @@ paths:
                     properties:
                       ALLOW_TALK_STRANGER:
                         type: boolean
-                        example: (byte:3:4)
+                        example: (byte:1)
                         description: 是否接受陌生人密語
                       ALLOW_INVITE_FRIEND:
                         type: boolean
-                        example: (byte:4:5)
+                        example: (byte:1)
                         description: 是否允許好友邀請
                       TRANSACTION_PASSWORD_SETTED:
                         type: boolean
-                        example: (byte:5:6)
+                        example: (byte:1)
                         description: 是否已設定交易密碼
   /24:
     post:
@@ -683,7 +702,7 @@ paths:
                     properties:
                       ITEMS:
                         type: array
-                        example: (byte:3:*)
+                        example: (byte:*)
                         description: 道具列表 (json data)
                         items:
                           type: object
@@ -718,7 +737,7 @@ paths:
                     properties:
                       SKINS:
                         type: array
-                        example: (byte:3:*)
+                        example: (byte:*)
                         description: 個人 skin 列表 (json data)
                         items:
                           type: object
@@ -749,7 +768,7 @@ paths:
                     properties:
                       RECORDS:
                         type: array
-                        example: (byte:3:*)
+                        example: (byte:*)
                         description: 遊戲記錄
                         items:
                           type: object
@@ -813,7 +832,7 @@ paths:
                   properties:
                     MISSION_ID:
                       type: number
-                      example: (byte:3:11)
+                      example: (byte:8)
                       description: 任務 id (uint64)
 
       responses:
@@ -828,15 +847,15 @@ paths:
                     properties:
                       MISSION_ID:
                         type: number
-                        example: (byte:3:11)
+                        example: (byte:8)
                         description: 任務 id (uint64)
                       STATUS:
                         type: number
-                        example: (byte:11:12)
+                        example: (byte:1)
                         description: 任務狀態 (int8)
                       ACTUAL_VALUE:
                         type: number
-                        example: (byte:12:20)
+                        example: (byte:8)
                         description: 目前達成值 (int64)
   /29:
     post:
@@ -854,7 +873,7 @@ paths:
                   properties:
                     MISSION_KEY:
                       type: string
-                      example: (byte:3:*)
+                      example: (byte:*)
                       description: 任務 key 
       responses:
         200:
@@ -893,7 +912,7 @@ paths:
                     properties:
                       MISSION_ID:
                         type: number
-                        example: (byte:3:11)
+                        example: (byte:8)
                         description: 任務 id (uint64)
       responses:
         200: 
@@ -907,11 +926,11 @@ paths:
                     properties:
                       MISSION_ID:
                         type: number
-                        example: (byte:3:11)
+                        example: (byte:8)
                         description: 任務 id (uint64)
                       STATUS:
                         type: number
-                        example: (byte:11:12)
+                        example: (byte:1)
                         description: 任務狀態 (int8) 
   /31:  
     post:
@@ -929,7 +948,7 @@ paths:
                   properties:
                     QUERY: 
                       type: object
-                      example: (byte:3:*)
+                      example: (byte:*)
                       description: 查詢條件
                       allOf:
                         - $ref: '#/components/schemas/QueryList'
@@ -945,7 +964,7 @@ paths:
                     properties:
                       DATA: 
                         type: object
-                        example: (byte:3:*)
+                        example: (byte:*)
                         description: mail list (json data)
                         allOf:
                           - $ref: '#/components/schemas/ResponseList'
@@ -971,7 +990,7 @@ paths:
                   properties:
                     MAIL_ID:
                       type: number
-                      example: (byte:3:11)
+                      example: (byte:8)
                       description: mail id (uint64)
       responses:
         200:
@@ -985,7 +1004,7 @@ paths:
                     properties:
                       MAIL:
                         type: object
-                        example: (byte:3:*)
+                        example: (byte:*)
                         description: mail 完整內容
                         allOf:
                           - $ref: '#/components/schemas/MailDetail'
@@ -1005,7 +1024,7 @@ paths:
                   properties:
                     MAIL_ID:
                       type: number
-                      example: (byte:3:11)
+                      example: (byte:8)
                       description: mail id (uint64)
       responses:
         200:
@@ -1019,15 +1038,15 @@ paths:
                     properties:
                       MAIL_ID:
                         type: number
-                        example: (byte:3:11)
+                        example: (byte:*)
                         description: mail id (uint64)
                       READED_AT:
                         type: number
-                        example: (byte:11:15)
+                        example: (byte:4)
                         description: readed at (int32)
                       NUM_UNREAD:
                         type: number
-                        example: (byte:15:19)
+                        example: (byte:4)
                         description: 未讀信件筆數 (uint32)
   /34:
     post:
@@ -1045,7 +1064,7 @@ paths:
                   properties:
                     MAIL_ID:
                       type: number
-                      example: (byte:3:11)
+                      example: (byte:8)
                       description: mail id (uint64)
       responses:
         200: 
@@ -1059,11 +1078,11 @@ paths:
                     properties:
                       MAIL_ID:
                         type: number
-                        example: (byte:3:11)
+                        example: (byte:8)
                         description: mail id (uint64)
                       RECEIVED_AT:
                         type: number
-                        example: (byte:11:15)
+                        example: (byte:4)
                         description: received at (int32)
   /35:
     post:
@@ -1081,7 +1100,7 @@ paths:
                   properties:
                     IDS: 
                       type: array
-                      example: (byte:3:*)
+                      example: (byte:*)
                       description: mail ids (json data)
                       items:
                         type: number
@@ -1097,7 +1116,7 @@ paths:
                     properties:
                       NUM_UNREAD:
                         type: number
-                        example: (byte:3:7)
+                        example: (byte:4)
                         description: 未讀信件筆數 (uint32)
   /36:
     post:
@@ -1123,7 +1142,7 @@ paths:
                     properties:
                       MAIL_DATA:
                         type: array
-                        example: (byte:3:11)
+                        example: (byte:*)
                         items:
                           type: object
                           properties:
@@ -1188,7 +1207,7 @@ paths:
                     properties:
                       NUM_UNREAD:
                         type: number
-                        example: (byte:3:7)
+                        example: (byte:4)
                         description: 未讀信件筆數 (uint32)
   /39:
     post:
@@ -1206,7 +1225,7 @@ paths:
                   properties:
                     QUERY: 
                       type: object
-                      example: (byte:3:*)
+                      example: (byte:*)
                       description: 查詢條件
                       allOf:
                         - $ref: '#/components/schemas/QueryList'
@@ -1230,7 +1249,7 @@ paths:
                     properties:
                       DATA: 
                         type: object
-                        example: (byte:3:*)
+                        example: (byte:*)
                         description: mail list (json data)
                         allOf:
                           - $ref: '#/components/schemas/ResponseList'
@@ -1257,8 +1276,8 @@ paths:
                   properties:
                     MEMBER_ID:
                       type: number
-                      example: (byte:3:11)
-                      description: 對方 id
+                      example: (byte:8)
+                      description: 對方 id (uint64)
 
       responses:
         200: 
@@ -1272,13 +1291,13 @@ paths:
                     properties:
                       MEMBER_ID:
                         type: number
-                        example: (byte:3:11)
+                        example: (byte:8)
                         description: 玩家 id (uint64)
                       STATUS:
                         allOf: 
                           - $ref: '#/components/schemas/InviteStatus'
                           - type: number
-                            example: (byte:11:12)
+                            example: (byte:1)
   /41:
     post:
       summary: 解除好友 / 取消邀請 / 拒絕好友邀請
@@ -1300,8 +1319,8 @@ paths:
                   properties:
                     MEMBER_ID:
                       type: number
-                      example: (byte:3:11)
-                      description: 對方 id
+                      example: (byte:8)
+                      description: 對方 id(uint64)
       responses:
         200: 
           description: ok       
@@ -1314,13 +1333,13 @@ paths:
                     properties:
                       MEMBER_ID:
                         type: number
-                        example: (byte:3:11)
+                        example: (byte:8)
                         description: 玩家 id (uint64)
                       STATUS:
                         allOf: 
                           - $ref: '#/components/schemas/InviteStatus'
                           - type: number
-                            example: (byte:11:12)
+                            example: (byte:1)
   /42:
     post:
       summary: 加入 / 移除黑名單
@@ -1338,11 +1357,11 @@ paths:
                   properties:
                     MEMBER_ID:
                       type: number
-                      example: (byte:3:11)
-                      description: 對方 id
+                      example: (byte:8)
+                      description: 對方 id (uint64)
                     ACTION:
                       type: boolean
-                      example: (byte:11:12)
+                      example: (byte:1)
                       description: 'true. 設為黑名單, false. 從黑名單中移除'
       responses:
         200: 
@@ -1356,11 +1375,11 @@ paths:
                     properties:
                       MEMBER_ID:
                         type: number
-                        example: (byte:3:11)
+                        example: (byte:8)
                         description: 玩家 id (uint64)
                       IS_BLOCK:
                         type: boolean
-                        example: (byte:11:12)
+                        example: (byte:1)
                         description: 是否為黑名單
   /43:
     post:
@@ -1386,7 +1405,7 @@ paths:
                     properties:
                       NUM_INVITED: 
                         type: number
-                        example: (byte:3:7)
+                        example: (byte:4)
                         description: 等待回應的數量 uint32
   /44:
     post:
@@ -1404,7 +1423,7 @@ paths:
                   properties:
                     QUERY: 
                       type: object
-                      example: (byte:3:*)
+                      example: (byte:0)
                       description: 查詢條件
                       allOf:
                         - $ref: '#/components/schemas/QueryList'
@@ -1412,7 +1431,6 @@ paths:
                           properties:
                             search:
                               type: string
-                              example: (byte:3:*)
                               description: 查詢玩家
       responses:
         200: 
@@ -1426,7 +1444,7 @@ paths:
                     properties:
                       DATA: 
                         type: object
-                        example: (byte:3:*)
+                        example: (byte:*)
                         description: player list (json data)
                         allOf:
                           - $ref: '#/components/schemas/ResponseList'
@@ -1452,7 +1470,7 @@ paths:
                   properties:
                     ENTER_OR_LEAVE: 
                       type: boolean
-                      example: (byte:3:4)
+                      example: (byte:1)
                       description: true. 進入, false. 離開
       responses:
         200:
@@ -1466,7 +1484,7 @@ paths:
                     properties:
                       ENTER_OR_LEAVE: 
                         type: boolean
-                        example: (byte:3:4)
+                        example: (byte:1)
                         description: true. 進入, false. 離開
   /46:
     post:
@@ -1492,7 +1510,7 @@ paths:
                     properties:
                       DATA:
                         type: array
-                        example: (byte:3:*)
+                        example: (byte:*)
                         description: 公開頻道列表
                         items:
                           $ref: '#/components/schemas/ChatPublic'
@@ -1514,7 +1532,7 @@ paths:
                     properties:
                       DATA: 
                         type: object
-                        example: (byte:3:*)
+                        example: (byte:*)
                         description: 訊息內容 (json data)
                         allOf:
                           - $ref: '#/components/schemas/ChatMessage'
@@ -1534,7 +1552,7 @@ paths:
                   properties:
                     DATA:
                       type: object
-                      example: (byte:3:*)
+                      example: (byte:*)
                       description: 訊息資料(json data)
                       properties:
                         chatId:
@@ -1555,7 +1573,7 @@ paths:
                     properties:
                       DATA: 
                         type: object
-                        example: (byte:3:*)
+                        example: (byte:*)
                         description: 訊息內容 (json data)
                         allOf:
                           - $ref: '#/components/schemas/ChatMessage'
@@ -1577,7 +1595,7 @@ paths:
                     properties:
                       DATA:
                         type: object
-                        example: (byte:3:*)
+                        example: (byte:*)
                         description: 訊息內容 (json data)
                         allOf:
                           - $ref: '#/components/schemas/PrivateMessage'
@@ -1598,7 +1616,7 @@ paths:
                   properties:
                     DATA:
                       type: object
-                      example: (byte:3:*)
+                      example: (byte:*)
                       description: 訊息資料(json data)
                       properties:
                         toId:
@@ -1619,7 +1637,7 @@ paths:
                     properties:
                       DATA:
                         type: object
-                        example: (byte:3:*)
+                        example: (byte:*)
                         description: 訊息內容 (json data)
                         allOf:
                           - $ref: '#/components/schemas/PrivateMessage'
@@ -1640,7 +1658,7 @@ paths:
                   properties:
                     SEARCH:
                       type: string
-                      example: (byte:3:*)
+                      example: (byte:*)
                       description: 查詢名稱
       responses:
         200:
@@ -1654,7 +1672,7 @@ paths:
                     properties:
                       DATA:
                         type: array
-                        example: (byte:3:*)
+                        example: (byte:*)
                         description: 玩家列表 (json data)
                         items:
                           $ref: '#/components/schemas/Member'
@@ -1682,7 +1700,7 @@ paths:
                     properties:
                       DATA:
                         type: array
-                        example: (byte:3:*)
+                        example: (byte:*)
                         description: 商店列表
                         items:
                           $ref: '#/components/schemas/Store'
@@ -1704,14 +1722,14 @@ paths:
                       allOf:
                         - $ref: '#/components/schemas/CommodityType'
                         - type: number
-                          example: (byte:3:4)
+                          example: (byte:1)
                     ID:
                       type: number
-                      example: (byte:4:12)
+                      example: (byte:8)
                       description: 商品 id (uint64)
                     COUNT:
                       type: number
-                      example: (byte:12:16)
+                      example: (byte:4)
                       description: 購買數量 (uint32)
       responses:
         200: 
@@ -1725,11 +1743,11 @@ paths:
                     properties:
                       DIAMOND_POINT:
                         type: number
-                        example: (byte:3:11)
+                        example: (byte:8)
                         description: 售出後 diamond point 餘額 (int64)
                       GAME_POINT:
                         type: number
-                        example: (byte:11:19)
+                        example: (byte:8)
                         description: 售出後 game point 餘額 (int64)
   /54:
     post:
@@ -1747,7 +1765,7 @@ paths:
                   properties:
                     ITEMS:
                       type: array
-                      example: (byte:3:*)
+                      example: (byte:*)
                       description: 售出的道具商品編號, 只有道具可賣出 (json data)
                       items:
                         type: number
@@ -1764,11 +1782,11 @@ paths:
                     properties:
                       DIAMOND_POINT:
                         type: number
-                        example: (byte:3:11)
+                        example: (byte:8)
                         description: 售出後 diamond point 餘額 (int64)
                       GAME_POINT:
                         type: number
-                        example: (byte:11:19)
+                        example: (byte:8)
                         description: 售出後 game point 餘額 (int64)
   /55:
     post:
@@ -1786,7 +1804,7 @@ paths:
                   properties:
                     ID:
                       type: number
-                      example: (byte:3:11)
+                      example: (byte:8)
                       description: 交易對象 id
       responses:
         200:
@@ -1816,7 +1834,7 @@ paths:
                     properties:
                       DATA:
                         type: object
-                        example: (byte:3:*)
+                        example: (byte:*)
                         description: 來自某人的交換邀請 (json data)
                         allOf:
                           - $ref: '#/components/schemas/Member'
@@ -1837,7 +1855,7 @@ paths:
                   properties:
                     ID:
                       type: number
-                      example: (byte:3:11)
+                      example: (byte:8)
                       description: 接受某玩家的交請 (uint64)
       responses:
         200:
@@ -1851,8 +1869,8 @@ paths:
                     properties:
                       ID:
                         type: number
-                        example: (byte:3:11)
-                        description: 交換對象的 id (若有問題即中斷)
+                        example: (byte:8)
+                        description: 交換對象的 id , 若有問題即中斷 (uint64)
   /58:
     post:
       summary: 取消 / 中斷 / 拒絕交換邀請、狀態
@@ -1869,7 +1887,7 @@ paths:
                   properties:
                     ID:
                       type: number
-                      example: (byte:3:*)
+                      example: (byte:8)
                       description: 拒絕的對象 id (uint64), 0 則全部拒絕
       responses:
         200:
@@ -1895,7 +1913,7 @@ paths:
                   properties:
                     PASSWORD:
                       type: string
-                      example: (byte:3:*)
+                      example: (byte:*)
                       description: 交易密碼
       responses:
         200:
@@ -1909,7 +1927,7 @@ paths:
                     properties:
                       EXCHANGE_TOKEN:
                         type: string
-                        example: (byte:3:*)
+                        example: (byte:*)
                         description: 一次性 token 
   /60:
     post:
@@ -1927,7 +1945,7 @@ paths:
                   properties:
                     DATA: 
                       type: object
-                      example: (byte:3:*)
+                      example: (byte:*)
                       description: 提交交換內容 (json data)
                       properties:
                         locked:
@@ -1951,7 +1969,7 @@ paths:
                     properties:
                       DATA:
                         type: array
-                        example: (byte:3:*)
+                        example: (byte:*)
                         description: 交換內容 (json data)
                         items:
                           $ref: '#/components/schemas/ExchangeContent'
@@ -1973,7 +1991,7 @@ paths:
                     properties:
                       STATUS: 
                         type: number
-                        example: (byte:3:4)
+                        example: (byte:1)
                         description: 1. 交換完成, 2. 等待對方完成
   /62:
     post:
@@ -1999,7 +2017,7 @@ paths:
                     properties:
                       DATA:
                         type: array
-                        example: (byte:3:*)
+                        example: (byte:*)
                         description: 轉蛋活動 (json data)
                         items:
                           $ref: '#/components/schemas/Gashapon'
@@ -2019,12 +2037,12 @@ paths:
                   properties:
                     GASHAPON_ID:
                       type: number
-                      example: (byte:3:11)
-                      description: 轉蛋活動 id
+                      example: (byte:8)
+                      description: 轉蛋活動 id (uint64)
                     GASHAPON_COST_ID:
                       type: number
-                      example: (byte:11:19)
-                      description: 消費方式
+                      example: (byte:8)
+                      description: 消費方式 id (uint64)
       responses:
         200:
           description: ok
@@ -2037,7 +2055,7 @@ paths:
                     properties:
                       ITEMS:
                         type: array
-                        example: (byte:3:*)
+                        example: (byte:*)
                         description: 獲得的道具
                         items:
                           $ref: '#/components/schemas/Item'
@@ -2054,14 +2072,21 @@ components:
             - range: 1 ~ 255
             - 每個 channel 編號同時只能發送一次
             - 每個 channel 發送後，必需設定 timeout, 時間內未接到回傳時，認定失敗
-          example: (byte:0:1)
+          example: (byte:1)
         EVENT_ID:
           type: number
           description: |
             #### 事件編號
             - range: 1 ~ 65535
             - 用來定義各請求 or 資料的編號
-          example: (byte:1:3)
+          example: (byte:2)
+        VERSION_ID:
+          type: number
+          description: |
+            - 訊息序列編號, 0 ~ 255 循環
+            - 每次由 Server 端傳送的訊息 + 1
+            - Client 檢查差值是否與上次請求差 1
+            - 若差值大於 3, 則重新登入
     EventMemberData: 
       allOf:
         - $ref: '#/components/schemas/EventData'
@@ -2069,7 +2094,7 @@ components:
           properties:
             MEMBER_ID: 
               type: number
-              example: (byte:3:11)
+              example: (byte:8)
               description: 玩家 id (uint64)
     QueryList:
       description: 分頁查詢
