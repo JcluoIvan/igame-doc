@@ -117,10 +117,10 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/SourceItem'
-                  avatarSkins: 
+                  skins: 
                     type: array
                     items:
-                      $ref: '#/components/schemas/SourceAvatarSkin'
+                      $ref: '#/components/schemas/SourceSkin'
                   levels: 
                     type: array
                     items:
@@ -179,7 +179,7 @@ components:
         description:
           type: string
           description: 道具說明
-    SourceAvatarSkin:
+    SourceSkin:
       type: object
       properties:
         id:

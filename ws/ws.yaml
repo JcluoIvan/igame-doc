@@ -2207,7 +2207,7 @@ components:
         - 2 # 外框
         - 3 # 特效
         - 4 # 背景
-    AvatarSkin:
+    Skin:
       type: object
       properties:
         type: 
