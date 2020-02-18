@@ -409,12 +409,6 @@ paths:
                         type: number
                         example: (byte:8)
                         description: 玩家 id (uint64)
-                      SKIN_TYPE:
-                        type: number
-                        example: (byte:1)
-                        description: skin 類型(uint8)
-                        allOf:
-                          - $ref: '#/components/schemas/SkinType'
                       SKIN_ID:
                         type: number
                         example: (byte:8)
