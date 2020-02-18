@@ -226,7 +226,7 @@ paths:
                         type: string
   /9:
     post:
-      summary: 更新 Diamond Point
+      summary: 取得 Diamond Point
       tags:
         - All
         - Home
@@ -252,7 +252,7 @@ paths:
                         description: Diamond point (int64)                       
   /10:
     post:
-      summary: 更新 Game Point
+      summary: 取得 Game Point
       tags:
         - All
         - Home
@@ -288,12 +288,11 @@ paths:
 
   /12:
     post:
-      summary: 更新玩家等級 & 經驗值(Experience)
+      summary: 取得 玩家等級 & 經驗值(Experience)
       tags:
         - All
         - Personal
       requestBody:
-        description: 請求更新 經驗值
         content:
           application/json:
             schema:
@@ -319,12 +318,11 @@ paths:
                         description: 經驗值(uint64)
   /13:
     post:
-      summary: 更新暱稱, Code
+      summary: 取得玩家 暱稱, Code
       tags:
         - All
         - Personal
       requestBody:
-        description: 請求更新暱稱、頭像 `(僅更新自己的資料時，後端 server 才受理)`
         content:
           application/json:
             schema:
@@ -359,7 +357,7 @@ paths:
                             description: 玩家 code
   /14:
     post:
-      summary: 更新頭像
+      summary: 取得玩家頭像網址
       tags:
         - All
         - Personal
@@ -385,7 +383,7 @@ paths:
                         description: 頭像網址
   /15:
     post:
-      summary: 更新 skin
+      summary: 取得 / 設定 skin
       tags:
         - All
         - Personal
@@ -395,6 +393,18 @@ paths:
             schema:
               allOf:
                 - $ref: '#/components/schemas/RequestEventData'
+                - type: object
+                  properties:
+                    SAVE:
+                      type: boolean
+                      description: 是否更新個人 skin
+                    SKINS:
+                      type: array
+                      example: (byte:*)
+                      description: skin id 陣列 (json data)
+                      items:
+                        type: number 
+
       responses:
         200:
           description: ok
@@ -409,10 +419,12 @@ paths:
                         type: number
                         example: (byte:8)
                         description: 玩家 id (uint64)
-                      SKIN_ID:
-                        type: number
-                        example: (byte:8)
-                        description: avatar_skin.id (uint64)
+                      SKINS:
+                        type: array
+                        example: (byte:*)
+                        description: 已套用的 skin 陣列 (json data)
+                        items:
+                          type: number 
   /16:
     post:
       summary: 更新簡介
@@ -436,7 +448,7 @@ paths:
           description: ok
   /17:
     post:
-      summary: 更新 email
+      summary: 取得 email
       tags:
         - All
         - Personal
