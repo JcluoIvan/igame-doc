@@ -2065,6 +2065,14 @@ components:
     EventData:
       type: object
       properties:
+        VERSION_ID:
+          type: number
+          example: (byte:4)
+          description: |
+            - 訊息序列編號 (uint32)
+            - 每次由 Server 端傳送的訊息 + 1
+            - Client 檢查差值是否與上次請求差 1
+            - 若差值大於 3, 則重新登入
         EVENT_CHANNEL:
           type: number
           description: |
@@ -2080,14 +2088,6 @@ components:
             - range: 1 ~ 65535
             - 用來定義各請求 or 資料的編號
           example: (byte:2)
-        VERSION_ID:
-          type: number
-          example: (byte:4)
-          description: |
-            - 訊息序列編號 (uint32)
-            - 每次由 Server 端傳送的訊息 + 1
-            - Client 檢查差值是否與上次請求差 1
-            - 若差值大於 3, 則重新登入
     EventMemberData: 
       allOf:
         - $ref: '#/components/schemas/EventData'
