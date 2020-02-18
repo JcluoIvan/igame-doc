@@ -2082,8 +2082,9 @@ components:
           example: (byte:2)
         VERSION_ID:
           type: number
+          example: (byte:4)
           description: |
-            - 訊息序列編號, 0 ~ 255 循環
+            - 訊息序列編號 (uint32)
             - 每次由 Server 端傳送的訊息 + 1
             - Client 檢查差值是否與上次請求差 1
             - 若差值大於 3, 則重新登入
