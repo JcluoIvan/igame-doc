@@ -131,9 +131,8 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/ResponseEventData"
+                  - $ref: '#/components/schemas/ResponseEventData'
                   - type: object
-                    example: (byte:*)
                     properties:
                       MARQUEE:
                         type: string
@@ -2080,15 +2079,15 @@ components:
             - range: 1 ~ 65535
             - 用來定義各請求 or 資料的編號
           example: (byte:2)
-  RequestEventMemberData: 
-    allOf:
-      - $ref: '#/components/schemas/EventMemberData'
-      - type: object
-        properties:
-          MEMBER_ID: 
-            type: number
-            example: (byte:8)
-            description: 玩家 id (uint64)
+    RequestEventMemberData: 
+      allOf:
+        - $ref: '#/components/schemas/EventMemberData'
+        - type: object
+          properties:
+            MEMBER_ID: 
+              type: number
+              example: (byte:8)
+              description: 玩家 id (uint64)
     ResponseEventData:
       allOf:
         - type: object
