@@ -341,7 +341,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/ResponseEventData"
+                  - $ref: "#/components/schemas/ResponseEventMemberData"
                   - type: object
                     properties:
                       DATA:
