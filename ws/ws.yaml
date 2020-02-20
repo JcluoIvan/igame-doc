@@ -1128,6 +1128,10 @@ paths:
                   - $ref: '#/components/schemas/ResponseEventData'
                   - type: object
                     properties:
+                      MAIL_ID:
+                        type: number
+                        example: (byte:8)
+                        description: mail id (uint64)
                       NUM_UNREADS:
                         type: number
                         example: (byte:4)
