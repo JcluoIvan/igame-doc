@@ -2077,7 +2077,7 @@ components:
           example: (byte:2)
     RequestEventMemberData: 
       allOf:
-        - $ref: '#/components/schemas/EventMemberData'
+        - $ref: '#/components/schemas/RequestEventMemberData'
         - type: object
           properties:
             MEMBER_ID: 
@@ -2099,7 +2099,7 @@ components:
         - $ref: '#/components/schemas/RequestEventData'
     ResponseEventMemberData: 
       allOf:
-        - $ref: '#/components/schemas/EventMemberData'
+        - $ref: '#/components/schemas/ResponseEventMemberData'
         - type: object
           properties:
             MEMBER_ID: 
