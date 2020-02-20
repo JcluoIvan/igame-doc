@@ -1052,8 +1052,8 @@ paths:
                         description: mail id (uint64)
                       READED_AT:
                         type: number
-                        example: (byte:4)
-                        description: readed at (uint32)
+                        example: (byte:8)
+                        description: readed at (int64)
                       NUM_UNREADS:
                         type: number
                         example: (byte:4)
@@ -1092,8 +1092,8 @@ paths:
                         description: mail id (uint64)
                       RECEIVED_AT:
                         type: number
-                        example: (byte:4)
-                        description: received at (uint32)
+                        example: (byte:8)
+                        description: received at (int64)
   /35:
     post:
       summary: 刪除信件
