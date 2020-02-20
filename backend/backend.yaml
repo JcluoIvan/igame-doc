@@ -1525,8 +1525,6 @@ paths:
             schema:
               type: object
               properties:
-                id:
-                  type: number
                 name:
                   type: string
                 description:
