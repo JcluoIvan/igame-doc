@@ -1413,7 +1413,7 @@ paths:
                   - $ref: '#/components/schemas/ResponseEventData'
                   - type: object
                     properties:
-                      NUM_INVITED: 
+                      NUM_INVITEDS: 
                         type: number
                         example: (byte:4)
                         description: 等待回應的數量 uint32
