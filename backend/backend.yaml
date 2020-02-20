@@ -467,7 +467,7 @@ paths:
       responses:
         204:
           description: ok
-  /providers/{id}:
+  /providers/{pid}:
     parameters:
       - in: path
         name: id
@@ -874,7 +874,7 @@ paths:
       responses:
         204:
           description: ok
-  /gashapons/{id}:
+  /gashapons/{gid}:
     parameters:
       - in: path
         name: id
@@ -1301,7 +1301,7 @@ paths:
       responses:
         204:
           description: ok
-  /missions/{id}:
+  /missions/{mid}:
     get:
       summary: 取得任務資料
       tags:
