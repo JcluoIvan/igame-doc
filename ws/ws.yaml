@@ -819,7 +819,7 @@ paths:
                             description: 每日任務列表
                             items:
                               $ref: '#/components/schemas/Mission'
-                          periods:
+                          longTerms:
                             type: array
                             description: 期間任務列表
                             items:
