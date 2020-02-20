@@ -894,21 +894,22 @@ paths:
                   - $ref: '#/components/schemas/ResponseEventData'
                   - type: object
                     properties:
-                      MISSION_DATA:
-                        type: object
-                        properties:
-                          id:
-                            type: number
-                            description: 任務 id
-                          mmid:
-                            type: number
-                            description: 玩家接受任務後的 mmid (uint64)
-                          key: 
-                            type: string
-                          status:
-                            $ref: '#/components/schemas/MissionStatus'
-                          actualValue:
-                            type: number
+                      MISSION_ID:
+                        type: number
+                        example: (byte:8)
+                        description: 任務 id
+                      MEMBER_MISSION_ID:
+                        type: number
+                        example: (byte:8)
+                        description: 玩家接受任務後的 mmid (uint64)
+                      STATUS:
+                        type: number
+                        example: (byte:1)
+                        description: 任務狀態 (int8)
+                      ACTUAL_VALUE:
+                        type: number
+                        example: (byte:4)
+                        description: 目前達成值 (int32)
   /30:
     post:
       summary: 領取已完成的任務獎勵
