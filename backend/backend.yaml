@@ -2940,7 +2940,7 @@ paths:
                   description: 貼圖包名稱
                 imageId:
                   $ref: '#/components/schemas/ImageId'
-                imageIndex:
+                defaultIndex:
                   type: number
                   description: 此貼圖包的預設的貼圖位置
                 enabled:
