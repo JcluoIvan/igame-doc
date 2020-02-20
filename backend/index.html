@@ -49,7 +49,7 @@
             window.onload = function() {
                 // Begin Swagger UI call region
                 const ui = SwaggerUIBundle({
-                    url: "./backend.yaml",
+                    url: `./backend.yaml?${new Date().getTime()}`,
                     dom_id: "#swagger-ui",
                     deepLinking: true,
                     presets: [
