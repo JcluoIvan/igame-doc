@@ -854,10 +854,10 @@ paths:
                   - $ref: '#/components/schemas/ResponseEventData'
                   - type: object
                     properties:
-                      MISSION_ID:
+                      MEMBER_MISSION_ID:
                         type: number
                         example: (byte:8)
-                        description: 任務 id (uint64)
+                        description: 玩家接受任務後的 mmid (uint64)
                       STATUS:
                         type: number
                         example: (byte:1)
@@ -880,10 +880,10 @@ paths:
                 - $ref: '#/components/schemas/RequestEventData'
                 - type: object
                   properties:
-                    MISSION_KEY:
-                      type: string
-                      example: (byte:*)
-                      description: 任務 key 
+                    MISSION_ID:
+                      type: number
+                      example: (byte:8)
+                      description: 任務 id
       responses:
         200:
           description: ok
@@ -899,6 +899,10 @@ paths:
                         properties:
                           id:
                             type: number
+                            description: 任務 id
+                          mmid:
+                            type: number
+                            description: 玩家接受任務後的 mmid (uint64)
                           key: 
                             type: string
                           status:
@@ -2362,30 +2366,32 @@ components:
       description: |
         - 0 # 未承接
         - 1 # 進行中
-        - 2 # 已完成 (未領取獎勵)
-        - 3 # 已完成並領取獎勵
-        - 4 # 已取消
-        - 5 # 失敗
-        - 6 # 過期
+        - 2 # 已完成
+        - 3 # 已取消
+        - 4 # 失敗
+        - 5 # 過期
       enum:
         - 0 # 未承接
         - 1 # 進行中
-        - 2 # 已完成 (未領取獎勵)
-        - 3 # 已完成並領取獎勵
-        - 4 # 已取消
-        - 5 # 失敗
-        - 6 # 過期
+        - 2 # 已完成
+        - 3 # 已取消
+        - 4 # 失敗
+        - 5 # 過期
     Mission:
       type: object
       properties:
         id:
           type: number
-          description: 任務 id (未承接時 = 0)
+          description: 任務 id 
+        mmid:
+          type: number
+          description: 玩家接受後的任務 id (未承接時 = 0)
         key: 
           type: string
           description: 任務識別 key 
         name: 
           type: string
+          description: 任務名稱
         isDaily:
           type: boolean
           description: 是否為每日任務
