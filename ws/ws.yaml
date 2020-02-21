@@ -1515,29 +1515,7 @@ paths:
                           $ref: '#/components/schemas/ChatPublic'
   /47:
     post:
-      summary: 收到聊天訊息(聊天室)
-      tags:
-        - All
-        - Chat
-      responses:
-        200:
-          description: ok
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/ResponseEventData'
-                  - type: object
-                    properties:
-                      DATA: 
-                        type: object
-                        example: (byte:*)
-                        description: 訊息內容 (json data)
-                        allOf:
-                          - $ref: '#/components/schemas/ChatMessage'
-  /48:
-    post:
-      summary: 發送訊息(聊天室)
+      summary: 發送 / 收到聊天訊息(聊天室)
       tags:
         - All
         - Chat
@@ -1576,32 +1554,17 @@ paths:
                         description: 訊息內容 (json data)
                         allOf:
                           - $ref: '#/components/schemas/ChatMessage'
-  /49:
+  /48:
     post:
-      summary: 收到私人訊息(1 對 1 訊息)
+      summary: 未設定
       tags:
-        - All
-        - Chat
+        - None
       responses:
         200:
           description: ok
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/ResponseEventData'
-                  - type: object
-                    properties:
-                      DATA:
-                        type: object
-                        example: (byte:*)
-                        description: 訊息內容 (json data)
-                        allOf:
-                          - $ref: '#/components/schemas/PrivateMessage'
-
-  /50:
+  /49:
     post:
-      summary: 發送私人訊息(1 對 1 訊息)
+      summary: 收到 / 發送 私人訊息(1 對 1 訊息)
       tags:
         - All
         - Chat
@@ -1640,6 +1603,15 @@ paths:
                         description: 訊息內容 (json data)
                         allOf:
                           - $ref: '#/components/schemas/PrivateMessage'
+
+  /50:
+    post:
+      summary: 未設定
+      tags:
+        - None
+      responses:
+        200:
+          description: ok
 
   /51:
     post:
@@ -1789,7 +1761,7 @@ paths:
                         description: 售出後 game point 餘額 (int64)
   /55:
     post:
-      summary: 送出交換邀請
+      summary: 送出 / 收到交換邀請
       tags:
         - All
         - Exchange
@@ -1813,6 +1785,14 @@ paths:
               schema:
                 allOf:
                   - $ref: '#/components/schemas/ResponseEventData'
+                  - type: object
+                    properties:
+                      DATA:
+                        type: object
+                        example: (byte:*)
+                        description: 邀請某人 (json data)
+                        allOf:
+                          - $ref: '#/components/schemas/Member'
                   
 
   /56:
@@ -2491,6 +2471,10 @@ components:
           type: number
         fromId:
           type: number
+          description: 來自某人 id
+        ToId:
+          type: number
+          description: 傳給某人 id
         messageType:
           $ref: '#/components/schemas/MessageType'
         message:
@@ -2620,7 +2604,7 @@ components:
           type: number
         itemId:
           type: number
-        numItem:  
+        numItems:  
           type: number
     GashaponCost:
       type: object
