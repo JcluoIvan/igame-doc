@@ -3717,8 +3717,6 @@ components:
         price:
           type: number
           description: 商品價格
-        enabled:
-          $ref: '#/components/schemas/EnabledType'
         updatedAt:
           $ref: '#/components/schemas/UpdatedAt'
         createdAt:
