@@ -1761,7 +1761,7 @@ paths:
                         description: 售出後 game point 餘額 (int64)
   /55:
     post:
-      summary: 送出 / 收到交換邀請
+      summary: 送出交換邀請
       tags:
         - All
         - Exchange
@@ -1793,8 +1793,6 @@ paths:
                         description: 邀請某人 (json data)
                         allOf:
                           - $ref: '#/components/schemas/Member'
-                  
-
   /56:
     post:
       summary: 收到交換邀請
@@ -1817,7 +1815,6 @@ paths:
                         description: 來自某人的交換邀請 (json data)
                         allOf:
                           - $ref: '#/components/schemas/Member'
-
   /57:
     post:
       summary: 接受交換邀請
@@ -1876,6 +1873,11 @@ paths:
               schema:
                 allOf:
                   -  $ref: '#/components/schemas/ResponseEventData'
+                  - type:
+                    properties:
+                      ID:
+                        type: number
+                        description: 取消 / 中斷此交易的玩家
   /59:
     post:
       summary: 交易密碼驗證 (取得交易 token)
