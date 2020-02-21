@@ -646,6 +646,8 @@ paths:
                               description: 遊戲名稱
                             enabled:
                               $ref: '#/components/schemas/QueryParameterEnabled'
+                            multiplayer:
+                              $ref: '#/components/schemas/Multiplayer'
                             experienceRate:
                               type: number
                               description: 經驗值比率
@@ -680,6 +682,8 @@ paths:
                   description: 遊戲名稱
                 enabled:
                   $ref: '#/components/schemas/EnabledType'
+                multiplayer:
+                  $ref: '#/components/schemas/Multiplayer'
                 experienceRate:
                   type: number
                   minimum: 0
@@ -738,6 +742,8 @@ paths:
                     description: 遊戲名稱
                   enabled:
                     $ref: '#/components/schemas/QueryParameterEnabled'
+                  multiplayer:
+                    $ref: '#/components/schemas/Multiplayer'
                   experienceRate:
                     type: number
                     description: 經驗值比率
@@ -772,6 +778,8 @@ paths:
                   description: 遊戲名稱
                 enabled:
                   $ref: '#/components/schemas/EnabledType'
+                multiplayer:
+                  $ref: '#/components/schemas/Multiplayer'
                 experienceRate:
                   type: number
                   description: 經驗值比率(0.000 ~ 1.000)
@@ -3842,6 +3850,10 @@ components:
       type: boolean
       description: |
         ## 啟/停用狀態
+    Multiplayer:
+      type: boolean
+      description: |
+        ## 是否為多人遊戲
     GameType:
       type: number
       description: |
