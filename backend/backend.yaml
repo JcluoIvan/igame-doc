@@ -118,25 +118,19 @@ paths:
                     example: ok
   /members:
     get:
-      summary: 查詢玩家列表
+      summary: 查詢玩家列表(分頁)
       tags:
         - Member
-      requestBody:
-        description: 查詢玩家(分頁)
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              allOf:
-                - $ref: '#/components/schemas/QueryList'
-                - type: object
-                  required:
-                    - enabled
-                  properties:
-                    enabled:
-                      $ref: '#/components/schemas/QueryParameterEnabled'
-                    nickname:
-                      type: string
-                      description: 暱稱查詢(模糊查詢)
+      parameters:
+        - $ref: '#/components/parameters/QueryPage' 
+        - $ref: '#/components/parameters/QuerySize' 
+        - $ref: '#/components/parameters/QuerySorts' 
+        - $ref: '#/components/parameters/QueryEnabled'
+        - in: query
+          name: nickname
+          description: 暱稱查詢(模糊查詢)
+          schema:
+            type: string
       responses:
         200:
           description: ok
@@ -215,20 +209,11 @@ paths:
       summary: 查詢公告(分頁)
       tags:
         - Announcement
-      requestBody:
-        description: 無資料
-        required: false
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              allOf:
-                - $ref: '#/components/schemas/QueryList'
-              type: object
-              required:
-                - enabled
-              properties:
-                enabled:
-                  $ref: '#/components/schemas/QueryParameterEnabled'
+      parameters:
+        - $ref: '#/components/parameters/QueryPage' 
+        - $ref: '#/components/parameters/QuerySize' 
+        - $ref: '#/components/parameters/QuerySorts' 
+        - $ref: '#/components/parameters/QueryEnabled'
       responses:
         200:
           description: ok
@@ -393,16 +378,12 @@ paths:
       summary: 提供商列表(分頁)
       tags:
         - Provider
-      requestBody:
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              allOf:
-                - $ref: '#/components/schemas/QueryList'
-                - type: object
-                  properties:
-                    enabled:
-                      $ref: '#/components/schemas/QueryParameterEnabled'
+
+      parameters:
+        - $ref: '#/components/parameters/QueryPage' 
+        - $ref: '#/components/parameters/QuerySize' 
+        - $ref: '#/components/parameters/QuerySorts' 
+        - $ref: '#/components/parameters/QueryEnabled'
       responses:
         200:
           description: ok
@@ -464,6 +445,24 @@ paths:
                     ```
                 enabled:
                   $ref: '#/components/schemas/EnabledType'
+      responses:
+        204:
+          description: ok
+    delete:
+      summary: 刪除提供商
+      tags:
+        - Provider
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  description: 提供商 id
+                  items:
+                    type: number
       responses:
         204:
           description: ok
@@ -565,25 +564,7 @@ paths:
       responses:
         204:
           description: ok
-  /providers/delete:
-    delete:
-      summary: 刪除提供商
-      tags:
-        - Provider
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                ids:
-                  type: array
-                  description: 提供商 id
-                  items:
-                    type: number
-      responses:
-        204:
-          description: ok
+
   /providers/{pid}/games:
     parameters:
       - in: path
@@ -596,21 +577,18 @@ paths:
       summary: 查詢提供商遊戲
       tags:
         - ProviderGame
-      requestBody:
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              allOf:
-                - $ref: '#/components/schemas/QueryList'
-                - type: object
-                  properties:
-                    enabled:
-                      $ref: '#/components/schemas/QueryParameterEnabled'
-                    name:
-                      type: string
-                      description: 遊戲名稱
-                    type:
-                      $ref: '#/components/schemas/QueryParameterGameType'
+
+      parameters:
+        - $ref: '#/components/parameters/QueryPage' 
+        - $ref: '#/components/parameters/QuerySize' 
+        - $ref: '#/components/parameters/QuerySorts' 
+        - $ref: '#/components/parameters/QueryEnabled'
+        - $ref: '#/components/parameters/QueryGameType'
+        - in: query
+          name: name
+          description: 遊戲名稱
+          schema: 
+            type: string
       responses:
         200:
           description: ok
@@ -696,6 +674,24 @@ paths:
       responses:
         204:
           description: ok
+    delete:
+      summary: 刪除多項遊戲
+      tags:
+        - ProviderGame
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  items:
+                    type: number
+      responses:
+        204:
+          description: ok
+
   /providers/{pid}/games/{gid}:
     parameters:
       - in: path
@@ -806,43 +802,23 @@ paths:
       responses:
         204:
           description: ok
-  /providers/{pid}/games/delete:
-    delete:
-      summary: 刪除多項遊戲
-      tags:
-        - ProviderGame
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                ids:
-                  type: array
-                  items:
-                    type: number
-      responses:
-        204:
-          description: ok
-
+  
   /gashapons:
     get:
       summary: 查詢轉蛋活動
       tags:
         - Gashapon
-      requestBody:
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              allOf:
-                - $ref: '#/components/schemas/QueryList'
-                - type: object
-                  properties:
-                    name:
-                      type: string
-                      description: 轉蛋活動名稱(模糊查詢)
-                    enabled:
-                      $ref: '#/components/schemas/QueryParameterEnabled'
+
+      parameters:
+        - $ref: '#/components/parameters/QueryPage' 
+        - $ref: '#/components/parameters/QuerySize' 
+        - $ref: '#/components/parameters/QuerySorts' 
+        - $ref: '#/components/parameters/QueryEnabled'
+        - in: query
+          name: name
+          description: 轉蛋活動名稱(模糊查詢)
+          schema: 
+            type: string
       responses:
         200:
           description: ok
@@ -879,6 +855,24 @@ paths:
                   $ref: '#/components/schemas/StartAt'
                 endAt:
                   $ref: '#/components/schemas/EndAt'
+      responses:
+        204:
+          description: ok
+    delete:
+      summary: 刪除多筆轉蛋活動資料
+      tags:
+        - Gashapon
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  description: 轉蛋活動 id
+                  items:
+                    type: number
       responses:
         204:
           description: ok
@@ -924,25 +918,7 @@ paths:
       responses:
         204:
           description: ok
-  /gashapons/delete:
-    delete:
-      summary: 刪除多筆轉蛋活動資料
-      tags:
-        - Gashapon
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                ids:
-                  type: array
-                  description: 轉蛋活動 id
-                  items:
-                    type: number
-      responses:
-        204:
-          description: ok
+
   /gashapons/{gid}/costs:
     parameters:
       - in: path
@@ -955,12 +931,10 @@ paths:
       summary: 查詢轉蛋活動消費方法
       tags:
         - GashaponCost
-      requestBody:
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              allOf:
-                - $ref: '#/components/schemas/QueryList'
+      parameters:
+        - $ref: '#/components/parameters/QueryPage' 
+        - $ref: '#/components/parameters/QuerySize' 
+        - $ref: '#/components/parameters/QuerySorts' 
       responses:
         200:
           description: ok
@@ -991,6 +965,24 @@ paths:
                   type: number
                 times:
                   type: number
+      responses:
+        204:
+          description: ok
+    delete:
+      summary: 刪除多項轉蛋活動消費方式
+      tags:
+        - GashaponCost
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  description: 消費方式 id
+                  items:
+                    type: number
       responses:
         204:
           description: ok
@@ -1038,33 +1030,7 @@ paths:
       responses:
         204:
           description: ok
-  /gashapons/{gid}/costs/delete:
-    parameters:
-      - in: path
-        name: gid
-        required: true
-        description: 轉蛋活動 id
-        schema:
-          type: number
-    delete:
-      summary: 刪除多項轉蛋活動消費方式
-      tags:
-        - GashaponCost
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                ids:
-                  type: array
-                  description: 消費方式 id
-                  items:
-                    type: number
-      responses:
-        204:
-          description: ok
-  /gashapons/{gid}/reward/delete:
+  /gashapons/{gid}/reward:
     parameters:
       - in: path
         name: gid
@@ -1076,12 +1042,10 @@ paths:
       summary: 查詢轉蛋獎勵
       tags:
         - GashaponReward
-      requestBody:
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              allOf:
-                - $ref: '#/components/schemas/QueryList'
+      parameters:
+        - $ref: '#/components/parameters/QueryPage' 
+        - $ref: '#/components/parameters/QuerySize' 
+        - $ref: '#/components/parameters/QuerySorts' 
       responses:
         200:
           description: ok
@@ -1189,12 +1153,10 @@ paths:
       summary: 取得轉蛋適用的遊戲列表
       tags:
         - GashaponGame
-      requestBody:
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              allOf:
-                - $ref: '#/components/schemas/QueryList'
+      parameters:
+        - $ref: '#/components/parameters/QueryPage' 
+        - $ref: '#/components/parameters/QuerySize' 
+        - $ref: '#/components/parameters/QuerySorts' 
       responses:
         200:
           description: ok
@@ -1309,6 +1271,24 @@ paths:
       responses:
         204:
           description: ok
+    delete:
+      summary: 刪除多個任務
+      tags:
+        - Mission
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  description: 任務 id 陣列
+                  items:
+                    type: number
+      responses:
+        204:
+          description: ok
   /missions/{mid}:
     get:
       summary: 取得任務資料
@@ -1349,25 +1329,7 @@ paths:
       responses:
         204:
           description: ok
-  /missions/delete:
-    delete:
-      summary: 刪除多個任務
-      tags:
-        - Mission
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                ids:
-                  type: array
-                  description: 任務 id 陣列
-                  items:
-                    type: number
-      responses:
-        204:
-          description: ok
+
   /missions/{mid}/rewards:
     parameters:
       - in: path
@@ -1380,12 +1342,10 @@ paths:
       summary: 任務獎勵
       tags:
         - MissionReward
-      requestBody:
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              allOf:
-                - $ref: '#/components/schemas/QueryList'
+      parameters:
+        - $ref: '#/components/parameters/QueryPage' 
+        - $ref: '#/components/parameters/QuerySize' 
+        - $ref: '#/components/parameters/QuerySorts' 
       responses:
         200:
           description: ok
@@ -1417,6 +1377,26 @@ paths:
       responses:
         204:
           description: ok
+    delete:
+      summary: 刪除多項獎勵
+      tags:
+        - MissionReward
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  description: 獎勵 id 陣列
+                  items:
+                    type: number
+      responses:
+        204:
+          description: ok
+
+
   /missions/{mid}/rewards/{rid}:
     parameters:
       - in: path
@@ -1448,46 +1428,22 @@ paths:
       responses:
         204:
           description: ok
-  /missions/{mid}/rewards/delete:
-    delete:
-      summary: 刪除多項獎勵
-      tags:
-        - MissionReward
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                ids:
-                  type: array
-                  description: 獎勵 id 陣列
-                  items:
-                    type: number
-      responses:
-        204:
-          description: ok
-
   /stores:
     get:
       summary: 查詢商店
       tags:
         - Store
-      requestBody:
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              allOf:
-                - $ref: '#/components/schemas/QueryList'
-                - type: object
-                  properties:
-                    name:
-                      type: string
-                      description: 商店名稱
-                    shopType:
-                      $ref: '#/components/schemas/QueryParameterShopType'
-                    enabled:
-                      $ref: '#/components/schemas/QueryParameterEnabled'
+      parameters:
+        - $ref: '#/components/parameters/QueryPage' 
+        - $ref: '#/components/parameters/QuerySize' 
+        - $ref: '#/components/parameters/QuerySorts' 
+        - $ref: '#/components/parameters/QueryEnabled'
+        - $ref: '#/components/parameters/QueryShopType'
+        - in: query
+          name: name
+          description: 商店名稱
+          schema: 
+            type: string
       responses:
         200:
           description: ok
@@ -1545,6 +1501,24 @@ paths:
                   $ref: '#/components/schemas/StartAt'
                 endAt:
                   $ref: '#/components/schemas/EndAt'
+      responses:
+        204:
+          description: ok
+    delete:
+      summary: 刪除多個商店 `(後端使用 tx 執行)`
+      tags:
+        - Store
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  description: 商站編號
+                  items:
+                    type: number
       responses:
         204:
           description: ok
@@ -1627,25 +1601,7 @@ paths:
       responses:
         204:
           description: ok
-  /stores/delete:
-    delete:
-      summary: 刪除多個商店 `(後端使用 tx 執行)`
-      tags:
-        - Store
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                ids:
-                  type: array
-                  description: 商站編號
-                  items:
-                    type: number
-      responses:
-        204:
-          description: ok
+  
   /stores/{sid}/items:
     parameters:
       - in: path
@@ -1658,12 +1614,11 @@ paths:
       summary: 取得(道具)商店道具
       tags:
         - StoreCommondityItem
-      requestBody:
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              allOf:
-                - $ref: '#/components/schemas/QueryList'
+
+      parameters:
+        - $ref: '#/components/parameters/QueryPage' 
+        - $ref: '#/components/parameters/QuerySize' 
+        - $ref: '#/components/parameters/QuerySorts'
       responses:
         200:
           description: ok
@@ -1699,6 +1654,24 @@ paths:
                   type: number
                 enabled:
                   $ref: '#/components/schemas/EnabledType'
+      responses:
+        204:
+          description: ok
+    delete:
+      summary: 刪除多項道具商品
+      tags:
+        - StoreCommondityItem
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  description: 道具商品編號 (後端使用 tx 處理)
+                  items:
+                    type: number
       responses:
         204:
           description: ok
@@ -1752,32 +1725,6 @@ paths:
       responses:
         204:
           description: ok
-  /stores/{sid}/items/delete:
-    parameters:
-      - in: path
-        name: sid
-        required: true
-        description: 商店 id
-        schema:
-          type: number
-    delete:
-      summary: 刪除多項道具商品
-      tags:
-        - StoreCommondityItem
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                ids:
-                  type: array
-                  description: 道具商品編號 (後端使用 tx 處理)
-                  items:
-                    type: number
-      responses:
-        204:
-          description: ok
 
   /stores/{sid}/avatars:
     parameters:
@@ -1791,12 +1738,10 @@ paths:
       summary: 查詢商店的 avatar skin 商品 `(僅允許商店販售，不可回購)`
       tags:
         - StoreCommondityAvatar
-      requestBody:
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              allOf:
-                - $ref: '#/components/schemas/QueryList'
+      parameters:
+        - $ref: '#/components/parameters/QueryPage' 
+        - $ref: '#/components/parameters/QuerySize' 
+        - $ref: '#/components/parameters/QuerySorts'
       responses:
         200:
           description: ok
@@ -1855,6 +1800,26 @@ paths:
       responses:
         204:
           description: ok
+    delete:
+      summary: 刪除多項 avatar skin 商品
+      tags:
+        - StoreCommondityAvatar
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  description: avatar skin 商品編號 (後端使用 tx 處理)
+                  items:
+                    type: number
+      responses:
+        204:
+          description: ok
+
+
   /stores/{sid}/avatars/{aid}:
     parameters:
       - in: path
@@ -1919,32 +1884,6 @@ paths:
       responses:
         204:
           description: ok
-  /stores/{sid}/avatars/delete:
-    parameters:
-      - in: path
-        name: sid
-        required: true
-        description: 商店 id
-        schema:
-          type: number
-    delete:
-      summary: 刪除多項 avatar skin 商品
-      tags:
-        - StoreCommondityAvatar
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                ids:
-                  type: array
-                  description: avatar skin 商品編號 (後端使用 tx 處理)
-                  items:
-                    type: number
-      responses:
-        204:
-          description: ok
 
   /stores/{sid}/stickers:
     parameters:
@@ -1958,12 +1897,10 @@ paths:
       summary: 查詢貼圖包商品列表
       tags:
         - StoreModelCommonditySticker
-      requestBody:
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              allOf:
-                - $ref: '#/components/schemas/QueryList'
+      parameters:
+        - $ref: '#/components/parameters/QueryPage' 
+        - $ref: '#/components/parameters/QuerySize' 
+        - $ref: '#/components/parameters/QuerySorts'
       responses:
         200:
           description: ok
@@ -1995,6 +1932,24 @@ paths:
                 price:
                   type: number
                   description: 貼圖包商品價格
+      responses:
+        204:
+          description: ok
+    delete:
+      summary: 刪除多項貼圖包商品
+      tags:
+        - StoreModelCommonditySticker
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  description: 貼圖包商品編號 (後端使用 tx 處理)
+                  items:
+                    type: number
       responses:
         204:
           description: ok
@@ -2042,56 +1997,27 @@ paths:
       responses:
         204:
           description: ok
-  /stores/{sid}/stickers/delete:
-    parameters:
-      - in: path
-        name: sid
-        required: true
-        description: 商店 id
-        schema:
-          type: number
-    delete:
-      summary: 刪除多項貼圖包商品
-      tags:
-        - StoreModelCommonditySticker
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                ids:
-                  type: array
-                  description: 貼圖包商品編號 (後端使用 tx 處理)
-                  items:
-                    type: number
-      responses:
-        204:
-          description: ok
 
   /items:
     get:
       summary: 道具、物品列表(分頁)
       tags:
         - ItemManager
-      requestBody:
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              allOf:
-                - $ref: '#/components/schemas/QueryList'
-                - type: object
-                  required:
-                    - enabled
-                  properties:
-                    name:
-                      type: string
-                      description: 道具名稱 (模糊查詢)
-                    key:
-                      type: string
-                      description: 道具代號 (模糊查詢)
-                    enabled:
-                      $ref: '#/components/schemas/QueryParameterEnabled'
+      parameters:
+        - $ref: '#/components/parameters/QueryPage' 
+        - $ref: '#/components/parameters/QuerySize' 
+        - $ref: '#/components/parameters/QuerySorts' 
+        - $ref: '#/components/parameters/QueryEnabled'
+        - in: query
+          name: name
+          description: 道具名稱 (模糊查詢)
+          schema: 
+            type: string
+        - in: query
+          name: key
+          description: 道具代號 (模糊查詢)
+          schema: 
+            type: string
       responses:
         200:
           description: ok
@@ -2264,21 +2190,17 @@ paths:
       summary: 查詢頭像 skin 列表
       tags:
         - AvatarSkinManager
-      requestBody:
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              allOf:
-                - $ref: '#/components/schemas/QueryList'
-                - type: object
-                  properties:
-                    name:
-                      type: string
-                      description: skin 名稱
-                    type:
-                      $ref: '#/components/schemas/QueryParameterAvatarSkinType'
-                    enabled:
-                      $ref: '#/components/schemas/QueryParameterEnabled'
+      parameters:
+        - $ref: '#/components/parameters/QueryPage' 
+        - $ref: '#/components/parameters/QuerySize' 
+        - $ref: '#/components/parameters/QuerySorts' 
+        - $ref: '#/components/parameters/QueryEnabled'
+        - $ref: '#/components/parameters/QueryAvatarSkinType'
+        - in: query
+          name: name
+          description: skin 名稱
+          schema: 
+            type: string
       responses:
         200:
           description: ok
@@ -2426,16 +2348,18 @@ paths:
       summary: 取得圖片列表(不分頁)
       tags:
         - ImageManager
-      requestBody:
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              type: object
-              properties:
-                dirPath:
-                  type: string
-                  description: 圖片路徑
-                  example: /items
+      parameters:
+        - $ref: '#/components/parameters/QueryPage' 
+        - $ref: '#/components/parameters/QuerySize' 
+        - $ref: '#/components/parameters/QuerySorts' 
+        - $ref: '#/components/parameters/QueryEnabled'
+        - $ref: '#/components/parameters/QueryAvatarSkinType'
+        - in: query
+          name: dirPath
+          description: 圖片路徑
+          example: /items
+          schema: 
+            type: string
       responses:
         200:
           description: ok
@@ -2501,6 +2425,24 @@ paths:
       responses:
         200:
           description: ok
+    delete:
+      summary: 刪除圖片
+      tags:
+        - ImageManager
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  description: 圖片 id 陣列
+                  items:
+                    type: number
+      responses:
+        204:
+          description: ok
   /images/{id}:
     get:
       summary: 取得圖片詳細資訊
@@ -2562,26 +2504,8 @@ paths:
       responses:
         204:
           description: ok
-  /images/delete:
-    delete:
-      summary: 刪除圖片
-      tags:
-        - ImageManager
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                ids:
-                  type: array
-                  description: 圖片 id 陣列
-                  items:
-                    type: number
-      responses:
-        204:
-          description: ok
 
+ 
   /level-configs:
     get:
       summary: 玩家等級管理(每等級需要的經驗值)
@@ -2591,6 +2515,10 @@ paths:
       description: |
         ## Ver20200205
         - 移除 rank 參數
+      parameters:
+        - $ref: '#/components/parameters/QueryPage' 
+        - $ref: '#/components/parameters/QuerySize' 
+        - $ref: '#/components/parameters/QuerySorts' 
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -2729,12 +2657,10 @@ paths:
       description: |
         ## Ver20200205
         - 新增 minimumLevel 參數
-      requestBody:
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              allOf:
-                - $ref: '#/components/schemas/QueryList'
+      parameters:
+        - $ref: '#/components/parameters/QueryPage' 
+        - $ref: '#/components/parameters/QuerySize' 
+        - $ref: '#/components/parameters/QuerySorts' 
       responses:
         200:
           description: ok
@@ -2862,19 +2788,16 @@ paths:
       summary: 查詢貼圖列表
       tags:
         - StickerManager
-      requestBody:
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              allOf:
-                - $ref: '#/components/schemas/QueryList'
-                - type: object
-                  properties:
-                    name:
-                      type: string
-                      description: 貼圖包名稱
-                    enabled:
-                      $ref: '#/components/schemas/QueryParameterEnabled'
+      parameters:
+        - $ref: '#/components/parameters/QueryPage' 
+        - $ref: '#/components/parameters/QuerySize' 
+        - $ref: '#/components/parameters/QuerySorts' 
+        - $ref: '#/components/parameters/QueryEnabled'
+        - in: query
+          name: name
+          description: 貼圖包名稱
+          schema: 
+            type: string
       responses:
         200:
           description: ok
@@ -2977,15 +2900,16 @@ paths:
       summary: 查詢圖片所有路徑
       tags:
         - Common
-      requestBody:
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              type: object
-              properties:
-                dirPath:
-                  type: string
-                  description: 查詢 dir_path = '?%' 的路徑
+      parameters:
+        - $ref: '#/components/parameters/QueryPage' 
+        - $ref: '#/components/parameters/QuerySize' 
+        - $ref: '#/components/parameters/QuerySorts' 
+        - $ref: '#/components/parameters/QueryEnabled'
+        - in: query
+          name: dirPath
+          description: 查詢 dir_path = '?%' 的路徑
+          schema: 
+            type: string
       responses:
         200:
           description: ok
@@ -3002,25 +2926,25 @@ paths:
   /common/images:
     get:
       summary: 查詢圖片
+      description: |
+        ## 查詢圖片 (分頁)
+        - 預設依 dir_path asc, id desc 排序
       tags:
         - Common
-      requestBody:
-        description: |
-          ## 查詢圖片 (分頁)
-          - 預設依 dir_path asc, id desc 排序
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              allOf:
-                - $ref: '#/components/schemas/QueryList'
-                - type: object
-                  properties:
-                    dirPath:
-                      type: string
-                      description: 路徑
-                    title:
-                      type: string
-                      description: 圖片名稱 (模糊查詢)
+      parameters:
+        - $ref: '#/components/parameters/QueryPage' 
+        - $ref: '#/components/parameters/QuerySize' 
+        - $ref: '#/components/parameters/QuerySorts' 
+        - in: query
+          name: dirPath
+          description: 查詢 dir_path = '?%' 的路徑
+          schema: 
+            type: string
+        - in: query
+          name: title
+          description: 圖片名稱 (模糊查詢)
+          schema:
+            type: string  
 
       responses:
         200:
@@ -3096,23 +3020,23 @@ paths:
       summary: 查詢提供商
       tags:
         - Common
-      requestBody:
-        description: |
-          ## 查詢提供商 (分頁)
-          - 預設依 username asc 排序
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              allOf:
-                - $ref: '#/components/schemas/QueryList'
-                - type: object
-                  properties:
-                    username:
-                      type: string
-                      description: 提供商 username
-                    name:
-                      type: string
-                      description: 提供商名稱
+      description: |
+        ## 查詢提供商 (分頁)
+        - 預設依 username asc 排序
+      parameters:
+        - $ref: '#/components/parameters/QueryPage' 
+        - $ref: '#/components/parameters/QuerySize' 
+        - $ref: '#/components/parameters/QuerySorts' 
+        - in: query
+          name: username
+          description: 提供商 username
+          schema: 
+            type: string
+        - in: query
+          name: name
+          description: 提供商名稱
+          schema:
+            type: string  
       responses:
         200:
           description: ok
@@ -3139,22 +3063,21 @@ paths:
       summary: 查詢道具
       tags:
         - Common
-      requestBody:
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              allOf:
-                - $ref: '#/components/schemas/QueryList'
-                - type: object
-                  properties:
-                    name:
-                      type: string
-                      description: 道具名稱(模糊查詢)
-                    key:
-                      type: string
-                      description: 道具代號(模糊查詢)
-                    enabled:
-                      $ref: '#/components/schemas/QueryParameterEnabled'
+      parameters:
+        - $ref: '#/components/parameters/QueryPage' 
+        - $ref: '#/components/parameters/QuerySize' 
+        - $ref: '#/components/parameters/QuerySorts' 
+        - $ref: '#/components/parameters/QueryEnabled'
+        - in: query
+          name: name
+          description: 提供商名稱
+          schema:
+            type: string  
+        - in: query
+          name: key
+          description: 道具代號(模糊查詢)
+          schema: 
+            type: string
       responses:
         200:
           description: ok
@@ -3190,24 +3113,17 @@ paths:
       summary: 查詢頭像 skin
       tags:
         - Common
-      requestBody:
-        description: |
-          ## 查詢頭像 skin
-          - 預設依 type asc, name asc 排序
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              allOf:
-                - $ref: '#/components/schemas/QueryList'
-                - type: object
-                  properties:
-                    name:
-                      type: string
-                      description: skin 名稱
-                    type:
-                      $ref: '#/components/schemas/AvatarSkinType'
-                    enabled:
-                      $ref: '#/components/schemas/QueryParameterEnabled'
+      parameters:
+        - $ref: '#/components/parameters/QueryPage' 
+        - $ref: '#/components/parameters/QuerySize' 
+        - $ref: '#/components/parameters/QuerySorts' 
+        - $ref: '#/components/parameters/QueryEnabled'
+        - $ref: '#/components/parameters/QueryAvatarSkinType'
+        - in: query
+          name: name
+          description: skin 名稱
+          schema:
+            type: string 
       responses:
         200:
           description: ok
@@ -3241,18 +3157,16 @@ paths:
       summary: 查詢貼圖包
       tags:
         - Common
-      requestBody:
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              allOf:
-                - $ref: '#/components/schemas/QueryList'
-                - type: object
-                  properties:
-                    name:
-                      type: string
-                    enabled:
-                      $ref: '#/components/schemas/QueryParameterEnabled'
+      parameters:
+        - $ref: '#/components/parameters/QueryPage' 
+        - $ref: '#/components/parameters/QuerySize' 
+        - $ref: '#/components/parameters/QuerySorts' 
+        - $ref: '#/components/parameters/QueryEnabled'
+        - in: query
+          name: name
+          description: 貼圖包 名稱
+          schema:
+            type: string 
       responses:
         200:
           description: ok
@@ -3284,12 +3198,10 @@ paths:
       summary: 任務類型列表
       tags:
         - Common
-      requestBody:
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              allOf:
-                - $ref: '#/components/schemas/QueryList'
+      parameters:
+        - $ref: '#/components/parameters/QueryPage' 
+        - $ref: '#/components/parameters/QuerySize' 
+        - $ref: '#/components/parameters/QuerySorts' 
       responses:
         200:
           description: ok
@@ -3861,87 +3773,7 @@ components:
       enum:
         - 1 # slot
         - 2 # table
-    QueryParameterMissionType:
-      type: number
-      description: |
-        ## 任務類型
-        - -1 # 全部
-        - 1 # slot 轉數
-      enum:
-        - -1 # 全部
-        - 1 # slot 轉數
-
-    QueryParameterEnabled:
-      type: string
-      description: |
-        ## 啟/停用狀態
-        - all # 全部
-        - enabled # 停用
-        - disabled # 啟用
-      enum:
-        - all # 全部
-        - enabled # 停用
-        - disabled # 啟用
-    QueryParameterGameType:
-      type: number
-      description: |
-        ## 遊戲類型
-        - 0 # 查詢全部
-        - 1 # slot
-        - 2 # table
-      enum:
-        - 0 # 查詢全部
-        - 1 # slot
-        - 2 # table
-    QueryParameterShopType:
-      type: number
-      description: |
-        ## 商店
-        - -1 # 全部
-        - 1 # buy
-        - 2 # sell
-      enum:
-        - -1 # 全部
-        - 1 # buy (供玩家購買的商品)
-        - 2 # sell (供玩家販賣的商品)
-    QueryParameterAvatarSkinType:
-      type: number
-      description: |
-        ## Skin 類型
-        - -1 # 全部
-        - 1 # avatar 頭像
-        - 2 # frame 像框
-        - 3 # effects 特效
-        - 4 # background 背景
-      enum:
-        - -1 # 全部
-        - 1 # avatar 頭像
-        - 2 # frame 像框
-        - 3 # effects 特效
-        - 4 # background 背景
-
-    QueryList:
-      description: 分頁查詢
-      type: object
-      required:
-        - page
-        - size
-        - tota
-      properties:
-        page:
-          type: number
-          description: 頁數
-          example: 1
-        size:
-          type: number
-          description: 每頁資料筆數
-          example: 15
-        sorts:
-          type: array
-          description: 查詢資料排序
-          example: ["name desc", "id asc"]
-          items:
-            type: string
+         
     ResponseList:
       description: 分頁查詢回傳結構
       type: object
@@ -3974,4 +3806,100 @@ components:
         message:
           type: string
 
+  parameters:
+    QueryPage:
+      in: query
+      name: page
+      description: 頁數
+      example: 1
+      schema: 
+        type: number
+    QuerySize:
+      in: query
+      name: size
+      description: 每頁資料筆數
+      example: 15
+      schema: 
+        type: number
+    QuerySorts:
+      in: query
+      name: sorts
+      description: 查詢資料排序
+      example: ["name desc", "id asc"]
+      schema: 
+        type: array
+        items:
+          type: string
+    QueryEnabled:
+      in: query
+      name: enabled
+      description: |
+        ## 啟/停用狀態
+        - all # 全部
+        - enabled # 停用
+        - disabled # 啟用
+      schema:
+        type: string
+        enum:
+          - all # 全部
+          - enabled # 停用
+          - disabled # 啟用
 
+    QueryMissionType:
+      in: query
+      name: missionType
+      description: |
+        ## 任務類型
+        - -1 # 全部
+        - 1 # slot 轉數
+      schema:
+        type: number
+        enum:
+          - -1 # 全部
+          - 1 # slot 轉數
+    QueryGameType:
+      in: query
+      name: gameType
+      description: |
+        ## 遊戲類型
+        - 0 # 查詢全部
+        - 1 # slot
+        - 2 # table
+      schema:
+        type: number
+        enum:
+          - 0 # 查詢全部
+          - 1 # slot
+          - 2 # table
+    QueryShopType:
+      in: query
+      name: shopType
+      description: |
+        ## 商店
+        - -1 # 全部
+        - 1 # buy
+        - 2 # sell
+      schema:
+        type: number
+      enum:
+        - -1 # 全部
+        - 1 # buy (供玩家購買的商品)
+        - 2 # sell (供玩家販賣的商品)
+    QueryAvatarSkinType:
+      in: query
+      name: skinType
+      description: |
+        ## Skin 類型
+        - -1 # 全部
+        - 1 # avatar 頭像
+        - 2 # frame 像框
+        - 3 # effects 特效
+        - 4 # background 背景
+      schema:
+        type: number
+        enum:
+          - -1 # 全部
+          - 1 # avatar 頭像
+          - 2 # frame 像框
+          - 3 # effects 特效
+          - 4 # background 背景
