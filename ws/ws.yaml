@@ -2083,7 +2083,7 @@ components:
         - $ref: '#/components/schemas/RequestEventData'
     ResponseEventMemberData: 
       allOf:
-        - $ref: '#/components/schemas/ResponseEventMemberData'
+        - $ref: '#/components/schemas/ResponseEventData'
         - type: object
           properties:
             MEMBER_ID: 
