@@ -573,6 +573,7 @@ paths:
       tags:
         - All
         - Personal
+        - Edit0224
       requestBody:
         content:
           application/json:
@@ -615,6 +616,7 @@ paths:
       tags:
         - All
         - Personal
+        - Edit0224
       requestBody:
         content:
           application/json:
@@ -636,9 +638,12 @@ paths:
                         example: (byte:8)
                         description: 累計回饋(uint64)
                       INVITE_FROM:
-                        type: string
-                        example: (byte:*)
-                        description: 推薦人名稱
+                        allOf:
+                          - $ref: '#/components/schemas/Member'
+                          - type: object
+                            example: (byte:*)
+                            description: 推薦人資料
+
   /23:
     post:
       summary: 取得 / 儲存 個人設定
