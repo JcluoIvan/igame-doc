@@ -569,16 +569,49 @@ paths:
                             description: 玩家 code
   /21:
     post:
-      summary: 未設定
+      summary: 查詢已推薦的玩家
       tags:
-        - None
+        - All
         - Personal
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/RequestEventData'
+                - type: object
+                  properties:
+                    QUERY:
+                      type: object
+                      example: (byte:*)
+                      description: 查詢條件 (json data)
+                      allOf:
+                        - $ref: '#/components/schemas/QueryList'
+
       responses:
         200:
           description: ok
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ResponseEventData'
+                  - type: object
+                    properties:
+                      DATA:
+                        example: (byte:*)
+                        description: 取得已推薦的玩家列表資料 (json data)
+                        allOf:
+                          - $ref: '#/components/schemas/ResponseList'
+                          - type: object
+                            properties:
+                              rows:
+                                type: array
+                                items:
+                                  $ref: '#/components/schemas/Member'
   /22:
     post:
-      summary: 取得累積回饋、介紹人、在線玩家
+      summary: 取得累積回饋、介紹人、
       tags:
         - All
         - Personal
@@ -598,33 +631,14 @@ paths:
                   - $ref: '#/components/schemas/ResponseEventData'
                   - type: object
                     properties:
-                      DATA: 
-                        description: json data
+                      BONUS:
+                        type: number
+                        example: (byte:8)
+                        description: 累計回饋(uint64)
+                      INVITE_FROM:
+                        type: string
                         example: (byte:*)
-                        type: object
-                        properties:
-                          bonusPoint:
-                            type: number
-                            description: 累計回鐀
-                          invitedFrom:
-                            type: string 
-                            description: 推薦人名稱
-                          invitedUsers:
-                            type: array
-                            items:
-                              type: object
-                              properties:
-                                avatar:
-                                  type: string
-                                skins:
-                                  $ref: '#/components/schemas/MemberSkin'
-                                nickname:
-                                  type: string
-                                code:
-                                  type: string
-                                gamePoint:
-                                  type: number
-
+                        description: 推薦人名稱
   /23:
     post:
       summary: 取得 / 儲存 個人設定
