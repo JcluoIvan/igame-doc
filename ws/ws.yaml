@@ -526,20 +526,13 @@ paths:
           application/json:
             schema:
               allOf:
-                - $ref: '#/components/schemas/RequestEventData'
+                - $ref: '#/components/schemas/RequestEventMemberData'
                 - type: object
                   properties:
-                    DATA:
-                      type: object
+                    NICKNAME: 
+                      type: string
                       example: (byte:*)
-                      description: 暱稱、 code
-                      properties:
-                        nickname: 
-                          type: string
-                          description: 暱稱
-                        code:
-                          type: string
-                          description: 玩家 code
+                      description: 修改玩家自己的暱稱
       responses:
         200:
           description: ok
@@ -1856,8 +1849,8 @@ paths:
             application/json:
               schema:
                 allOf:
-                  -  $ref: '#/components/schemas/ResponseEventData'
-                  - type:
+                  - $ref: '#/components/schemas/ResponseEventData'
+                  - type: object
                     properties:
                       ID:
                         type: number
@@ -2047,7 +2040,7 @@ components:
           example: (byte:2)
     RequestEventMemberData: 
       allOf:
-        - $ref: '#/components/schemas/RequestEventMemberData'
+        - $ref: '#/components/schemas/RequestEventData'
         - type: object
           properties:
             MEMBER_ID: 
