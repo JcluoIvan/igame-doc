@@ -1906,9 +1906,8 @@ paths:
                       example: (byte:*)
                       description: 提交交換內容 (json data)
                       properties:
-                        locked:
-                          type: boolean
-                          description: 是否鎖定 (鎖定後無法解除)
+                        step:
+                          $ref: '#/components/schemas/ExchangeStep'
                         gamePoint: 
                           type: number
                         itemId:
@@ -1933,7 +1932,7 @@ paths:
                           $ref: '#/components/schemas/ExchangeContent'
   /61:
     post:
-      summary: 確定交換
+      summary: 交換完成
       tags:
         - All
         - Exchange
@@ -1944,13 +1943,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/ResponseEventData'
-                  - type: object
-                    properties:
-                      STATUS: 
-                        type: number
-                        example: (byte:1)
-                        description: 1. 交換完成, 2. 等待對方完成
+                  - $ref: '#/components/schemas/ResponseEventMemberData'
   /62:
     post:
       summary: 取得轉蛋活動
@@ -2570,15 +2563,24 @@ components:
         price:
           type: number
           description: 價格
+    ExchangeStep:
+      type: number
+      description: |
+        - 1 # 同意邀請
+        - 2 # 鎖定內容
+        - 3 # 確定交換
+      enum:
+        - 1 # 同意邀請
+        - 2 # 鎖定內容
+        - 3 # 確定交換
     ExchangeContent: 
       type: object
       properties:
         id:
           type: number
           description: 玩家 id
-        locked:
-          type: boolean
-          description: 是否鎖定 (鎖定後無法解除)
+        step:
+          $ref: '#/components/schemas/ExchangeStep' 
         gamePoint: 
           type: number
         itemId:
