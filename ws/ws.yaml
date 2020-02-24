@@ -547,7 +547,20 @@ paths:
             application/json:
               schema:
                 allOf: 
-                  - $ref: '#/components/schemas/ResponseEventData'
+                  - $ref: "#/components/schemas/ResponseEventMemberData"
+                  - type: object
+                    properties:
+                      DATA:
+                        type: object
+                        example: (byte:*)
+                        description: 暱稱、 code
+                        properties:
+                          nickname: 
+                            type: string
+                            description: 暱稱
+                          code:
+                            type: string
+                            description: 玩家 code
   /21:
     post:
       summary: 未設定
