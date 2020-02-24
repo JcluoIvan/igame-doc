@@ -327,7 +327,7 @@ paths:
           description: ok
   /14:
     post:
-      summary: 取得玩家頭像網址
+      summary: 設定玩家頭像
       tags:
         - All
         - Personal
@@ -337,6 +337,12 @@ paths:
             schema:
               allOf:
                 - $ref: '#/components/schemas/RequestEventData'
+                - type: object
+                  properties:
+                    AVATAR: 
+                      type: string
+                      example: (byte:*)
+                      description: 圖片資料 bytes
       responses:
         200:
           description: ok
@@ -353,7 +359,7 @@ paths:
                         description: 頭像網址
   /15:
     post:
-      summary: 取得 / 設定 skin
+      summary: 設定 skin
       tags:
         - All
         - Personal
@@ -365,9 +371,6 @@ paths:
                 - $ref: '#/components/schemas/RequestEventData'
                 - type: object
                   properties:
-                    SAVE:
-                      type: boolean
-                      description: 是否更新個人 skin
                     SKINS:
                       type: array
                       example: (byte:*)
@@ -397,7 +400,7 @@ paths:
                           type: number 
   /16:
     post:
-      summary: 取得 / 修改簡介
+      summary: 修改簡介
       tags:
         - All
         - Personal
@@ -461,6 +464,16 @@ paths:
       tags:
         - All
         - Personal
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/RequestEventData'
+                - type: object
+                  properties:
+                    POSITION:
+                      type: string
       responses:
         200:
           description: ok
@@ -517,7 +530,7 @@ paths:
                         description: 暱稱
   /20:
     post:
-      summary: 修改 / 取得 暱稱, Code
+      summary: 修改 暱稱
       tags:
         - All
         - Personal
@@ -526,7 +539,7 @@ paths:
           application/json:
             schema:
               allOf:
-                - $ref: '#/components/schemas/RequestEventMemberData'
+                - $ref: '#/components/schemas/RequestEventData'
                 - type: object
                   properties:
                     NICKNAME: 
