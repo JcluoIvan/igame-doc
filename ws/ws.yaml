@@ -2009,7 +2009,14 @@ paths:
                         example: (byte:*)
                         description: 獲得的道具
                         items:
-                          $ref: '#/components/schemas/Item'
+                          type: object
+                          properties:
+                            id: 
+                              type: number
+                              description: 道具 id 
+                            numItems:
+                              type: number
+                              description: 道具數量
         
 components:
   schemas:
