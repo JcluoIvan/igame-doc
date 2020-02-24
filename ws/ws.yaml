@@ -2017,7 +2017,55 @@ paths:
                             numItems:
                               type: number
                               description: 道具數量
-        
+  /64:
+    post:
+      summary: 取得公告
+      tags:
+        - All
+        - Announcement
+      requestBody:
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/RequestEventData'
+                - type: object
+                  properties:
+                    QUERY: 
+                      type: object
+                      example: (byte:*)
+                      description: 查詢條件
+                      allOf:
+                        - $ref: '#/components/schemas/QueryList'
+                        - type: object
+                          properties:
+                            type: 
+                              $ref: '#/components/schemas/QueryAnnouncementType'
+
+      responses:
+        200: 
+          description: ok
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ResponseEventData'
+                  - type: object
+                    properties:
+                      DATA:
+                        type: object
+                        example: (byte:*)
+                        description: 公告列表
+                        allOf:
+                          - $ref: '#/components/schemas/ResponseList'
+                          - type: object
+                            properties:
+                              rows:
+                                type: array
+                                items:
+                                  $ref: '#/components/schemas/Announcement'
+              
+
 components:
   schemas:
     RequestEventData:
@@ -2243,6 +2291,9 @@ components:
         id: 
           type: number
           description: 玩家 id
+        mail: 
+          type: string
+          description: 玩家 mail
         avatar: 
           type: string
           description: 頭像圖片路徑
@@ -2632,6 +2683,7 @@ components:
           description: 消費方式
           items:
             $ref: '#/components/schemas/GashaponCost'
+    
     AnnouncementType:
       type: number
       description: |
@@ -2640,6 +2692,18 @@ components:
         - 2 # 遊戲
       enum:
         #### 公告類型
+        - 1 # 官方
+        - 2 # 遊戲
+    QueryAnnouncementType:
+      type: number
+      description: |
+        #### 公告類型
+        - -1 # 全部
+        - 1 # 官方
+        - 2 # 遊戲
+      enum:
+        #### 公告類型
+        - -1 # 全部
         - 1 # 官方
         - 2 # 遊戲
 
