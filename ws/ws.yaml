@@ -925,6 +925,7 @@ paths:
       tags:
         - All
         - Mission
+        - Edit0224
       requestBody:
         content:
           application/json:
@@ -951,6 +952,20 @@ paths:
                         type: number
                         example: (byte:8)
                         description: 玩家接受任務後的 mmid (uint64)
+                      REWARDS:
+                        type: array
+                        example: (byte:*)
+                        description: 領取到的道具(json data)
+                        items:
+                          type: object
+                          properties:
+                            id: 
+                              type: number
+                              description: 道具 id 
+                            numItems:
+                              type: number
+                              description: 道具數量
+
   /31:  
     post:
       summary: 取得個人信件列表
