@@ -318,43 +318,13 @@ paths:
                         description: 經驗值(uint64)
   /13:
     post:
-      summary: 取得玩家 暱稱, Code
+      summary: 未設定
       tags:
-        - All
-        - Personal
-      requestBody:
-        content:
-          application/json:
-            schema:
-                allOf:
-                  - $ref: "#/components/schemas/RequestEventData"
-                  - type: object
-                    properties:
-                      MEMBER_ID: 
-                        type: number
-                        example: (byte:8)
-                        description: 玩家 id 
+        - None
+
       responses:
         200:
           description: ok
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: "#/components/schemas/ResponseEventMemberData"
-                  - type: object
-                    properties:
-                      DATA:
-                        type: object
-                        example: (byte:*)
-                        description: 暱稱、 code
-                        properties:
-                          nickname: 
-                            type: string
-                            description: 暱稱
-                          code:
-                            type: string
-                            description: 玩家 code
   /14:
     post:
       summary: 取得玩家頭像網址
@@ -427,7 +397,7 @@ paths:
                           type: number 
   /16:
     post:
-      summary: 更新簡介
+      summary: 取得 / 修改簡介
       tags:
         - All
         - Personal
@@ -446,6 +416,18 @@ paths:
       responses:
         200:
           description: ok
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ResponseEventMemberData'
+                  - type: object
+                    properties:
+                      INTRODUCTION:
+                        type: string
+                        example: (byte:*)
+                        description: 簡介
+                    
   /17:
     post:
       summary: 取得 email
@@ -535,7 +517,7 @@ paths:
                         description: 暱稱
   /20:
     post:
-      summary: 修改暱稱
+      summary: 修改 / 取得 暱稱, Code
       tags:
         - All
         - Personal
@@ -547,10 +529,17 @@ paths:
                 - $ref: '#/components/schemas/RequestEventData'
                 - type: object
                   properties:
-                    NICKNAME:
-                      type: string
+                    DATA:
+                      type: object
                       example: (byte:*)
-                      description: 暱稱
+                      description: 暱稱、 code
+                      properties:
+                        nickname: 
+                          type: string
+                          description: 暱稱
+                        code:
+                          type: string
+                          description: 玩家 code
       responses:
         200:
           description: ok
@@ -561,31 +550,13 @@ paths:
                   - $ref: '#/components/schemas/ResponseEventData'
   /21:
     post:
-      summary: 修改簡介
+      summary: 未設定
       tags:
-        - All
+        - None
         - Personal
-      requestBody:
-        content:
-          application/json:
-            schema:
-              allOf:
-                - $ref: '#/components/schemas/RequestEventData'
-                - type: object
-                  properties:
-                    INTRODUCTION:
-                      type: string
-                      example: (byte:*)
-                      description: 簡介
       responses:
         200:
           description: ok
-          content:
-            application/json:
-              schema:
-                allOf: 
-                  - $ref: '#/components/schemas/ResponseEventData'
-
   /22:
     post:
       summary: 取得累積回饋、介紹人、在線玩家
