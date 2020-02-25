@@ -1326,6 +1326,8 @@ paths:
                   description: 任務說明(詳細說明)
                 startAt:
                   $ref: '#/components/schemas/StartAt'
+                endAt:
+                  $ref: '#/components/schemas/EndAt'
       responses:
         204:
           description: ok
