@@ -1122,6 +1122,19 @@ paths:
                         type: number
                         example: (byte:4)
                         description: 未讀信件筆數 (uint32)
+                      ANNEXS:
+                        type: array
+                        example: (byte:*)
+                        description: 領取到的道具(json data)
+                        items:
+                          type: object
+                          properties:
+                            id: 
+                              type: number
+                              description: 道具 id 
+                            numItems:
+                              type: number
+                              description: 道具數量
   /35:
     post:
       summary: 刪除信件
