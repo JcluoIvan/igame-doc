@@ -791,8 +791,8 @@ paths:
                         items:
                           type: object
                           properties:
-                            type:
-                              $ref: '#/components/schemas/GameType'
+                            game:
+                              $ref: '#/components/schemas/Game'
                             today:
                               $ref: '#/components/schemas/GameRecord'
                             total:
