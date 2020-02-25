@@ -1222,6 +1222,12 @@ paths:
               schema:
                 allOf:
                   - $ref: '#/components/schemas/ResponseEventData'
+                  - type: object
+                    properties:
+                      NUM_UNREADS:
+                        type: number
+                        example: (byte:4)
+                        description: 未讀信件筆數 (uint32)
   /38:
     post:
       summary: 取得未讀信件筆數
@@ -1460,17 +1466,9 @@ paths:
                 - $ref: '#/components/schemas/RequestEventData'
                 - type: object
                   properties:
-                    QUERY: 
-                      type: object
-                      example: (byte:0)
-                      description: 查詢條件
-                      allOf:
-                        - $ref: '#/components/schemas/QueryList'
-                        - type: object
-                          properties:
-                            search:
-                              type: string
-                              description: 查詢玩家
+                    SEARCH:
+                      type: string
+                      description: 查詢玩家
       responses:
         200: 
           description: ok       
@@ -1567,17 +1565,16 @@ paths:
                 - $ref: '#/components/schemas/RequestEventData'
                 - type: object
                   properties:
-                    DATA:
-                      type: object
+                    CHAT_ID:
+                      type: number
+                      example: (byte:8)
+                      description: chat id(uint64)
+                    MESSAGE_TYPE:
+                      $ref: '#/components/schemas/MessageType'
+                    MESSAGE:
+                      type: string
                       example: (byte:*)
-                      description: 訊息資料(json data)
-                      properties:
-                        chatId:
-                          type: number
-                        messageType:
-                          $ref: '#/components/schemas/MessageType'
-                        message: 
-                          type: string
+                      description: 訊息內容(皆以 bytes 傳送)
       responses:
         200:
           description: ok
@@ -1616,17 +1613,16 @@ paths:
                 - $ref: '#/components/schemas/RequestEventData'
                 - type: object
                   properties:
-                    DATA:
-                      type: object
+                    TO:
+                      type: number
+                      example: (byte:8)
+                      description: 傳送對象的 id (uint64)
+                    MESSAGE_TYPE:
+                      $ref: '#/components/schemas/MessageType'
+                    MESSAGE:
+                      type: string
                       example: (byte:*)
-                      description: 訊息資料(json data)
-                      properties:
-                        toId:
-                          type: number
-                        messageType:
-                          $ref: '#/components/schemas/MessageType'
-                        message: 
-                          type: string
+                      description: 訊息內容(皆以 bytes 傳送)
       responses:
         200:
           description: ok
@@ -2519,7 +2515,9 @@ components:
  
     MessageType:
       type: number
+      example: (byte:1)
       description: |
+        #### 訊息類型 (uint8)
         - 1 # text 
         - 2 # sticker
         - 3 # image
