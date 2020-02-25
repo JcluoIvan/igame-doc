@@ -1096,10 +1096,12 @@ paths:
                 - $ref: '#/components/schemas/RequestEventData'
                 - type: object
                   properties:
-                    MAIL_ID:
-                      type: number
-                      example: (byte:8)
-                      description: mail id (uint64)
+                    IDS: 
+                      type: array
+                      example: (byte:*)
+                      description: mail ids (json data)
+                      items:
+                        type: number
       responses:
         200: 
           description: ok       
@@ -1110,14 +1112,6 @@ paths:
                   - $ref: '#/components/schemas/ResponseEventData'
                   - type: object
                     properties:
-                      MAIL_ID:
-                        type: number
-                        example: (byte:8)
-                        description: mail id (uint64)
-                      RECEIVED_AT:
-                        type: number
-                        example: (byte:8)
-                        description: received at (int64)
                       NUM_UNREADS:
                         type: number
                         example: (byte:4)
@@ -1165,10 +1159,6 @@ paths:
                   - $ref: '#/components/schemas/ResponseEventData'
                   - type: object
                     properties:
-                      MAIL_ID:
-                        type: number
-                        example: (byte:8)
-                        description: mail id (uint64)
                       NUM_UNREADS:
                         type: number
                         example: (byte:4)
@@ -1199,6 +1189,19 @@ paths:
                         type: number
                         example: (byte:4)
                         description: 未讀信件筆數 (uint32)
+                      ANNEXS:
+                        type: array
+                        example: (byte:*)
+                        description: 領取到的道具(json data)
+                        items:
+                          type: object
+                          properties:
+                            id: 
+                              type: number
+                              description: 道具 id 
+                            numItems:
+                              type: number
+                              description: 道具數量
   /37:
     post:
       summary: 刪除已讀 / 已領取的信件
