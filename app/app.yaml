@@ -85,10 +85,6 @@ paths:
       summary: WebSocket 連線 (請使用 ws:// or wss://)
       tags:
         - Init
-      requestBody:
-        content:
-          application/json:
-            schema:
       responses:
         200:
           description: ok
@@ -99,7 +95,7 @@ paths:
         - Source
       responses:
         200:
-          description:
+          description: ok
           content:
             application/json:
               schema:
@@ -108,27 +104,27 @@ paths:
                   images:
                     type: array
                     items:
-                      $ref: '#/components/schemas/SourceImage'
-                  stickers: 
+                      $ref: "#/components/schemas/SourceImage"
+                  stickers:
                     type: array
                     items:
-                      $ref: '#/components/schemas/SourceSticker'
-                  items: 
+                      $ref: "#/components/schemas/SourceSticker"
+                  items:
                     type: array
                     items:
-                      $ref: '#/components/schemas/SourceItem'
-                  skins: 
+                      $ref: "#/components/schemas/SourceItem"
+                  skins:
                     type: array
                     items:
-                      $ref: '#/components/schemas/SourceSkin'
-                  levels: 
+                      $ref: "#/components/schemas/SourceSkin"
+                  levels:
                     type: array
                     items:
-                      $ref: '#/components/schemas/SourceLevel'
-                  ranks: 
+                      $ref: "#/components/schemas/SourceLevel"
+                  ranks:
                     type: array
                     items:
-                      $ref: '#/components/schemas/SourceRank'
+                      $ref: "#/components/schemas/SourceRank"
 components:
   schemas:
     SourceImage:
@@ -209,7 +205,7 @@ components:
     SourceLevel:
       type: object
       properties:
-        id: 
+        id:
           type: number
         level:
           type: number
@@ -220,7 +216,7 @@ components:
     SourceRank:
       type: object
       properties:
-        id: 
+        id:
           type: number
         rank:
           type: string
