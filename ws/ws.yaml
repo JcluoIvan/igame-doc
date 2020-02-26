@@ -1797,7 +1797,7 @@ paths:
                         description: 售出後 game point 餘額 (int64)
   /55:
     post:
-      summary: 送出交換邀請
+      summary: 送出交換 / 同意交換 邀請
       tags:
         - All
         - Exchange
@@ -1826,63 +1826,36 @@ paths:
                       DATA:
                         type: object
                         example: (byte:*)
-                        description: 邀請某人 (json data)
-                        allOf:
-                          - $ref: '#/components/schemas/Member'
+                        description: 邀請某人 or 收到某人邀請交換 (json data)
+                        properties:
+                          status:
+                            type: string
+                            description: |
+                              - inviting # 已邀請對方(等待對方同意)
+                              - invited # 被邀請(等待同意)
+                              - ok # 同意邀請(雙方進入交換頁面)
+                            enum:
+                              - inviting # 已邀請對方(等待對方同意)
+                              - invited # 被邀請(等待同意)
+                              - ok # 同意邀請(雙方進入交換頁面)
+                          member:
+                            $ref: '#/components/schemas/Member'
   /56:
     post:
-      summary: 收到交換邀請
+      summary:  未設定
       tags:
-        - All
-        - Exchange
+        - None
       responses:
         200:
           description: ok
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/ResponseEventData'
-                  - type: object
-                    properties:
-                      DATA:
-                        type: object
-                        example: (byte:*)
-                        description: 來自某人的交換邀請 (json data)
-                        allOf:
-                          - $ref: '#/components/schemas/Member'
   /57:
     post:
-      summary: 接受交換邀請
+      summary: 未設定
       tags:
-        - All
-        - Exchange
-      requestBody:
-        content:
-          application/json:
-            schema:
-              allOf:
-                - $ref: '#/components/schemas/RequestEventData'
-                - type: object
-                  properties:
-                    ID:
-                      type: number
-                      example: (byte:8)
-                      description: 接受某玩家的交請 (uint64)
+        - None
       responses:
         200:
           description: ok
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/ResponseEventData'
-                  - type: object
-                    properties:
-                      ID:
-                        type: number
-                        example: (byte:8)
-                        description: 交換對象的 id , 若有問題即中斷 (uint64)
   /58:
     post:
       summary: 取消 / 中斷 / 拒絕交換邀請、狀態
@@ -1914,6 +1887,9 @@ paths:
                       ID:
                         type: number
                         description: 取消 / 中斷此交易的玩家
+                      REJECT_ID: 
+                        type: number
+                        description: 拒絕交換的玩家 ID (對方 or 自己)
   /59:
     post:
       summary: 交易密碼驗證 (取得交易 token)
@@ -1965,6 +1941,9 @@ paths:
                       example: (byte:*)
                       description: 提交交換內容 (json data)
                       properties:
+                        id:
+                          type: number
+                          description: 交易對象 id
                         step:
                           $ref: '#/components/schemas/ExchangeStep'
                         gamePoint: 
@@ -2685,13 +2664,17 @@ components:
     ExchangeStep:
       type: number
       description: |
-        - 1 # 同意邀請
-        - 2 # 鎖定內容
-        - 3 # 確定交換
+        - 0 # 等待雙方同意
+        - 1 # 交換密碼驗證
+        - 2 # 選擇道具、點數
+        - 3 # 鎖定內容
+        - 4 # 確定交換
       enum:
-        - 1 # 同意邀請
-        - 2 # 鎖定內容
-        - 3 # 確定交換
+        - 0 # 等待雙方同意
+        - 1 # 交換密碼驗證
+        - 2 # 選擇道具、點數
+        - 3 # 鎖定內容
+        - 4 # 確定交換
     ExchangeContent: 
       type: object
       properties:

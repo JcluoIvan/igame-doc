@@ -1635,6 +1635,7 @@ paths:
                         type: array
                         items:
                           $ref: '#/components/schemas/ModelCommondityItem'
+                          
     post:
       summary: 新增(道具)商店道具
       tags:
@@ -1677,7 +1678,7 @@ paths:
       responses:
         204:
           description: ok
-  /stores/{sid}/items/{aid}:
+  /stores/{sid}/items/{iid}:
     parameters:
       - in: path
         name: sid
@@ -3651,6 +3652,10 @@ components:
         price:
           type: number
           description: 貼圖包商品價格
+        updatedAt:
+          $ref: '#/components/schemas/UpdatedAt'
+        createdAt:
+          $ref: '#/components/schemas/CreatedAt'
 
     DataRank:
       type: object
