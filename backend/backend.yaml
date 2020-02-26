@@ -2352,11 +2352,6 @@ paths:
       tags:
         - ImageManager
       parameters:
-        - $ref: '#/components/parameters/QueryPage' 
-        - $ref: '#/components/parameters/QuerySize' 
-        - $ref: '#/components/parameters/QuerySorts' 
-        - $ref: '#/components/parameters/QueryEnabled'
-        - $ref: '#/components/parameters/QueryAvatarSkinType'
         - in: query
           name: dirPath
           description: 圖片路徑
