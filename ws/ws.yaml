@@ -1056,10 +1056,12 @@ paths:
                 - $ref: '#/components/schemas/RequestEventData'
                 - type: object
                   properties:
-                    MAIL_ID:
-                      type: number
-                      example: (byte:8)
-                      description: mail id (uint64)
+                    IDS: 
+                      type: array
+                      example: (byte:*)
+                      description: mail ids (json data)
+                      items:
+                        type: number
       responses:
         200:
           description: ok
@@ -1480,17 +1482,11 @@ paths:
                   - type: object
                     properties:
                       DATA: 
-                        type: object
+                        type: array
                         example: (byte:*)
-                        description: player list (json data)
-                        allOf:
-                          - $ref: '#/components/schemas/ResponseList'
-                          - type: object
-                            properties:
-                              rows:
-                                type: array
-                                items: 
-                                  $ref: '#/components/schemas/Member'
+                        description: 玩家列表 (json data)
+                        items:
+                          $ref: '#/components/schemas/Member'
   /45:
     post:
       summary: 進入 / 離開聊天室
@@ -1775,8 +1771,7 @@ paths:
                       example: (byte:*)
                       description: 售出的道具商品編號, 只有道具可賣出 (json data)
                       items:
-                        type: number
-                        description: 商品編號
+                        $ref: '#/components/schemas/Item'
       responses:
         200:
           description: ok
@@ -1904,6 +1899,10 @@ paths:
                 - $ref: '#/components/schemas/RequestEventData'
                 - type: object
                   properties:
+                    ID:
+                      type: number
+                      example: (byte:8)
+                      description: 交易對象 id
                     PASSWORD:
                       type: string
                       example: (byte:*)
@@ -2295,22 +2294,8 @@ components:
       properties:
         id: 
           type: number
-        name: 
-          type: string
-        key: 
-          type: string
-        transferable:
-          type: boolean
-          description: 是否可轉讓
-        description:
-          type: string
-          description: 道具描述
-        imageId:
+        numItems:
           type: number
-          description: 圖片編號
-        index:
-          type: number
-          description: 圖片位置  
     InviteStatus:
       type: number
       description: |
@@ -2587,6 +2572,9 @@ components:
     Store:
       type: object
       properties: 
+        id: 
+          type: number
+          description: 商店 id
         name: 
           type: string
           description: 商店名稱
