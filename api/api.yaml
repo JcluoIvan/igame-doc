@@ -38,7 +38,7 @@ servers:
   - url: "http://demo.project-host.net/v1"
     description: 測試伺服器網址
 tags:
-  - name: Update-0.0.8
+  - name: Update-0.0.9
     description: 部分 API 更新&修正
   - name: Common
     description: 共用 API
@@ -48,6 +48,8 @@ tags:
     description: 老虎機遊戲類型
   - name: Table
     description: Table Game 類型
+  - name: Update-0.0.8
+    description: 部分 API 更新&修正
   - name: Update-0.0.7
     description: 部分 API 更新&修正
   - name: Update-0.0.6
@@ -356,28 +358,37 @@ paths:
       summary: 使用道具 / 消費道具
       tags:
         - Common
+        - Update-0.0.9
         - Update-0.0.8
       description: |
+        #### Update-0.0.9
+        - 補上缺少的傳入參數
+          - sessionToken # 玩家必需在登入情況才允許使用
+          - memberToken # 玩家 token
+          - time # 時間參數
         #### Update-0.0.8
         - 新增API
       requestBody:
         content:
           application/json:
             schema:
-              type: object
               required:
                 - key
                 - numItems
-              properties:
-                key:
-                  type: string
-                  example: 3TimesFreeGame
-                  description: 道具代號
-                numItems:
-                  type: number
-                  example: 1
-                  minimum: 1
-                  description: 消費數量
+              allOf:
+                - $ref: "#/components/schemas/KeySessionToken"
+                - $ref: "#/components/schemas/RequestData"
+                - type: object
+                  properties:
+                    key:
+                      type: string
+                      example: 3TimesFreeGame
+                      description: 道具代號
+                    numItems:
+                      type: number
+                      example: 1
+                      minimum: 1
+                      description: 消費數量
 
       responses:
         200:

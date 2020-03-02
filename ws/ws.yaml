@@ -1882,7 +1882,7 @@ paths:
                       ID:
                         type: number
                         description: 取消 / 中斷此交易的玩家
-                      REJECT_ID: 
+                      CANCEL_BY: 
                         type: number
                         description: 拒絕交換的玩家 ID (對方 or 自己)
   /59:
@@ -1909,18 +1909,12 @@ paths:
                       description: 交易密碼
       responses:
         200:
-          description: ok
+          description: 無回傳值
           content:
             application/json:
               schema:
                 allOf:
                   - $ref: '#/components/schemas/ResponseEventData'
-                  - type: object
-                    properties:
-                      EXCHANGE_TOKEN:
-                        type: string
-                        example: (byte:*)
-                        description: 一次性 token 
   /60:
     post:
       summary: 更新交易狀態
@@ -1966,7 +1960,7 @@ paths:
                         example: (byte:*)
                         description: 交換內容 (json data)
                         items:
-                          $ref: '#/components/schemas/ExchangeContent'
+                          $ref: '#/components/schemas/ExchangeDetail'
   /61:
     post:
       summary: 交換完成
@@ -2663,7 +2657,7 @@ components:
         - 2 # 選擇道具、點數
         - 3 # 鎖定內容
         - 4 # 確定交換
-    ExchangeContent: 
+    ExchangeDetail: 
       type: object
       properties:
         id:
