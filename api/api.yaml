@@ -1015,11 +1015,14 @@ paths:
       - $ref: "#/components/parameters/ProviderPassword"
     post:
       tags:
+        - Update-0.0.10
         - Update-0.0.7
         - Update-0.0.3
         - Table
       summary: 遊戲開始時的保留額度
       description: |
+        #### Update-0.0.10
+        - 新增 E403013 `ResponseErrorReserveAlreadyExists` 錯誤回應
         #### Update-0.0.7
         - 新增 403 `ResponseErrorBetConflict` 錯誤
         #### Update-0.0.3
@@ -1095,6 +1098,7 @@ paths:
                   - $ref: "#/components/schemas/ResponseErrorGameNotFound"
                   - $ref: "#/components/schemas/ResponseErrorGameIsDisabled"
                   - $ref: "#/components/schemas/ResponseErrorBetConflict"
+                  - $ref: "#/components/schemas/ResponseErrorReserveAlreadyExists"
   /table/result:
     parameters:
       - $ref: "#/components/parameters/ProviderName"
@@ -1440,6 +1444,7 @@ components:
         - E403010 # 道具數量不足 (玩家無該道具)
         - E403011 # 遊戲獎勵已存在
         - E403012 # Jackpot 已存在
+        - E403013 # 保留額已存在
         ### 404
         - E404001 # 路徑不存在
         ### 405
@@ -1469,6 +1474,7 @@ components:
         - E403010 # 道具數量不足
         - E403011 # 遊戲獎勵已存在
         - E403012 # Jackpot 已存在
+        - E403013 # 保留額已存在
         ### 404
         - E404001 # 路徑不存在
         ### 405
@@ -1738,7 +1744,7 @@ components:
         message:
           type: string
           description: 錯誤原因、錯誤訊息
-          example: 道具數量不足
+          example: 遊戲獎勵已存在
     ResponseErrorJackpotAlreadyExists:
       description: Jackpot 已存在
       type: object
@@ -1750,7 +1756,19 @@ components:
         message:
           type: string
           description: 錯誤原因、錯誤訊息
-          example: 道具數量不足
+          example: Jackpot 已存在
+    ResponseErrorReserveAlreadyExists:
+      description: Reserve 已存在
+      type: object
+      properties:
+        code:
+          type: string
+          description: 錯誤編號 E403013, 參考 [ErrorCode](#model-ErrorCode)
+          example: E403013
+        message:
+          type: string
+          description: 錯誤原因、錯誤訊息
+          example: Reserve 已存在
   parameters:
     ProviderName:
       name: provider-name
