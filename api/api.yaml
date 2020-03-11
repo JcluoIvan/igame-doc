@@ -38,7 +38,7 @@ servers:
   - url: "http://demo.project-host.net/v1"
     description: 測試伺服器網址
 tags:
-  - name: Update-0.0.9
+  - name: Update-0.0.10
     description: 部分 API 更新&修正
   - name: Common
     description: 共用 API
@@ -48,6 +48,8 @@ tags:
     description: 老虎機遊戲類型
   - name: Table
     description: Table Game 類型
+  - name: Update-0.0.9
+    description: 部分 API 更新&修正
   - name: Update-0.0.8
     description: 部分 API 更新&修正
   - name: Update-0.0.7
@@ -635,10 +637,13 @@ paths:
       - $ref: "#/components/parameters/ProviderPassword"
     post:
       tags:
-        - Update-0.0.6
         - Slot
+        - Update-0.0.10
+        - Update-0.0.6
       summary: 遊戲獎勵
       description: |
+        #### Update-0.0.10
+        - 新增 E403011 bonus 已存在的錯誤回應
         #### Update-0.0.6
         - api path 由 `feature` 改為 `bonus` 易於辨識
       requestBody:
@@ -701,6 +706,7 @@ paths:
                   - $ref: "#/components/schemas/ResponseErrorMemberNotFound"
                   - $ref: "#/components/schemas/ResponseErrorGameNotFound"
                   - $ref: "#/components/schemas/ResponseErrorRoundNotFound"
+                  - $ref: "#/components/schemas/ResponseErrorBonusAlreadyExists"
   /slot/cancel:
     parameters:
       - $ref: "#/components/parameters/ProviderName"
@@ -765,8 +771,11 @@ paths:
       summary: 遊戲頭獎
       tags:
         - Slot
+        - Update-0.0.10
         - Update-0.0.8
       description: |
+        #### Update-0.0.10
+        - 新增 E403012 jackpot 已存在的錯誤回應
         #### Update-0.0.8
         - 新增API
       requestBody:
@@ -823,6 +832,7 @@ paths:
                   - $ref: "#/components/schemas/ResponseErrorMemberNotFound"
                   - $ref: "#/components/schemas/ResponseErrorGameNotFound"
                   - $ref: "#/components/schemas/ResponseErrorRoundNotFound"
+                  - $ref: "#/components/schemas/ResponseErrorJackpotAlreadyExists"
   /slot/result:
     parameters:
       - $ref: "#/components/parameters/ProviderName"
@@ -1428,6 +1438,8 @@ components:
         - E403008 # 道具不存在
         - E403009 # 道具無法使用(設定上非該遊戲可使用的道具)
         - E403010 # 道具數量不足 (玩家無該道具)
+        - E403011 # 遊戲獎勵已存在
+        - E403012 # Jackpot 已存在
         ### 404
         - E404001 # 路徑不存在
         ### 405
@@ -1455,6 +1467,8 @@ components:
         - E403008 # 道具不存在
         - E403009 # 道具無法使用(設定上非該遊戲可使用的道具)
         - E403010 # 道具數量不足
+        - E403011 # 遊戲獎勵已存在
+        - E403012 # Jackpot 已存在
         ### 404
         - E404001 # 路徑不存在
         ### 405
@@ -1702,13 +1716,37 @@ components:
           description: 錯誤原因、錯誤訊息
           example: 道具無法使用
     ResponseErrorInsufficientNumberOfItems:
-      description: 道具數量不足 (玩家無該道具)
+      description: 遊戲獎勵已存在
       type: object
       properties:
         code:
           type: string
           description: 錯誤編號 E403010, 參考 [ErrorCode](#model-ErrorCode)
           example: E403010
+        message:
+          type: string
+          description: 錯誤原因、錯誤訊息
+          example: 道具數量不足
+    ResponseErrorBonusAlreadyExists:
+      description: 遊戲獎勵已存在
+      type: object
+      properties:
+        code:
+          type: string
+          description: 錯誤編號 E403011, 參考 [ErrorCode](#model-ErrorCode)
+          example: E403011
+        message:
+          type: string
+          description: 錯誤原因、錯誤訊息
+          example: 道具數量不足
+    ResponseErrorJackpotAlreadyExists:
+      description: Jackpot 已存在
+      type: object
+      properties:
+        code:
+          type: string
+          description: 錯誤編號 E403012, 參考 [ErrorCode](#model-ErrorCode)
+          example: E403012
         message:
           type: string
           description: 錯誤原因、錯誤訊息
