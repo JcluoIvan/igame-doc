@@ -3056,6 +3056,62 @@ paths:
                               type: string
                             name:
                               type: string
+  /common/provider-games:
+    get:
+      summary: 查詢遊戲
+      tags:
+        - Common
+      description: |
+        ## 查詢提供商 (分頁)
+        - 預設依 username asc 排序
+      parameters:
+        - $ref: '#/components/parameters/QueryPage' 
+        - $ref: '#/components/parameters/QuerySize' 
+        - $ref: '#/components/parameters/QuerySorts' 
+        - $ref: '#/components/parameters/QueryEnabled'
+        - $ref: '#/components/parameters/QueryGameType'
+        - in: query
+          name: providerId
+          description: 提供商 id
+          schema: 
+            type: string
+        - in: query
+          name: name
+          description: 遊戲名稱
+          schema:
+            type: string   
+        - in: query
+          name: code
+          description: 遊戲代號
+          schema:
+            type: string 
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ResponseList'
+                  - type: object
+                    properties:
+                      rows:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: number
+                            imageId:
+                              type: number
+                            imageIndex:
+                              type: number
+                            name:
+                              type: string
+                            code: 
+                              type: string
+                            type:
+                              $ref: '#/components/schemas/GameType'
   /common/items:
     get:
       summary: 查詢道具

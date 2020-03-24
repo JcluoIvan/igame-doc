@@ -503,17 +503,22 @@ paths:
                     
   /17:
     post:
-      summary: 取得 email
+      summary: 設定交易密碼
       tags:
         - All
         - Personal
-      description: 僅會更新自己的 email 資料
       requestBody:
         content:
           application/json:
             schema:
                 allOf:
                   - $ref: "#/components/schemas/RequestEventData"
+                  - type: object
+                    properties:
+                      PASSWORD: 
+                        type: string
+                        example: (byte:*)
+                        description: 交易密碼
       responses:
         200:
           description: ok
@@ -524,10 +529,10 @@ paths:
                   - $ref: "#/components/schemas/ResponseEventData"
                   - type: object
                     properties:
-                      EMAIL:
-                        type: string
-                        example: (byte:*)
-                        description: 玩家 Email
+                      HAS_TRANSACTION_PASSWORD: 
+                        type: boolean
+                        example: (byte:1)
+                        description: 是否設定成功
   /18:
     post:
       summary: 更新玩家遊戲位置 (position)
