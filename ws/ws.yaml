@@ -258,7 +258,7 @@ paths:
                         type: string
   /9:
     post:
-      summary: 取得 Diamond Point
+      summary: 取得 點數 / 等級相關
       tags:
         - All
         - Home
@@ -278,16 +278,26 @@ paths:
                   - $ref: "#/components/schemas/ResponseEventMemberData"
                   - type: object
                     properties:
-                      DIAMOND_POINT:
-                        type: number                
-                        example: (byte:8)
-                        description: Diamond point (int64)                       
+                      DATA: 
+                        type: object
+                        example: (byte:*)
+                        description: 點數、等級相關資料 (json data) 
+                        properties:
+                          id: 
+                            type: number
+                          gamePoint:
+                            type: number
+                          diamondPoint:
+                            type: number
+                          level:
+                            type: number
+                          experience:
+                            type: number                   
   /10:
     post:
-      summary: 取得 Game Point
+      summary: 未使用
       tags:
-        - All
-        - Home
+        - None
       requestBody:
         description: 僅允許更新自己的點數
         content:
@@ -346,10 +356,9 @@ paths:
 
   /12:
     post:
-      summary: 取得 玩家等級 & 經驗值(Experience)
+      summary: 未使用
       tags:
-        - All
-        - Personal
+        - None
       requestBody:
         content:
           application/json:
