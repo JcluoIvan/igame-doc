@@ -258,7 +258,7 @@ paths:
                         type: string
   /9:
     post:
-      summary: 取得玩家點數、經驗值等資料
+      summary: 取得 點數 / 等級相關
       tags:
         - All
         - Home
@@ -363,10 +363,9 @@ paths:
 
   /12:
     post:
-      summary: 取得 玩家等級 & 經驗值(Experience)
+      summary: 未使用
       tags:
-        - All
-        - Personal
+        - None
       requestBody:
         content:
           application/json:
