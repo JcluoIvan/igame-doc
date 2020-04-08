@@ -258,7 +258,7 @@ paths:
                         type: string
   /9:
     post:
-      summary: 取得 Diamond Point
+      summary: 取得玩家點數、經驗值等資料
       tags:
         - All
         - Home
@@ -281,34 +281,51 @@ paths:
                       DIAMOND_POINT:
                         type: number                
                         example: (byte:8)
-                        description: Diamond point (int64)                       
+                        description: Diamond point (int64)      
+                      GAME_POINT:
+                        type: number
+                        example: (byte:8)
+                        description: Game Point (int64)          
+                      LEVEL:
+                        type: number
+                        example: (byte:4)
+                        description: Level (uint32)        
+                      EXPERIENCE:
+                        type: number
+                        example: (byte:8)
+                        description: Experience (uint64)        
   /10:
     post:
-      summary: 取得 Game Point
+      summary: 產生驗證碼，綁定 email
       tags:
         - All
-        - Home
+        - Personal
       requestBody:
-        description: 僅允許更新自己的點數
         content:
           application/json:
             schema:
               allOf:
                 - $ref: '#/components/schemas/RequestEventData'
+                - type: object
+                  properties:
+                    EMAIL: 
+                      type: string
+                      example: (byte:*)
+                      description: 綁定的 email
       responses:
         200:
-          description: 除了自己遊戲點數以外， server 也會主動通知其他玩家遊戲點數更新
+          description: ok
           content:
             application/json:
               schema:
                 allOf:
-                  - $ref: "#/components/schemas/ResponseEventMemberData"
+                  - $ref: "#/components/schemas/ResponseEventData"
                   - type: object
                     properties:
-                      GAME_POINT:
-                        type: number                
-                        example: (byte:8)
-                        description: Game point (int64)
+                      VERIFY_CODE:
+                        type: string
+                        example: (byte:*)
+                        description: 驗證碼
   /11:
     post:
       summary: 啟動遊戲
@@ -1082,7 +1099,7 @@ paths:
                               rows:
                                 type: array
                                 items: 
-                                  $ref: '#/components/schemas/MailRow'
+                                  $ref: '#/components/schemas/Mail'
   /32:
     post:
       summary: 取得信件內容
@@ -1101,6 +1118,13 @@ paths:
                       type: number
                       example: (byte:8)
                       description: mail id (uint64)
+                    READ:
+                      type: boolean
+                      example: (byte:1)
+                      description: |
+                        是否已讀信件 
+                        PS: 只會觸發「已讀」的更新, 傳 false 只是不會處理, 並不會將其改為「未讀」
+
       responses:
         200:
           description: ok
@@ -1116,13 +1140,12 @@ paths:
                         example: (byte:*)
                         description: mail 完整內容
                         allOf:
-                          - $ref: '#/components/schemas/MailDetail'
+                          - $ref: '#/components/schemas/Mail'
   /33:
     post:
-      summary: 已讀信件
+      summary: 未使用
       tags:
-        - All
-        - Mail
+        - None
       requestBody:
         content:
           application/json:
@@ -2570,7 +2593,7 @@ components:
       enum:
         - 1 # 一般通知訊息
         - 2 # 獎勵訊息
-    MailRow: 
+    Mail: 
       type: object
       properties:
         id:
@@ -2579,6 +2602,19 @@ components:
           type: string
         type:
           $ref: '#/components/schemas/MailType'
+        content:
+          type: string
+        annexs:
+          type: array
+          items:
+            type: object
+            properties:
+              id: 
+                type: number
+                description: 道具 id
+              numItems:
+                type: number
+                description: 道具數量
         readedAt:
           type: number
           description: 已讀時間
@@ -2591,25 +2627,6 @@ components:
         createdAt:
           type: number
           description: 建立時間
-    MailDetail:
-      type: object
-      allOf:
-        - $ref: '#/components/schemas/MailRow'
-        - type: object
-          properties:
-            content:
-              type: string
-            annexs:
-              type: array
-              items:
-                type: object
-                properties:
-                  id: 
-                    type: number
-                    description: 道具 id
-                  numItems:
-                    type: number
-                    description: 道具數量
  
     MessageType:
       type: number
