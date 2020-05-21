@@ -38,7 +38,7 @@ servers:
   - url: "http://demo.project-host.net/v1"
     description: 測試伺服器網址
 tags:
-  - name: Update-0.0.11
+  - name: Update-0.0.12
   - name: Common
     description: 共用 API
   - name: Multiplayer
@@ -47,6 +47,8 @@ tags:
     description: 老虎機遊戲類型
   - name: Table
     description: Table Game 類型
+  - name: Update-0.0.11
+  - name: Common
   - name: Update-0.0.10
     description: 部分 API 更新&修正
   - name: Update-0.0.9
@@ -1063,9 +1065,12 @@ paths:
       - $ref: "#/components/parameters/ProviderPassword"
     post:
       tags:
+        - Update-0.0.12
         - Table
       summary: 開獎
       description: |
+        #### Update-0.0.12
+        - 修正 ResultAmount 為該局結果，詳細請參考說明
         #### Update-0.0.11
         - 後端不再驗證額度正確性 (移除 E400002, E400003 錯誤回傳)
         #### Update-0.0.7
@@ -1093,9 +1098,17 @@ paths:
                     resultAmount:
                       type: number
                       description: |
-                        - 玩家獲得總額
-                        - 若有使用 保留額度(reserve) 時，必需符合下列條件
-                        > resultAmount = reserveAmount - betAmount + winAmount
+                        - 玩家結果 (winAmount - betAmount)
+                        - 保留額由平台自動加回, 不需要加到 resultAmount 中
+                        - 例：
+                        - ===== lost 100 =====
+                        - BetAmount: 100
+                        - WinAmount: 0
+                        - ResultAmount: -100 <i>(0 - 100)</i>
+                        - ===== win 100 =====
+                        - BetAmount: 100
+                        - WinAmount: 200
+                        - ResultAmount: 100 <i>(200 - 100)</i>
                     resultAt:
                       $ref: "#/components/schemas/UnixTime"
                     betAmount:
