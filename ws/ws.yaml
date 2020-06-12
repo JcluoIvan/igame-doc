@@ -54,7 +54,7 @@ tags:
 paths:
   /1:
     post:
-      summary: 心跳確認
+      summary: 系統參數
       tags:
         - All
         - Home
@@ -74,12 +74,25 @@ paths:
                   - $ref: '#/components/schemas/ResponseEventData'
   /2:
     post:
-      summary: 功能從缺
+      summary: 更新是否在線
       tags:
-        - None
+        - All
+        - Home
       responses:
         200:
           description: ok
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/RequestEventMemberData'
+                  - type: object 
+                    properties:
+                      ONLINE:
+                        type: boolean
+                        example: (byte:1)
+                        description: 玩家是否離線
+
   /3:
     post:
       summary: 關注 / 取消關注
@@ -363,15 +376,10 @@ paths:
 
   /12:
     post:
-      summary: 未使用
+      summary: 多人遊戲狀態通知 (切換邀請他人模式)
       tags:
-        - None
-      requestBody:
-        content:
-          application/json:
-            schema:
-                allOf:
-                  - $ref: "#/components/schemas/RequestEventData"
+        - All
+        - Home
       responses:
         200:
           description: ok
@@ -382,14 +390,18 @@ paths:
                   - $ref: "#/components/schemas/ResponseEventMemberData"
                   - type: object
                     properties:
-                      LEVEL:
-                        type: number
-                        example: (byte:4)
-                        description: 經驗值(uint32)
-                      EXPERIENCE:
+                      GAME_ID:
                         type: number
                         example: (byte:8)
-                        description: 經驗值(uint64)
+                        description: 遊戲 id (uint64)
+                      SECONDS:
+                        type: number
+                        example: (byte:4)
+                        description: 有效時間 (uint32)
+                      ROOM:
+                        type: string
+                        example: (byte:*)
+                        description: 房間代號
   /13:
     post:
       summary: 綁定 Email
@@ -531,10 +543,20 @@ paths:
                   - $ref: "#/components/schemas/RequestEventData"
                   - type: object
                     properties:
-                      PASSWORD: 
-                        type: string
+                      DATA: 
+                        type: object
                         example: (byte:*)
-                        description: 交易密碼
+                        description: 設定資料(json)
+                        properties:
+                          password:
+                            type: string
+                            description: 登入密碼
+                          oPassword:
+                            type: string
+                            description: 舊的交換密碼(第一次設定時為空值)
+                          nPassword:
+                            type: string
+                            description: 新的交換密碼
       responses:
         200:
           description: ok
@@ -1964,6 +1986,11 @@ paths:
                       type: number
                       example: (byte:8)
                       description: 交易對象 id
+                    INITIATE:
+                      type: boolean
+                      example: (byte:1)
+                      description: 是否為發起交換請求 (否則為同意交換請求)
+                    
       responses:
         200:
           description: ok
@@ -1993,20 +2020,92 @@ paths:
                             $ref: '#/components/schemas/Member'
   /56:
     post:
-      summary:  未設定
+      summary: 發出遊戲邀請
       tags:
-        - None
+        - All
+        - Home
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                PLAYER_ID:
+                  type: number
+                  example: (byte:8) 
+                  description: 邀請對象 id
+                ROOM:
+                  type: string
+                  example: (byte:*)
+                  description: 房間代號
+
       responses:
         200:
           description: ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  PLAYER_ID:
+                    type: number
+                    example: (byte:8)
+                    description: 邀請對象 id
+                  INVITE_STATUS:
+                    type: number
+                    example: (byte:1)
+                    description: 邀請狀態
+                    enum:
+                      - 0 # waiting 
+                      - 1 # 同意
+                      - 2 # 拒絕
+                  ROOM:
+                    type: string
+                    example: (byte:*)
+                    description: 房間代號
   /57:
     post:
-      summary: 未設定
+      summary: 收到遊戲邀請 / 同意邀請 / 拒絕邀請
       tags:
         - None
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ACCEPT:
+                  type: boolean
+                  example: (byte:1)
+                  description: 是否接受遊戲邀請
+                ROOM:
+                  type: string
+                  example: (byte:*)
+                  description: 房間代號
+              
       responses:
         200:
           description: ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  DATA:
+                    type: object
+                    example: (byte:*)
+                    properties:
+                      from:
+                        $ref: '#/components/schemas/Member'
+                      gameId: 
+                        type: number
+                      seconds:
+                        type: number
+                        description: 有效秒數
+                      room: 
+                        type: string
+                      
+
   /58:
     post:
       summary: 取消 / 中斷 / 拒絕交換邀請、狀態
@@ -2085,6 +2184,10 @@ paths:
                 - $ref: '#/components/schemas/RequestEventData'
                 - type: object
                   properties:
+                    ID:
+                      type: number
+                      example: (byte:8)
+                      description: 交易對象 id
                     DATA: 
                       type: object
                       example: (byte:*)
@@ -2099,7 +2202,7 @@ paths:
                           type: number
                         itemId:
                           type: number
-                        numItem:  
+                        numItems:  
                           type: number
       responses:
         200:
