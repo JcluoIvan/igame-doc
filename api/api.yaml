@@ -38,6 +38,8 @@ servers:
   - url: "http://demo.project-host.net/v1"
     description: 測試伺服器網址
 tags:
+  - name: Update-0.1.1
+    description: 補上部分缺少
   - name: Update-0.1.0
     description: 整合 API 功能
   - name: Common
@@ -752,9 +754,11 @@ paths:
     post:
       tags:
         - GameAPI
-        - Update-0.1.0
+        - Update-0.1.1
       summary: 開獎
       description: |
+        #### Update-0.1.1
+        - 補上 betAmount 
         #### Update-0.1.0
         - 整合 api , 代替 `/slot/result` 與 `/table/result`
         - 新增 403014 `ResponseErrorRoundAlreadyClosed` 錯誤
@@ -778,10 +782,27 @@ paths:
                   properties:
                     resultAmount:
                       type: number
-                      description: 玩家獲得總額 (resultAmount = winAmount + bonusAmount - betAmount)
+                      description: |
+                        - 玩家結果 (winAmount - betAmount)
+                        - 保留額由平台自動加回, 不需要加到 resultAmount 中
+                        - 例：
+                        - ===== lost 100 =====
+                        - BetAmount: 100
+                        - WinAmount: 0
+                        - ResultAmount: -100 <i>(0 - 100)</i>
+                        - ===== win 100 =====
+                        - BetAmount: 100
+                        - WinAmount: 200
+                        - ResultAmount: 100 <i>(200 - 100)</i>
+                        玩家獲得總額 (resultAmount = winAmount + jackpotAmount + bonusAmount - betAmount + (其他原因扣款))
+                    betAmount:
+                      type: number
+                      description: |
+                        - 下注總額 (不會用來計算錢包，相當於有效額度)
+                        - `當此局有使用 保留額度(reserve) 時，為必填`
                     winAmount:
                       type: number
-                      description: 中獎金額(含彩池)
+                      description: 中獎金額
                     detail:
                       type: string
                       description: 下注內容、牌型
