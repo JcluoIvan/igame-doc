@@ -38,6 +38,8 @@ servers:
   - url: "http://demo.project-host.net/v1"
     description: 測試伺服器網址
 tags:
+  - name: Update-0.1.2
+    description: 新增 API - Marquee
   - name: Update-0.1.1
     description: 補上部分缺少
   - name: Update-0.1.0
@@ -54,7 +56,6 @@ tags:
     description: Table Game 類型
   - name: Update-0.0.12
   - name: Update-0.0.11
-  - name: Common
   - name: Update-0.0.10
     description: 部分 API 更新&修正
   - name: Update-0.0.9
@@ -309,6 +310,41 @@ paths:
                   - $ref: "#/components/schemas/ResponseErrorItemNotFound"
                   - $ref: "#/components/schemas/ResponseErrorItemNotAllowedUse"
                   - $ref: "#/components/schemas/ResponseErrorInsufficientNumberOfItems"
+  /broadcast:
+    parameters:
+      - $ref: "#/components/parameters/ProviderName"
+      - $ref: "#/components/parameters/ProviderPassword"
+    post:
+      tags:
+        - Common
+        - Update-0.1.2
+      description: |
+        #### Update-0.1.2
+        - 新增 api 
+      summary: 廣播跑馬燈訊息
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message: 
+                  type: string
+      responses:
+        204:
+          description: OK (no-content)
+        401:
+          description: 401 Error
+          content:
+            application/json:
+              schema:
+                type: object
+                example: 請參考 Schema
+                oneOf:
+                  - $ref: "#/components/schemas/ResponseErrorDirectIPAccessNotAllowed"
+                  - $ref: "#/components/schemas/ResponseErrorProviderNotFound"
+                  - $ref: "#/components/schemas/ResponseErrorIncorrectProviderPassword"
+                  - $ref: "#/components/schemas/ResponseErrorProviderIsDisabled"
 
   /multiplayer/create:
     parameters:
