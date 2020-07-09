@@ -236,7 +236,64 @@ paths:
                 example: "請參考 schema"
                 oneOf:
                   - $ref: "#/components/schemas/ResponseErrorMemberNotFound"
-  /item/use:
+  /items/all:
+    parameters:
+      - $ref: "#/components/parameters/ProviderName"
+      - $ref: "#/components/parameters/ProviderPassword"
+    post:
+      summary: 取得該遊戲相關的道具數量
+      tags:
+        - Common
+      description: |
+        #### Update-0.0.8
+        - 新增API
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - game
+              allOf:
+                - $ref: "#/components/schemas/KeySessionToken"
+                - $ref: "#/components/schemas/RequestData"
+                - $ref: "#/components/schemas/KeyGame"
+
+      responses:
+        200:
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GameItem"
+        401:
+          description: 401 Error
+          content:
+            application/json:
+              schema:
+                type: object
+                example: 請參考 Schema
+                oneOf:
+                  - $ref: "#/components/schemas/ResponseErrorDirectIPAccessNotAllowed"
+                  - $ref: "#/components/schemas/ResponseErrorProviderNotFound"
+                  - $ref: "#/components/schemas/ResponseErrorIncorrectProviderPassword"
+                  - $ref: "#/components/schemas/ResponseErrorProviderIsDisabled"
+                  - $ref: "#/components/schemas/ResponseErrorIncorrectSessionToken"
+        403:
+          description: 403 Error
+          content:
+            application/json:
+              schema:
+                type: object
+                example: 請參考 Schema
+                oneOf:
+                  - $ref: "#/components/schemas/ResponseErrorMemberNotFound"
+                  - $ref: "#/components/schemas/ResponseErrorMemberIsDisabled"
+                  - $ref: "#/components/schemas/ResponseErrorMemberInsufficientBalance"
+                  - $ref: "#/components/schemas/ResponseErrorGameNotFound"
+                  - $ref: "#/components/schemas/ResponseErrorGameIsDisabled"
+  
+
+  /items/use:
     parameters:
       - $ref: "#/components/parameters/ProviderName"
       - $ref: "#/components/parameters/ProviderPassword"
@@ -260,10 +317,12 @@ paths:
             schema:
               required:
                 - key
+                - game
                 - numItems
               allOf:
                 - $ref: "#/components/schemas/KeySessionToken"
                 - $ref: "#/components/schemas/RequestData"
+                - $ref: "#/components/schemas/KeyGame"
                 - type: object
                   properties:
                     key:
@@ -310,8 +369,8 @@ paths:
                   - $ref: "#/components/schemas/ResponseErrorGameNotFound"
                   - $ref: "#/components/schemas/ResponseErrorGameIsDisabled"
                   - $ref: "#/components/schemas/ResponseErrorItemNotFound"
-                  - $ref: "#/components/schemas/ResponseErrorItemNotAllowedUse"
-                  - $ref: "#/components/schemas/ResponseErrorInsufficientNumberOfItems"
+                  - $ref: "#/components/schemas/ResponseErrorItemDisabled"
+                  - $ref: "#/components/schemas/ResponseErrorInsufficientItem"
   /broadcast:
     parameters:
       - $ref: "#/components/parameters/ProviderName"
@@ -2219,7 +2278,7 @@ components:
           type: string
           description: 錯誤原因、錯誤訊息
           example: 道具不存在
-    ResponseErrorItemNotAllowedUse:
+    ResponseErrorItemDisabled:
       description: 道具無法使用(設定上非該遊戲可使用的道具)
       type: object
       properties:
@@ -2231,7 +2290,7 @@ components:
           type: string
           description: 錯誤原因、錯誤訊息
           example: 道具無法使用
-    ResponseErrorInsufficientNumberOfItems:
+    ResponseErrorInsufficientItem:
       description: 遊戲獎勵已存在
       type: object
       properties:
