@@ -46,34 +46,12 @@ tags:
     description: 多人連線 API
   - name: GameAPI
     description: 共用 API
-  - name: Slot
-    description: 老虎機遊戲類型
-  - name: Table
-    description: Table Game 類型
   - name: Update-0.1.2
     description: 新增 API - Marquee
   - name: Update-0.1.1
     description: 補上部分缺少
   - name: Update-0.1.0
     description: 整合 API 功能
-  - name: Update-0.0.12
-  - name: Update-0.0.11
-  - name: Update-0.0.10
-    description: 部分 API 更新&修正
-  - name: Update-0.0.9
-    description: 部分 API 更新&修正
-  - name: Update-0.0.8
-    description: 部分 API 更新&修正
-  - name: Update-0.0.7
-    description: 部分 API 更新&修正
-  - name: Update-0.0.6
-    description: 部分 API 更新&修正
-  - name: Update-0.0.5
-    description: 部分 API 更新&修正
-  - name: Update-0.0.4
-    description: 部分 API 更新&修正
-  - name: Update-0.0.3
-    description: 部分 API 更新&修正
 paths:
   /auth:
     parameters:
@@ -244,8 +222,9 @@ paths:
       summary: 取得該遊戲相關的道具數量
       tags:
         - Common
+        - Update-0.1.3
       description: |
-        #### Update-0.0.8
+        #### Update-0.1.3
         - 新增API
       requestBody:
         content:
@@ -301,9 +280,10 @@ paths:
       summary: 使用道具 / 消費道具
       tags:
         - Common
-        - Update-0.0.9
-        - Update-0.0.8
+        - Update-0.1.3
       description: |
+        #### Update-0.1.3
+        - 新增傳入參數、回傳參數
         #### Update-0.0.9
         - 補上缺少的傳入參數
           - sessionToken # 玩家必需在登入情況才允許使用
@@ -341,7 +321,15 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GameItem"
+                allOf:
+                  - $ref: "#/components/schemas/GameItem"
+                  - type: object
+                    properties:
+                      effect: 
+                        type: number
+                        example: 5500
+                        description: 消費道具後的效果序號
+
         401:
           description: 401 Error
           content:
@@ -371,6 +359,7 @@ paths:
                   - $ref: "#/components/schemas/ResponseErrorItemNotFound"
                   - $ref: "#/components/schemas/ResponseErrorItemDisabled"
                   - $ref: "#/components/schemas/ResponseErrorInsufficientItem"
+
   /broadcast:
     parameters:
       - $ref: "#/components/parameters/ProviderName"
@@ -379,7 +368,6 @@ paths:
       tags:
         - Common
         - Update-0.1.3
-        - Update-0.1.2
       description: |
         #### Update-0.1.3
         - 新增參數 [excludeMemberToken] , 指定某玩家忽略此則訊息
@@ -401,7 +389,9 @@ paths:
                     type: string
                     minLength: 64
                     maxLength: 64
-                    description: 玩家唯一編號 (sha256 string)
+                    description: |
+                      忽略通知指定的玩家, 最多設定 50人
+                      [... 玩家唯一編號 (sha256 string) ]
       responses:
         204:
           description: OK (no-content)
@@ -425,7 +415,6 @@ paths:
     post:
       tags:
         - Multiplayer
-        - Update-0.0.3
       summary: 多人連線建立房間
       description: |
         #### Update-0.0.3
@@ -492,8 +481,10 @@ paths:
     post:
       tags:
         - GameAPI
-        - Update-0.1.0
+        - Update-0.1.3
       description: |
+        #### Update-0.1.3
+        - 新增道具效果參數 `effect`
         #### Update-0.1.0
         - 整合 api , 代替 `/slot/bet` 與 `/table/bet`
       summary: 下注
@@ -511,8 +502,8 @@ paths:
                 - $ref: "#/components/schemas/KeySessionToken"
                 - $ref: "#/components/schemas/RequestData"
                 - $ref: "#/components/schemas/KeyTransactionID"
-                - $ref: "#/components/schemas/KeyRound"
                 - $ref: "#/components/schemas/KeyGame"
+                - $ref: "#/components/schemas/KeyRound"
                 - type: object
                   properties:
                     betAmount:
@@ -524,6 +515,10 @@ paths:
                       type: string
                       description: 玩家下注時的 IP
                       example: "127.0.0.1"
+                    effect:
+                      type: number
+                      description: 此局套用的效果參數
+                      example: 5500
       responses:
         200:
           description: OK
@@ -567,9 +562,11 @@ paths:
     post:
       tags:
         - GameAPI
-        - Update-0.1.0
+        - Update-0.1.3
       summary: 遊戲開始時的保留額度
       description: |
+        #### Update-0.1.3
+        - 新增道具效果參數 `effect`
         #### Update-0.1.0
         - 整合 api , 代替 `/table/reserve`
         - 新增 403014 `ResponseErrorRoundAlreadyClosed` 錯誤
@@ -607,6 +604,10 @@ paths:
                       type: string
                       description: 玩家保留額度時的 IP
                       example: "127.0.0.1"
+                    effect:
+                      type: number
+                      description: 此局套用的效果參數
+                      example: 5500
       responses:
         200:
           description: OK
@@ -1020,818 +1021,6 @@ paths:
                   - $ref: "#/components/schemas/ResponseErrorGameNotFound"
                   - $ref: "#/components/schemas/ResponseErrorRoundNotFound"
                   - $ref: '#/components/schemas/ResponseErrorRoundAlreadyClosed'
-
-  /slot/bet:
-    parameters:
-      - $ref: "#/components/parameters/ProviderName"
-      - $ref: "#/components/parameters/ProviderPassword"
-    post:
-      tags:
-        - Slot
-        - Update-0.1.0
-        - Update-0.0.3
-      description: |
-        #### Update-0.1.0
-        - 即將棄用, 請改用 `[/bet](#/API/post_game_bet)` 代替
-        #### Update-0.0.3
-        - 新增 403 回傳錯誤
-          - 遊戲已用
-      summary: 下注 (即將棄用)
-      requestBody:
-        content:
-          application/json:
-            schema:
-              required:
-                - id
-                - round
-                - game
-                - betAmount
-                - betAt
-              allOf:
-                - $ref: "#/components/schemas/KeySessionToken"
-                - $ref: "#/components/schemas/RequestData"
-                - $ref: "#/components/schemas/KeyTransactionID"
-                - $ref: "#/components/schemas/KeyRound"
-                - $ref: "#/components/schemas/KeyGame"
-                - type: object
-                  properties:
-                    betAmount:
-                      type: number
-                      description: 注額
-                    betAt:
-                      $ref: "#/components/schemas/UnixTime"
-                    ip:
-                      type: string
-                      description: 玩家下注時的 IP
-                      example: "127.0.0.1"
-      responses:
-        200:
-          description: OK
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: "#/components/schemas/TransactionResponse"
-        401:
-          description: 401 Error
-          content:
-            application/json:
-              schema:
-                type: object
-                example: 請參考 Schema
-                oneOf:
-                  - $ref: "#/components/schemas/ResponseErrorDirectIPAccessNotAllowed"
-                  - $ref: "#/components/schemas/ResponseErrorProviderNotFound"
-                  - $ref: "#/components/schemas/ResponseErrorIncorrectProviderPassword"
-                  - $ref: "#/components/schemas/ResponseErrorProviderIsDisabled"
-                  - $ref: "#/components/schemas/ResponseErrorIncorrectSessionToken"
-        403:
-          description: 403 Error
-          content:
-            application/json:
-              schema:
-                type: object
-                example: 請參考 Schema
-                oneOf:
-                  - $ref: "#/components/schemas/ResponseErrorMemberNotFound"
-                  - $ref: "#/components/schemas/ResponseErrorMemberIsDisabled"
-                  - $ref: "#/components/schemas/ResponseErrorMemberInsufficientBalance"
-                  - $ref: "#/components/schemas/ResponseErrorGameNotFound"
-                  - $ref: "#/components/schemas/ResponseErrorGameIsDisabled"
-  /slot/bonus:
-    parameters:
-      - $ref: "#/components/parameters/ProviderName"
-      - $ref: "#/components/parameters/ProviderPassword"
-    post:
-      tags:
-        - Slot
-        - Update-0.1.0
-        - Update-0.0.10
-        - Update-0.0.6
-      summary: 遊戲獎勵 (即將棄用)
-      description: |
-        #### Update-0.1.0
-        - 即將棄用, 請改用 `[/bet](#/API/post_game_bet)` 代替
-        #### Update-0.0.10
-        - 新增 E403011 bonus 已存在的錯誤回應
-        #### Update-0.0.6
-        - api path 由 `feature` 改為 `bonus` 易於辨識
-      requestBody:
-        description: |
-          - `必需` 在遊戲局 `開獎` 之前完成，否則將被拒絕
-          - 基本只要未結算的單就會無條件接受此請求(即使玩家被停用也會接受)
-          - 若發生錯誤可直接鎖定遊戲，正常流程上應該是不會錯誤
-        content:
-          application/json:
-            schema:
-              required:
-                - id
-                - round
-                - game
-                - type
-                - bonus
-                - bonusAt
-              allOf:
-                - $ref: "#/components/schemas/RequestData"
-                - $ref: "#/components/schemas/KeyTransactionID"
-                - $ref: "#/components/schemas/KeyRound"
-                - $ref: "#/components/schemas/KeyGame"
-                - type: object
-                  properties:
-                    type:
-                      $ref: "#/components/schemas/SlotBonusType"
-                    bonus:
-                      type: number
-                      description: 派發額度
-                    bonusAt:
-                      $ref: "#/components/schemas/UnixTime"
-      responses:
-        200:
-          description: OK
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: "#/components/schemas/TransactionResponse"
-        401:
-          description: 401 Error
-          content:
-            application/json:
-              schema:
-                type: object
-                example: 請參考 Schema
-                oneOf:
-                  - $ref: "#/components/schemas/ResponseErrorDirectIPAccessNotAllowed"
-                  - $ref: "#/components/schemas/ResponseErrorProviderNotFound"
-                  - $ref: "#/components/schemas/ResponseErrorIncorrectProviderPassword"
-                  - $ref: "#/components/schemas/ResponseErrorProviderIsDisabled"
-        403:
-          description: 403 Error
-          content:
-            application/json:
-              schema:
-                type: object
-                example: 請參考 Schema
-                oneOf:
-                  - $ref: "#/components/schemas/ResponseErrorMemberNotFound"
-                  - $ref: "#/components/schemas/ResponseErrorGameNotFound"
-                  - $ref: "#/components/schemas/ResponseErrorRoundNotFound"
-                  - $ref: "#/components/schemas/ResponseErrorBonusAlreadyExists"
-  /slot/cancel:
-    parameters:
-      - $ref: "#/components/parameters/ProviderName"
-      - $ref: "#/components/parameters/ProviderPassword"
-    post:
-      tags:
-        - Slot
-        - Update-0.1.0
-        - Update-0.0.11
-      summary: 取消 (即將棄用)
-      description: |
-        ## 取消此局遊戲，若是已結算(完成)的遊戲局無法 `取消`
-        #### Update-0.1.0
-        - 即將棄用, 請改用 `[/bet](#/API/post_game_cancel)` 代替
-        #### Update-0.0.11
-        - 新增 id 參數
-
-      requestBody:
-        content:
-          application/json:
-            schema:
-              required:
-                - id
-                - game
-                - round
-                - cancelAt
-              allOf:
-                - $ref: "#/components/schemas/RequestData"
-                - $ref: "#/components/schemas/KeyTransactionID"
-                - $ref: "#/components/schemas/KeyGame"
-                - $ref: "#/components/schemas/KeyRound"
-                - type: object
-                  properties:
-                    cancelAt:
-                      $ref: "#/components/schemas/UnixTime"
-      responses:
-        200:
-          description: OK
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: "#/components/schemas/TransactionResponse"
-        401:
-          description: 401 Error
-          content:
-            application/json:
-              schema:
-                type: object
-                example: 請參考 Schema
-                oneOf:
-                  - $ref: "#/components/schemas/ResponseErrorDirectIPAccessNotAllowed"
-                  - $ref: "#/components/schemas/ResponseErrorProviderNotFound"
-                  - $ref: "#/components/schemas/ResponseErrorIncorrectProviderPassword"
-                  - $ref: "#/components/schemas/ResponseErrorProviderIsDisabled"
-        403:
-          description: 403 Error
-          content:
-            application/json:
-              schema:
-                type: object
-                example: 請參考 Schema
-                oneOf:
-                  - $ref: "#/components/schemas/ResponseErrorMemberNotFound"
-                  - $ref: "#/components/schemas/ResponseErrorGameNotFound"
-                  - $ref: "#/components/schemas/ResponseErrorRoundNotFound"
-  /slot/jackpot:
-    parameters:
-      - $ref: "#/components/parameters/ProviderName"
-      - $ref: "#/components/parameters/ProviderPassword"
-    post:
-      tags:
-        - Slot
-        - Update-0.1.0
-        - Update-0.0.11
-        - Update-0.0.10
-        - Update-0.0.8
-      summary: 遊戲頭獎 (即將棄用)
-      description: |
-        - `必需` 在遊戲局 `開獎` 之前完成，否則將被拒絕
-        - 每局僅有一次 jackpot 的產生
-        #### Update-0.1.0
-        - 即將棄用, 請改用 `[/bet](#/API/post_game_jackpot)` 代替
-        #### Update-0.0.11
-        - 新增傳入參數 jackpotAt
-        #### Update-0.0.10
-        - 新增 E403012 jackpot 已存在的錯誤回應
-        #### Update-0.0.8
-        - 新增API
-      requestBody:
-        content:
-          application/json:
-            schema:
-              required:
-                - id
-                - round
-                - game
-                - type
-                - jackpot
-              allOf:
-                - $ref: "#/components/schemas/RequestData"
-                - $ref: "#/components/schemas/KeyTransactionID"
-                - $ref: "#/components/schemas/KeyRound"
-                - $ref: "#/components/schemas/KeyGame"
-                - type: object
-                  properties:
-                    jackpot:
-                      type: number
-                      description: 中獎額度
-                    jackpotAt:
-                      $ref: "#/components/schemas/UnixTime"
-      responses:
-        200:
-          description: OK
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: "#/components/schemas/TransactionResponse"
-        401:
-          description: 401 Error
-          content:
-            application/json:
-              schema:
-                type: object
-                example: 請參考 Schema
-                oneOf:
-                  - $ref: "#/components/schemas/ResponseErrorDirectIPAccessNotAllowed"
-                  - $ref: "#/components/schemas/ResponseErrorProviderNotFound"
-                  - $ref: "#/components/schemas/ResponseErrorIncorrectProviderPassword"
-                  - $ref: "#/components/schemas/ResponseErrorProviderIsDisabled"
-        403:
-          description: 403 Error
-          content:
-            application/json:
-              schema:
-                type: object
-                example: 請參考 Schema
-                oneOf:
-                  - $ref: "#/components/schemas/ResponseErrorMemberNotFound"
-                  - $ref: "#/components/schemas/ResponseErrorGameNotFound"
-                  - $ref: "#/components/schemas/ResponseErrorRoundNotFound"
-                  - $ref: "#/components/schemas/ResponseErrorJackpotAlreadyExists"
-  /slot/result:
-    parameters:
-      - $ref: "#/components/parameters/ProviderName"
-      - $ref: "#/components/parameters/ProviderPassword"
-    post:
-      tags:
-        - Slot
-        - Update-0.1.0
-        - Update-0.0.7
-        - Update-0.0.6
-      summary: 開獎 (即將棄用)
-      description: |
-        "`開獎後`此局獎鎖定，無法再寫入其他交易"
-        #### Update-0.1.0
-        - 即將棄用, 請改用 `[/bet](#/API/post_game_result)` 代替
-        #### Update-0.0.7
-        - 新增 400 `ResponseErrorInvalidBetAmount` 錯誤
-        #### Update-0.0.6
-        - 新增 `resultAmount` 說明「(resultAmount = winAmount + bonusAmount - betAmount)」
-        - 新增 `winAmount` 傳入參數
-      requestBody:
-        content:
-          application/json:
-            schema:
-              required:
-                - id
-                - game
-                - round
-                - resultAmount
-                - resultAt
-              allOf:
-                - $ref: "#/components/schemas/RequestData"
-                - $ref: "#/components/schemas/KeyTransactionID"
-                - $ref: "#/components/schemas/KeyRound"
-                - $ref: "#/components/schemas/KeyGame"
-                - type: object
-                  properties:
-                    resultAmount:
-                      type: number
-                      description: 玩家獲得總額 (resultAmount = winAmount + bonusAmount - betAmount)
-                    winAmount:
-                      type: number
-                      description: 中獎金額(含彩池)
-                    detail:
-                      type: string
-                      description: 下注內容、牌型
-                    resultAt:
-                      $ref: "#/components/schemas/UnixTime"
-
-      responses:
-        200:
-          description: OK
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: "#/components/schemas/TransactionResponse"
-        "400":
-          description: OK
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: "#/components/schemas/#/components/schemas/ResponseErrorInvalidBetAmount"
-
-        401:
-          description: 401 Error
-          content:
-            application/json:
-              schema:
-                type: object
-                example: 請參考 Schema
-                oneOf:
-                  - $ref: "#/components/schemas/ResponseErrorDirectIPAccessNotAllowed"
-                  - $ref: "#/components/schemas/ResponseErrorProviderNotFound"
-                  - $ref: "#/components/schemas/ResponseErrorIncorrectProviderPassword"
-                  - $ref: "#/components/schemas/ResponseErrorProviderIsDisabled"
-        403:
-          description: 403 Error
-          content:
-            application/json:
-              schema:
-                type: object
-                example: 請參考 Schema
-                oneOf:
-                  - $ref: "#/components/schemas/ResponseErrorMemberNotFound"
-                  - $ref: "#/components/schemas/ResponseErrorGameNotFound"
-                  - $ref: "#/components/schemas/ResponseErrorRoundNotFound"
-  /table/bet:
-    parameters:
-      - $ref: "#/components/parameters/ProviderName"
-      - $ref: "#/components/parameters/ProviderPassword"
-    post:
-      tags:
-        - Table
-        - Update-0.1.0
-        - Update-0.0.7
-        - Update-0.0.3
-      summary: 下注 (即將棄用)
-      description: |
-        #### Update-0.1.0
-        - 即將棄用, 請改用 `[/bet](#/API/post_game_bet)` 代替
-        #### Update-0.0.7
-        - 新增 403 `ResponseErrorBetConflict` 錯誤
-        #### Update-0.0.3
-        - 新增 403 回傳錯誤
-          - 遊戲已用
-        #### Update-0.0.2
-        - 移除 400 response 錯誤類型: 參數中的額度計算不正確
-      requestBody:
-        content:
-          application/json:
-            schema:
-              required:
-                - id
-                - game
-                - round
-                - betAmount
-                - betAt
-              allOf:
-                - $ref: "#/components/schemas/KeySessionToken"
-                - $ref: "#/components/schemas/RequestData"
-                - $ref: "#/components/schemas/KeyTransactionID"
-                - $ref: "#/components/schemas/KeyGame"
-                - $ref: "#/components/schemas/KeyRound"
-                - type: object
-                  properties:
-                    betAmount:
-                      type: number
-                      description: 下注額度
-                    betAt:
-                      $ref: "#/components/schemas/UnixTime"
-                    ip:
-                      type: string
-                      description: 玩家下注時的 IP
-                      example: "127.0.0.1"
-      responses:
-        200:
-          description: OK
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: "#/components/schemas/TransactionResponse"
-        "400":
-          description: |
-            <s> 400 Error </s> <i style="color: red">棄用 (於下個本版移除)</i>
-          content:
-            application/json:
-              schema:
-                type: object
-                example: 請參考 Schema (棄用)
-                oneOf:
-                  - $ref: "#/components/schemas/ResponseErrorInvalidResultAmount"
-
-        401:
-          description: 401 Error
-          content:
-            application/json:
-              schema:
-                type: object
-                example: 請參考 Schema
-                oneOf:
-                  - $ref: "#/components/schemas/ResponseErrorDirectIPAccessNotAllowed"
-                  - $ref: "#/components/schemas/ResponseErrorProviderNotFound"
-                  - $ref: "#/components/schemas/ResponseErrorIncorrectProviderPassword"
-                  - $ref: "#/components/schemas/ResponseErrorProviderIsDisabled"
-                  - $ref: "#/components/schemas/ResponseErrorIncorrectSessionToken"
-        403:
-          description: 403 Error
-          content:
-            application/json:
-              schema:
-                type: object
-                example: 請參考 Schema
-                oneOf:
-                  - $ref: "#/components/schemas/ResponseErrorMemberNotFound"
-                  - $ref: "#/components/schemas/ResponseErrorMemberIsDisabled"
-                  - $ref: "#/components/schemas/ResponseErrorGameNotFound"
-                  - $ref: "#/components/schemas/ResponseErrorRoundNotFound"
-                  - $ref: "#/components/schemas/ResponseErrorGameIsDisabled"
-                  - $ref: "#/components/schemas/ResponseErrorBetConflict"
-  /table/reserve:
-    parameters:
-      - $ref: "#/components/parameters/ProviderName"
-      - $ref: "#/components/parameters/ProviderPassword"
-    post:
-      tags:
-        - Table
-        - Update-0.1.0
-        - Update-0.0.10
-        - Update-0.0.7
-        - Update-0.0.3
-      summary: 遊戲開始時的保留額度 (即將棄用)
-      description: |
-        #### Update-0.1.0
-        - 即將棄用, 請改用 `[/bet](#/API/post_game_reserve)` 代替
-        #### Update-0.0.10
-        - 新增 E403013 `ResponseErrorReserveAlreadyExists` 錯誤回應
-        #### Update-0.0.7
-        - 新增 403 `ResponseErrorBetConflict` 錯誤
-        #### Update-0.0.3
-        - 新增 403 回傳錯誤
-          - 遊戲已用
-        #### Update-0.0.2
-        - 新增 ip 傳入值
-      requestBody:
-        description: |
-          - 部分遊戲需要此功能來保留額度(如：麻將)
-          - `使用此功能開局的遊戲，無法使用 bet 加注`
-          - 使用此功能時，下注額度由 `遊戲方` 計算扣款於保留額度
-          - 遊戲結束，傳送結果時 `必需` 包含該局的 `下注注額` 與 `中獎額度`
-          - 若中斷遊戲局時(不列下注記錄)，需發出 `cancel` 取消該局遊戲，才會將玩家保留額退還
-        content:
-          application/json:
-            schema:
-              required:
-                - id
-                - game
-                - round
-                - reserveAmount
-                - reserveAt
-              allOf:
-                - $ref: "#/components/schemas/KeySessionToken"
-                - $ref: "#/components/schemas/RequestData"
-                - $ref: "#/components/schemas/KeyTransactionID"
-                - $ref: "#/components/schemas/KeyGame"
-                - $ref: "#/components/schemas/KeyRound"
-                - type: object
-                  properties:
-                    reserveAmount:
-                      type: number
-                      description: 入桌扣住的點數
-                    reserveAt:
-                      $ref: "#/components/schemas/UnixTime"
-                    ip:
-                      type: string
-                      description: 玩家保留額度時的 IP
-                      example: "127.0.0.1"
-      responses:
-        200:
-          description: OK
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: "#/components/schemas/TransactionResponse"
-        401:
-          description: 401 Error
-          content:
-            application/json:
-              schema:
-                type: object
-                example: 請參考 Schema
-                oneOf:
-                  - $ref: "#/components/schemas/ResponseErrorDirectIPAccessNotAllowed"
-                  - $ref: "#/components/schemas/ResponseErrorProviderNotFound"
-                  - $ref: "#/components/schemas/ResponseErrorIncorrectProviderPassword"
-                  - $ref: "#/components/schemas/ResponseErrorProviderIsDisabled"
-                  - $ref: "#/components/schemas/ResponseErrorIncorrectSessionToken"
-        403:
-          description: 403 Error
-          content:
-            application/json:
-              schema:
-                type: object
-                example: 請參考 Schema
-                oneOf:
-                  - $ref: "#/components/schemas/ResponseErrorMemberNotFound"
-                  - $ref: "#/components/schemas/ResponseErrorMemberInsufficientBalance"
-                  - $ref: "#/components/schemas/ResponseErrorMemberIsDisabled"
-                  - $ref: "#/components/schemas/ResponseErrorGameNotFound"
-                  - $ref: "#/components/schemas/ResponseErrorGameIsDisabled"
-                  - $ref: "#/components/schemas/ResponseErrorBetConflict"
-                  - $ref: "#/components/schemas/ResponseErrorReserveAlreadyExists"
-  /table/result:
-    parameters:
-      - $ref: "#/components/parameters/ProviderName"
-      - $ref: "#/components/parameters/ProviderPassword"
-    post:
-      tags:
-        - Table
-        - Update-0.1.0
-        - Update-0.0.12
-      summary: 開獎 (即將棄用)
-      description: |
-        #### Update-0.1.0
-        - 即將棄用, 請改用 `[/bet](#/API/post_game_result)` 代替
-        - 新增 403014 `ResponseErrorRoundAlreadyClosed` 錯誤
-        #### Update-0.0.12
-        - 修正 ResultAmount 為該局結果，詳細請參考說明
-        #### Update-0.0.11
-        - 後端不再驗證額度正確性 (移除 E400002, E400003 錯誤回傳)
-        #### Update-0.0.7
-        - 新增 400 `ResponseErrorInvalidBetAmount` 錯誤
-        #### Update-0.0.2
-        - 新增 400 response 錯誤回應: 參數中的額度計算不正確
-      requestBody:
-        description: "`開獎後`此局獎鎖定，無法再寫入其他交易"
-        content:
-          application/json:
-            schema:
-              required:
-                - id
-                - game
-                - round
-                - resultAmount
-                - resultAt
-              allOf:
-                - $ref: "#/components/schemas/RequestData"
-                - $ref: "#/components/schemas/KeyTransactionID"
-                - $ref: "#/components/schemas/KeyGame"
-                - $ref: "#/components/schemas/KeyRound"
-                - type: object
-                  properties:
-                    resultAmount:
-                      type: number
-                      description: |
-                        - 玩家結果 (winAmount - betAmount)
-                        - 保留額由平台自動加回, 不需要加到 resultAmount 中
-                        - 例：
-                        - ===== lost 100 =====
-                        - BetAmount: 100
-                        - WinAmount: 0
-                        - ResultAmount: -100 <i>(0 - 100)</i>
-                        - ===== win 100 =====
-                        - BetAmount: 100
-                        - WinAmount: 200
-                        - ResultAmount: 100 <i>(200 - 100)</i>
-                    resultAt:
-                      $ref: "#/components/schemas/UnixTime"
-                    betAmount:
-                      type: number
-                      description: |
-                        - 下注總額 (不會用來計算錢包，相當於有效額度)
-                        - `當此局有使用 保留額度(reserve) 時，為必填`
-                    winAmount:
-                      type: number
-                      description: |
-                        - 玩家此局中獎額度
-                        - `當此局有使用 保留額度(reserve) 時，為必填`
-                    detail:
-                      type: string
-                      description: 下注內容、牌型
-
-      responses:
-        200:
-          description: OK
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: "#/components/schemas/TransactionResponse"
-        400:
-          description: 400 Error
-          content:
-            application/json:
-              schema:
-                type: object
-                example: 請參考 Schema
-                oneOf:
-                  - $ref: "#/components/schemas/ResponseErrorInvalidResultAmount"
-                  - $ref: "#/components/schemas/ResponseErrorInvalidBetAmount"
-
-        401:
-          description: 401 Error
-          content:
-            application/json:
-              schema:
-                type: object
-                example: 請參考 Schema
-                oneOf:
-                  - $ref: "#/components/schemas/ResponseErrorDirectIPAccessNotAllowed"
-                  - $ref: "#/components/schemas/ResponseErrorProviderNotFound"
-                  - $ref: "#/components/schemas/ResponseErrorIncorrectProviderPassword"
-                  - $ref: "#/components/schemas/ResponseErrorProviderIsDisabled"
-        403:
-          description: 403 Error
-          content:
-            application/json:
-              schema:
-                type: object
-                example: 請參考 Schema
-                oneOf:
-                  - $ref: "#/components/schemas/ResponseErrorMemberNotFound"
-                  - $ref: "#/components/schemas/ResponseErrorGameNotFound"
-                  - $ref: "#/components/schemas/ResponseErrorRoundNotFound"
-                  - $ref: '#/components/schemas/ResponseErrorRoundAlreadyClosed'
-  /table/cancel:
-    parameters:
-      - $ref: "#/components/parameters/ProviderName"
-      - $ref: "#/components/parameters/ProviderPassword"
-    post:
-      tags:
-        - Table
-        - Update-0.1.0
-      summary: 取消 (即將棄用)
-      description: |
-        取消此局遊戲，若是已結算(完成)的遊戲局無法 `取消`
-        #### Update-0.1.0
-        - 即將棄用, 請改用 `[/bet](#/API/post_game_cancel)` 代替
-        - 新增 403014 `ResponseErrorRoundAlreadyClosed` 錯誤
-      requestBody:
-        content:
-          application/json:
-            schema:
-              required:
-                - game
-                - round
-                - cancelAt
-              allOf:
-                - $ref: "#/components/schemas/RequestData"
-                - $ref: "#/components/schemas/KeyGame"
-                - $ref: "#/components/schemas/KeyRound"
-                - type: object
-                  properties:
-                    cancelAt:
-                      $ref: "#/components/schemas/UnixTime"
-      responses:
-        200:
-          description: OK
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: "#/components/schemas/TransactionResponse"
-        401:
-          description: 401 Error
-          content:
-            application/json:
-              schema:
-                type: object
-                example: 請參考 Schema
-                oneOf:
-                  - $ref: "#/components/schemas/ResponseErrorDirectIPAccessNotAllowed"
-                  - $ref: "#/components/schemas/ResponseErrorProviderNotFound"
-                  - $ref: "#/components/schemas/ResponseErrorIncorrectProviderPassword"
-                  - $ref: "#/components/schemas/ResponseErrorProviderIsDisabled"
-        403:
-          description: 403 Error
-          content:
-            application/json:
-              schema:
-                type: object
-                example: 請參考 Schema
-                oneOf:
-                  - $ref: "#/components/schemas/ResponseErrorMemberNotFound"
-                  - $ref: "#/components/schemas/ResponseErrorGameNotFound"
-                  - $ref: "#/components/schemas/ResponseErrorRoundNotFound"
-                  - $ref: '#/components/schemas/ResponseErrorRoundAlreadyClosed'
-
-  /table/tie:
-    parameters:
-      - $ref: "#/components/parameters/ProviderName"
-      - $ref: "#/components/parameters/ProviderPassword"
-    post:
-      tags:
-        - Table
-        - Update-0.1.0
-      summary: 合局 (即將棄用)
-      description: |
-        #### Update-0.1.0
-        - 即將棄用, 請改用 `[/bet](#/API/post_game_tie)` 代替
-        - 新增 403014 `ResponseErrorRoundAlreadyClosed` 錯誤
-      requestBody:
-        content:
-          application/json:
-            schema:
-              required:
-                - game
-                - round
-                - resultAt
-              allOf:
-                - $ref: "#/components/schemas/RequestData"
-                - $ref: "#/components/schemas/KeyGame"
-                - $ref: "#/components/schemas/KeyRound"
-                - type: object
-                  properties:
-                    resultAt:
-                      $ref: "#/components/schemas/UnixTime"
-      responses:
-        200:
-          description: OK
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: "#/components/schemas/TransactionResponse"
-        401:
-          description: 401 Error
-          content:
-            application/json:
-              schema:
-                type: object
-                example: 請參考 Schema
-                oneOf:
-                  - $ref: "#/components/schemas/ResponseErrorDirectIPAccessNotAllowed"
-                  - $ref: "#/components/schemas/ResponseErrorProviderNotFound"
-                  - $ref: "#/components/schemas/ResponseErrorIncorrectProviderPassword"
-                  - $ref: "#/components/schemas/ResponseErrorProviderIsDisabled"
-        403:
-          description: 403 Error
-          content:
-            application/json:
-              schema:
-                type: object
-                example: 請參考 Schema
-                oneOf:
-                  - $ref: "#/components/schemas/ResponseErrorMemberNotFound"
-                  - $ref: "#/components/schemas/ResponseErrorGameNotFound"
-                  - $ref: "#/components/schemas/ResponseErrorRoundNotFound"
-                  - $ref: '#/components/schemas/ResponseErrorRoundAlreadyClosed'
 components:
   schemas:
     MemberInfo:
@@ -1973,6 +1162,7 @@ components:
         - E403012 # Jackpot 已存在
         - E403013 # 保留額已存在
         - E403014 # 遊戲局已結算
+        - E403015 # 效果序號不存在
         ### 404
         - E404001 # 路徑不存在
         ### 405
@@ -2006,6 +1196,7 @@ components:
         - E403012 # Jackpot 已存在
         - E403013 # 保留額已存在
         - E403014 # 遊戲局已結算
+        - E403015 # 效果序號不存在
         ### 404
         - E404001 # 路徑不存在
         ### 405
@@ -2350,6 +1541,18 @@ components:
           type: string
           description: 錯誤原因、錯誤訊息
           example: 遊戲局已結算
+    ResponseErrorEffectNotFound:
+      description: 效果序號不存在
+      type: object
+      properties:
+        code:
+          type: string
+          description: 錯誤編號 E403015, 參考 [ErrorCode](#model-ErrorCode)
+          example: E403015
+        message:
+          type: string
+          description: 錯誤原因、錯誤訊息
+          example: 效果序號不存在
   parameters:
     ProviderName:
       name: provider-name
