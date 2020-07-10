@@ -38,14 +38,16 @@ servers:
   - url: "http://demo.project-host.net/v1"
     description: 測試伺服器網址
 tags:
-  - name: Update-0.1.3
-    description: API - /broadcast  新增參數 
+  - name: Update-0.1.4
+    description: 補上錯誤類型
   - name: Common
     description: 共用 API
   - name: Multiplayer
     description: 多人連線 API
   - name: GameAPI
     description: 共用 API
+  - name: Update-0.1.3
+    description: API - /broadcast  新增參數 
   - name: Update-0.1.2
     description: 新增 API - Marquee
   - name: Update-0.1.1
@@ -222,8 +224,10 @@ paths:
       summary: 取得該遊戲相關的道具數量
       tags:
         - Common
-        - Update-0.1.3
+        - Update-0.1.4
       description: |
+        #### Update-0.1.4
+        - 修正 response 結構錯誤
         #### Update-0.1.3
         - 新增API
       requestBody:
@@ -243,7 +247,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GameItem"
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items: 
+                      $ref: "#/components/schemas/GameItem"
         401:
           description: 401 Error
           content:
@@ -280,8 +289,10 @@ paths:
       summary: 使用道具 / 消費道具
       tags:
         - Common
-        - Update-0.1.3
+        - Update-0.1.4
       description: |
+        #### Update-0.1.4
+        - 新增錯誤 `403 - ResponseErrorGameNotApplicableEffect`
         #### Update-0.1.3
         - 新增傳入參數、回傳參數
         #### Update-0.0.9
@@ -359,6 +370,7 @@ paths:
                   - $ref: "#/components/schemas/ResponseErrorItemNotFound"
                   - $ref: "#/components/schemas/ResponseErrorItemDisabled"
                   - $ref: "#/components/schemas/ResponseErrorInsufficientItem"
+                  - $ref: "#/components/schemas/ResponseErrorGameNotApplicableEffect"
 
   /broadcast:
     parameters:
@@ -481,8 +493,10 @@ paths:
     post:
       tags:
         - GameAPI
-        - Update-0.1.3
+        - Update-0.1.4
       description: |
+        #### Update-0.1.4
+        - 新增錯誤 `403 - ResponseErrorGameNotApplicableEffect`
         #### Update-0.1.3
         - 新增道具效果參數 `effect`
         #### Update-0.1.0
@@ -553,6 +567,7 @@ paths:
                   - $ref: "#/components/schemas/ResponseErrorMemberInsufficientBalance"
                   - $ref: "#/components/schemas/ResponseErrorGameNotFound"
                   - $ref: "#/components/schemas/ResponseErrorGameIsDisabled"
+                  - $ref: "#/components/schemas/ResponseErrorGameNotApplicableEffect"
 
 
   /game/reserve:
@@ -560,11 +575,13 @@ paths:
       - $ref: "#/components/parameters/ProviderName"
       - $ref: "#/components/parameters/ProviderPassword"
     post:
+      summary: 遊戲開始時的保留額度
       tags:
         - GameAPI
-        - Update-0.1.3
-      summary: 遊戲開始時的保留額度
+        - Update-0.1.4
       description: |
+        #### Update-0.1.4
+        - 新增錯誤 `403 - ResponseErrorGameNotApplicableEffect`
         #### Update-0.1.3
         - 新增道具效果參數 `effect`
         #### Update-0.1.0
@@ -645,6 +662,7 @@ paths:
                   - $ref: "#/components/schemas/ResponseErrorBetConflict"
                   - $ref: "#/components/schemas/ResponseErrorReserveAlreadyExists"
                   - $ref: "#/components/schemas/ResponseErrorRoundAlreadyClosed"
+                  - $ref: "#/components/schemas/ResponseErrorGameNotApplicableEffect"
 
   /game/bonus:
     parameters:
@@ -1163,6 +1181,7 @@ components:
         - E403013 # 保留額已存在
         - E403014 # 遊戲局已結算
         - E403015 # 效果序號不存在
+        - E403016 # 遊戲不適用此效果 (道具不屬於該遊戲)
         ### 404
         - E404001 # 路徑不存在
         ### 405
@@ -1197,6 +1216,7 @@ components:
         - E403013 # 保留額已存在
         - E403014 # 遊戲局已結算
         - E403015 # 效果序號不存在
+        - E403016 # 遊戲不適用此效果 (道具不屬於該遊戲)
         ### 404
         - E404001 # 路徑不存在
         ### 405
@@ -1553,6 +1573,18 @@ components:
           type: string
           description: 錯誤原因、錯誤訊息
           example: 效果序號不存在
+    ResponseErrorGameNotApplicableEffect:
+      description: 遊戲不適用此效果
+      type: object
+      properties:
+        code:
+          type: string
+          description: 錯誤編號 E403016, 參考 [ErrorCode](#model-ErrorCode)
+          example: E403016
+        message:
+          type: string
+          description: 錯誤原因、錯誤訊息
+          example: 遊戲不適用此效果
   parameters:
     ProviderName:
       name: provider-name
