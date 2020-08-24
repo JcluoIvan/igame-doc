@@ -38,14 +38,16 @@ servers:
   - url: "http://demo.project-host.net/v1"
     description: 測試伺服器網址
 tags:
-  - name: Update-0.1.4
-    description: 補上錯誤類型
+  - name: Update-0.1.5
+    description: 新增錯誤類型
   - name: Common
     description: 共用 API
   - name: Multiplayer
     description: 多人連線 API
   - name: GameAPI
     description: 共用 API
+  - name: Update-0.1.4
+    description: 補上錯誤類型
   - name: Update-0.1.3
     description: API - /broadcast  新增參數 
   - name: Update-0.1.2
@@ -289,8 +291,10 @@ paths:
       summary: 使用道具 / 消費道具
       tags:
         - Common
-        - Update-0.1.4
+        - Update-0.1.5
       description: |
+        #### Update-0.1.5
+        - 新增錯誤 `403 - ResponseErrorRequestNotAllowed`
         #### Update-0.1.4
         - 新增錯誤 `403 - ResponseErrorGameNotApplicableEffect`
         #### Update-0.1.3
@@ -371,6 +375,7 @@ paths:
                   - $ref: "#/components/schemas/ResponseErrorItemDisabled"
                   - $ref: "#/components/schemas/ResponseErrorInsufficientItem"
                   - $ref: "#/components/schemas/ResponseErrorGameNotApplicableEffect"
+                  - $ref: "#/components/schemas/ResponseErrorRequestNotAllowed"
 
   /broadcast:
     parameters:
@@ -1182,6 +1187,7 @@ components:
         - E403014 # 遊戲局已結算
         - E403015 # 效果序號不存在
         - E403016 # 遊戲不適用此效果 (道具不屬於該遊戲)
+        - E403017 # 玩家無法使用此功能/操作
         ### 404
         - E404001 # 路徑不存在
         ### 405
@@ -1217,6 +1223,7 @@ components:
         - E403014 # 遊戲局已結算
         - E403015 # 效果序號不存在
         - E403016 # 遊戲不適用此效果 (道具不屬於該遊戲)
+        - E403017 # 玩家無法使用此功能/操作
         ### 404
         - E404001 # 路徑不存在
         ### 405
@@ -1585,6 +1592,18 @@ components:
           type: string
           description: 錯誤原因、錯誤訊息
           example: 遊戲不適用此效果
+    ResponseErrorRequestNotAllowed:
+      description: 玩家無法使用此功能/操作
+      type: object
+      properties:
+        code:
+          type: string
+          description: 錯誤編號 E403017, 參考 [ErrorCode](#model-ErrorCode)
+          example: E403017
+        message:
+          type: string
+          description: 錯誤原因、錯誤訊息
+          example: 玩家無法使用此功能/操作
   parameters:
     ProviderName:
       name: provider-name
